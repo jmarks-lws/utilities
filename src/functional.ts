@@ -1,3 +1,4 @@
+import { hasKey, HashOf } from './object';
 
 export interface IMappableObject {
   map: (fn: (element: any, index: number, sourceArray: any[]) => any) => any[];
@@ -28,3 +29,9 @@ export const mapAsync = async <T, U>(
   list: T[],
   fn: ((x: T) => Promise<U>),
 ) => Promise.all(list.map(async (id) => fn(id)))
+
+export const take = <T>(key: string, defaultValue?: T) => ({
+  from: (object: HashOf<T>) => (hasKey(object, key) ? object[key] : defaultValue),
+});
+
+export const identityFn = (id: any) => id;
