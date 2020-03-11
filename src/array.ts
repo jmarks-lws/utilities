@@ -3,7 +3,40 @@ import {
 } from './object';
 import { IMappableObject } from './functional';
 
-const int = (value: string) => parseInt(value, 10);
+interface FilterFn<T> {
+  (el: T, i?: number, m?: T[]): boolean;
+}
+interface ReduceFn <T>{
+  (previousValue: T, currentValue: any, currentIndex?: number, array?: any[]): T;
+}
+
+/**
+ * A series of simple functional array utilities
+ */
+export const head = ([x]: any[]) => x;
+export const tail = ([, ...xs]: any[]) => xs;
+export const def = (x: any) => typeof x !== 'undefined';
+export const undef = (x: any) => !def(x);
+export const copy = (arr: any[]) => [...arr];
+export const length = ([x, ...xs] : any[]) : number => (def(x) ? 1 + length(xs) : 0)
+export const reverse = ([x, ...xs] : any[]) : any[] => (def(x) ? [...reverse(xs), x] : []);
+export const chopFirst = ([x, ...xs]: any[], n: number = 1): any => (def(x) && n ? [x, ...chopFirst(xs, n - 1)] : []);
+export const chopLast = (xs: any[], n: number = 1): any => reverse(chopFirst(reverse(xs), n));
+
+/**
+ * Abstractions of Array dot methods, with some additional typescript annotation.
+ */
+export const isArray = (x: any) : boolean => Array.isArray(x);
+export const concat = <T>(a: T[], b: T[]) : T[] => a.concat(b);
+export const reduce = <T>(a: any[], fn: ReduceFn<T>, init?: any) => a.reduce(fn, init);
+export const reduceRight = <T>(a: any[], fn: ReduceFn<T>, init?: any) => reduce(reverse(a), fn, init);
+
+// eslint-disable-next-line no-nested-ternary
+export const slice = ([x, ...xs] : any[], i: number, y: number, curr : number = 0) : any[] => (def(x)
+  ? (curr === i
+    ? [y, x, ...slice(xs, i, y, curr + 1)]
+    : [x, ...slice(xs, i, y, curr + 1)])
+  : [])
 
 /**
  * Utility mapping function for functional style programming.
@@ -34,6 +67,13 @@ export const prune = <T>(initialList: T[], pruneList: T[]) => initialList.filter
  * @param b
  */
 export const intersect = <T>(a: T[], b: T[]) => a.filter((el: T) => b.includes(el));
+
+/**
+ * Returns a new array consisting of elements that exist only in `a` and only in `b`, but not in both `a` and `b`
+ * @param a
+ * @param b
+ */
+export const notIntersect = <T>(a: T[], b: T[]) => concat(prune(a, intersect(a, b)), prune(b, intersect(a, b)));
 
 /**
  * Returns a new array that is the result of removing `element` from `array`
@@ -72,7 +112,11 @@ export const pickEach = <T>(array: Array<T>, fields: string[]) => map(array, (e:
  * @param array - The source array
  * @param whereFn - Function used to filter the source list.
  */
-export const where = <T>(array: Array<T>, whereFn: ((testElement: T) => boolean)) => array.filter(whereFn);
+export const where = <T>(array: Array<T>, whereFn: FilterFn<T>) => array.filter(whereFn);
+
+export const whereNot = <T>(array: Array<T>, whereFn: FilterFn<T>) => array.filter((x, i, a) => !whereFn(x, i, a));
+
+export const partition = <T>(array: T[], fn: FilterFn<T>) => [where(array, fn), whereNot(array, fn)];
 
 /**
  * Returns the first T from an Array<T>
@@ -108,40 +152,42 @@ export const count = <T>(array: Array<T>) => array.length;
  * @param array - The source array
  * @param fn - Function used to filter the source list.
  */
-export const countWhere = <T>(array: Array<T>, fn: ((el: T) => boolean)) => array.filter(fn).length
+export const countWhere = <T>(array: Array<T>, fn: FilterFn<T>) => array.filter(fn).length
 
 /**
  * Returns a sum of a provided field from the elements in an array.
  * @param array - The source array
  * @param field - Which field to sum. If the value of any instance of this property in any element cannot be parsed to an Integer, the result will be NaN
  */
-export const sum = <T>(array: T[], field: string) => array.reduce((prev, cur) => prev + int((cur as Hash)[field]), 0)
+export const sum = <T>(array: T[], field: string) => array.reduce(
+  (prev, cur) => prev + parseInt((cur as Hash)[field], 10), 0,
+)
 /**
  * Returns a sum of a provided field matching a given condition from the elements in an array.
  * @param array - The source array
  * @param fn - Function used to filter the source list.
  * @param field - Which field to sum. If the value of any instance of this property in any element cannot be parsed to an Integer, the result will be NaN
  */
-export const sumWhere = <T>(array: Array<T>, fn: ((el: T) => boolean), field: string) => sum(array.filter(fn), field);
+export const sumWhere = <T>(array: Array<T>, fn: FilterFn<T>, field: string) => sum(array.filter(fn), field);
 
 /**
  * Asserts that an array has any elements matching a condition
  * @param array - The source array
  * @param fn - Function used to filter the source list.
  */
-export const hasAny = <T>(array: Array<T>, fn: ((el: T) => boolean)) => array.filter(fn).length > 0;
+export const hasAny = <T>(array: Array<T>, fn: FilterFn<T>) => array.filter(fn).length > 0;
 /**
  * Asserts that an array does not have any elements matching a condition
  * @param array - The source array
  * @param fn - Function used to filter the source list.
  */
-export const hasNone = <T>(array: Array<T>, fn: ((el: T) => boolean)) => !hasAny(array, fn);
+export const hasNone = <T>(array: Array<T>, fn: FilterFn<T>) => !hasAny(array, fn);
 /**
  * Asserts that all elements match a given condition
  * @param array - The source array
  * @param fn - Function used to filter the source list.
  */
-export const hasAll = <T>(array: T[], fn: ((el: T) => boolean)) => array.filter(fn).length === array.length;
+export const hasAll = <T>(array: T[], fn: FilterFn<T>) => array.filter(fn).length === array.length;
 
 /**
  * Returns a hash from an array of objects where the key is the value of the provided field name.
@@ -157,3 +203,13 @@ export const hash = <T>(array: Array<T>, key: string) : Hash => (
  * @param array - The source array
  */
 export const compactArray = (array: any[]) => array.filter((el) => ![null, undefined].includes(el))
+
+/**
+ * Returns a new array with all sub-array elements concatenated into it recursively up to the specified depth.
+ * @param arr
+ * @param d
+ */
+export const flatten = (arr: any[], d = 1): any[] => (d > 0
+  ? arr.reduce((acc, val) => acc.concat(isArray(val) ? flatten(val, d - 1) : val), [])
+  : arr.slice()
+)

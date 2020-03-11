@@ -1,4 +1,5 @@
 import { hasKey, HashOf } from './object';
+import { reverse } from './array';
 
 export interface IMappableObject {
   map: (fn: (element: any, index: number, sourceArray: any[]) => any) => any[];
@@ -34,4 +35,57 @@ export const take = <T>(key: string, defaultValue?: T) => ({
   from: (object: HashOf<T>) => (hasKey(object, key) ? object[key] : defaultValue),
 });
 
-export const identityFn = (id: any) => id;
+/**
+ * Returns the value given. Intended for used in some branching expressions as a means of ensuring
+ * we always return a function value to reduce complexity otherwise introduced with null checking, etc.
+ * @param id
+ */
+export const identity = (id: any) => id;
+
+
+/**
+ * Partially apply a function by filling in any number of its arguments.
+ * Note: We will often lose some of typescript's intellisense when using `partial()`
+ * @param fn The function to partially apply
+ * @param args Some arguments. Does not have to be all of the arguments needed for the base function.
+ */
+export const partial = (fn: CallableFunction, ...args: any[]) => (...newArgs: any[]) => fn(...args, ...newArgs);
+
+
+export const spreadArg = (fn: CallableFunction) => (...args: any[]) => fn(args);
+
+export const reverseArgs = (fn: CallableFunction) => (...args: any[]) => fn(...reverse(args));
+
+/**
+ * Functional style conditional
+ * @param condition An expression representing the query
+ * @param truePath A function to apply when `condition` resolves to true
+ * @param falsePath A function to apply when `condition` resolves to false
+ */
+export const branch = <T>(
+  condition: boolean,
+  truePath: ((x: T) => any),
+  falsePath: ((x: T) => any),
+) => (x: T) => (condition ? truePath(x) : falsePath(x));
+
+/**
+ * Functional style try catch expression
+ * @param tryPath A function which contains the initial code that will be attempted
+ * @param catchPath A function which handles errors if they occur in `tryPath`
+ * @param finallyPath A function that is run after try or finally.
+ */
+export const tryCatch = <T>(
+  tryPath: ((x: T) => any),
+  catchPath: ((x: T, error?: any) => any),
+  finallyPath: ((x: T, results: ({ tryResult: any, catchResult: any })) => any),
+) => (x: T) => {
+    let tryResult: any = null;
+    let catchResult: any = null;
+    try {
+      tryResult = tryPath(x);
+    } catch (error) {
+      catchResult = catchPath(x, error);
+    } finally {
+      finallyPath(x, { tryResult, catchResult });
+    }
+  }

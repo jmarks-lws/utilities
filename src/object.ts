@@ -121,3 +121,10 @@ export const hasDiff = (a: Hash, b: Hash) => keys(diff(a, b)).length > 0;
  * @param b
  */
 export const noDiff = (a: Hash, b: Hash) => !hasDiff(a, b);
+
+/**
+ * Safely get a value from an object
+ * @param obj
+ * @param field
+ */
+export const pluck = (obj: Hash, field: string) : Hash => (hasKey(obj, field) ? pick(obj, [ field ])[field] : null);
