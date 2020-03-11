@@ -1,5 +1,7 @@
 import { hasKey, HashOf } from './object';
-import { reverse } from './array';
+import {
+  reverse, head, undef, tail,
+} from './array';
 
 export interface IMappableObject {
   map: (fn: (element: any, index: number, sourceArray: any[]) => any) => any[];
@@ -87,5 +89,20 @@ export const tryCatch = <T>(
       catchResult = catchPath(x, error);
     } finally {
       finallyPath(x, { tryResult, catchResult });
+    }
+  }
+
+
+export const tryCatchManyAsync = <T>(
+  initialPath: ((x: T, error?: any) => Promise<any>),
+  ...catchPaths: Array<((x: T, error?: any) => Promise<any>)>
+) => async (x: T, err?: any): Promise<any> => {
+    try {
+      return await initialPath(x, err);
+    } catch (error) {
+      // TODO: Work with this until I can use a `branch()`/`branchAsync()`
+      const init = head(catchPaths);
+      if (undef(init)) throw err;
+      return tryCatchManyAsync(init, ...tail(catchPaths))(x, error);
     }
   }

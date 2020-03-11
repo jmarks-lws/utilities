@@ -3,6 +3,7 @@ import {
   compactObject,
   merge,
   getSharedKeys,
+  remapKeys,
 } from '../src/object';
 
 describe('Object utilities tests', () => {
@@ -58,5 +59,30 @@ describe('Object utilities tests', () => {
     expect(getSharedKeys(testPerson1, { id: 'id', dob: 'dob', test: 'test' })).toMatchObject([
       'id', 'dob',
     ]);
+  });
+
+  test('remapKeys works as expected', async () => {
+    expect.assertions(2);
+
+    const sourceObj = {
+      a: 123,
+      b: 234,
+      c: 345,
+    };
+    const remap = {
+      a: 'a1',
+      b: 'b1',
+    }
+
+    expect(remapKeys(sourceObj, remap)).toMatchObject({
+      a1: 123,
+      b1: 234,
+    });
+
+    expect(remapKeys(sourceObj, remap, true)).toMatchObject({
+      a1: 123,
+      b1: 234,
+      c: 345,
+    })
   });
 })

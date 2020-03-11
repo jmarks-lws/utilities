@@ -1,4 +1,6 @@
-import { intersect, map, prune } from './array';
+import {
+  intersect, map, prune, reduce,
+} from './array';
 
 export interface Hash { [index:string]: any }
 export interface HashOf<T> { [index:string]: T }
@@ -109,6 +111,36 @@ export const diff = (a: Hash, b: Hash) => {
 }
 
 /**
+ * Provides a list of change descriptions where the "from" object is `a` and the "to" object is `b`.
+ * '-' indicates a field was removed, '+' indicates a field was added
+ * @param a
+ * @param b
+ */
+export const fullDiff = (a: Hash, b: Hash) => {
+  const dif: Hash = {};
+  const aKeys = keys(a);
+  const bKeys = keys(b);
+  aKeys.forEach((key: string) => {
+    if (!bKeys.includes(key)) {
+      dif[key] = { '-': a[key] };
+    } else if (typeof a[key] === 'object') {
+      const comparison = diff(a[key], b[key]);
+      if (keys(comparison).length > 0) {
+        dif[key] = comparison;
+      }
+    } else if (typeof a[key] !== typeof b[key] || a[key] !== b[key]) {
+      dif[key] = { '-': a[key], '+': b[key] };
+    }
+  });
+  bKeys.forEach((key) => {
+    if (!aKeys.includes(key)) {
+      dif[key] = { '+': b[key] };
+    }
+  })
+  return dif;
+}
+
+/**
  * Returns a boolean indicating whether the two provided objects have different data.
  * @param a
  * @param b
@@ -128,3 +160,19 @@ export const noDiff = (a: Hash, b: Hash) => !hasDiff(a, b);
  * @param field
  */
 export const pluck = (obj: Hash, field: string) : Hash => (hasKey(obj, field) ? pick(obj, [ field ])[field] : null);
+
+/**
+ * Returns a new object derived from `obj` where the keys are changed as described by `remap`, optionally including or omitting remaining data.
+ *
+ * @param obj Source object to remap keys
+ * @param remap A map of key value pairs where the keys match keys from the source object and the values are the new object key names
+ * @param returnAll Default `false`. If this is true, all data from the source object will be returned with only the key names in
+ *                  `remap` being changed. All other keys and values will remain as they were in the source object.
+ */
+export const remapKeys = (obj: Hash, remap: Hash, returnAll: boolean = false) : Hash => reduce(
+  keys(obj),
+  (acc: Hash, k: string) => merge(
+    { ...acc },
+    ((hasKey(remap, k) || returnAll) ? { [(hasKey(remap, k) ? remap[k] : k)]: obj[k] } : {}),
+  ), {} as Hash,
+)
