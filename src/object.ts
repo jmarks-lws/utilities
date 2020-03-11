@@ -176,3 +176,11 @@ export const remapKeys = (obj: Hash, remap: Hash, returnAll: boolean = false) : 
     ((hasKey(remap, k) || returnAll) ? { [(hasKey(remap, k) ? remap[k] : k)]: obj[k] } : {}),
   ), {} as Hash,
 )
+
+/**
+ * Returns a new object where the keys and corresponding values of `obj` have been swapped with each other.
+ * @param obj Object to invert
+ */
+export const invert = (
+  obj: Hash,
+): Hash => reduce(keys(obj), (acc: Hash, key: string) => ({ ...acc, [acc[key]]: key }), {} as Hash);
