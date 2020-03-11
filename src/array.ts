@@ -31,6 +31,21 @@ export const concat = <T>(a: T[], b: T[]) : T[] => a.concat(b);
 export const reduce = <T>(a: any[], fn: ReduceFn<T>, init?: any) => a.reduce(fn, init);
 export const reduceRight = <T>(a: any[], fn: ReduceFn<T>, init?: any) => reduce(reverse(a), fn, init);
 
+/**
+ * Returns an array using the following rules:
+ *  - If an array is provided, the return array will be a copy of the input array. (via `slice()`)
+ *  - If a null or undefined value is provided, a new empty array will be returned.
+ *  - If any other value is provided, the return value will be a new array with the
+ *    original provided value as its only element.
+ * @param input - The value to transform
+ */
+export const arrayWrap = (input: any) : any[] => {
+  if (Array.isArray(input)) {
+    return input.slice();
+  }
+  return (input === null || input === undefined) ? [] : [ input ];
+}
+
 // eslint-disable-next-line no-nested-ternary
 export const slice = ([x, ...xs] : any[], i: number, y: number, curr : number = 0) : any[] => (def(x)
   ? (curr === i
