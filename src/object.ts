@@ -1,5 +1,5 @@
 import {
-  intersect, map, prune, reduce,
+  intersect, map, prune, reduce, def, head, tail,
 } from './array';
 
 export interface Hash { [index:string]: any }
@@ -59,7 +59,7 @@ export const compactObject = (o: any) => pick(o, keys(o).filter((key) => ![undef
  * @param {Hash} a
  * @param {Hash} b
  */
-export const merge = (a: Hash, b: Hash) : Hash => ({ ...a, ...b })
+export const merge = (a: Hash, ...b: Hash[]) : Hash => ({ ...a, ...(def(head(b)) ? merge(head(b), ...tail(b)) : null) })
 
 /**
  * Returns a new object that is the result of merging together two objects ONLY on keys that both share.
