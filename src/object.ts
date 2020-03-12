@@ -1,8 +1,8 @@
 import {
   intersect, map, prune, reduce, head, tail,
   reverse,
+  arrayEmpty,
 } from './array';
-import { def } from './miscellaneous';
 
 
 export interface Hash { [index:string]: any }
@@ -61,7 +61,7 @@ export const compactObject = (o: any) => pick(o, keys(o).filter((key) => ![undef
  * overwrite values before them.
  * @param {Hash[]} a - As many hashes as you like to merge together from left to right.
  */
-export const merge = (...a: Hash[]) : Hash => ({ ...head(a), ...(def(head(tail(a))) ? merge(...tail(a)) : null) })
+export const merge = (...a: Hash[]) : Hash => ({ ...head(a), ...(!arrayEmpty(tail(a)) ? merge(...tail(a)) : null) })
 
 /**
  * Returns a new object that is the result of merging together a series of objects going from the last to

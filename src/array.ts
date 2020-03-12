@@ -226,3 +226,5 @@ export const flatten = (arr: any[], d = 1): any[] => (d > 0
   ? arr.reduce((acc, val) => acc.concat(isArray(val) ? flatten(val, d - 1) : val), [])
   : arr.slice()
 )
+
+export const arrayEmpty = (array: any[]) => count(array) === 0;
