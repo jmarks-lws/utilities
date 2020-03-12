@@ -1,7 +1,6 @@
 import { hasKey, HashOf } from './object';
-import {
-  reverse, head, undef, tail,
-} from './array';
+import { reverse, head, tail } from './array';
+import { undef } from './miscellaneous';
 
 export interface IMappableObject {
   map: (fn: (element: any, index: number, sourceArray: any[]) => any) => any[];
@@ -54,7 +53,7 @@ export const identity = (id: any) => id;
 export const partial = (fn: CallableFunction, ...args: any[]) => (...newArgs: any[]) => fn(...args, ...newArgs);
 
 
-export const spreadArg = (fn: CallableFunction) => (...args: any[]) => fn(args);
+export const spreadArgs = (fn: CallableFunction) => (...args: any[]) => fn(args);
 
 export const reverseArgs = (fn: CallableFunction) => (...args: any[]) => fn(...reverse(args));
 
@@ -91,7 +90,6 @@ export const tryCatch = <T>(
       finallyPath(x, { tryResult, catchResult });
     }
   }
-
 
 export const tryCatchManyAsync = <T>(
   initialPath: ((x: T, error?: any) => Promise<any>),

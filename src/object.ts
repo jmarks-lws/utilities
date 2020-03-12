@@ -1,6 +1,9 @@
 import {
-  intersect, map, prune, reduce, def, head, tail,
+  intersect, map, prune, reduce, head, tail,
+  reverse,
 } from './array';
+import { def } from './miscellaneous';
+
 
 export interface Hash { [index:string]: any }
 export interface HashOf<T> { [index:string]: T }
@@ -54,12 +57,25 @@ export const mapKeys = (o: Hash, fn: ((k: string, i: number) => any)) => map(key
 export const compactObject = (o: any) => pick(o, keys(o).filter((key) => ![undefined, null].includes(o[key])));
 
 /**
- * Returns a new object that is the result of merging together two objects. If both `a` and `b` have values
- * for the same property, the resulting object will receive the value for that property from object `b`.
- * @param {Hash} a
- * @param {Hash} b
+ * Returns a new object that is the result of merging together a series of objects. Values to the right
+ * overwrite values before them.
+ * @param {Hash[]} a - As many hashes as you like to merge together from left to right.
  */
-export const merge = (a: Hash, ...b: Hash[]) : Hash => ({ ...a, ...(def(head(b)) ? merge(head(b), ...tail(b)) : null) })
+export const merge = (...a: Hash[]) : Hash => ({ ...head(a), ...(def(head(tail(a))) ? merge(...tail(a)) : null) })
+
+/**
+ * Returns a new object that is the result of merging together a series of objects going from the last to
+ * the first objects. Values to the left overwrite values to their right.
+ * @param {Hash[]} a - As many hashes as you like to merge together from left to right.
+ */
+export const mergeRight = (...a: Hash[]) : Hash => merge(...reverse(a));
+
+/**
+ * Gets a list of keys that exist in both provided objects and returns them as a new string array.
+ * @param a
+ * @param b
+ */
+export const getSharedKeys = (a: Hash, b: Hash) : Array<string> => intersect(keys(a), keys(b));
 
 /**
  * Returns a new object that is the result of merging together two objects ONLY on keys that both share.
@@ -69,16 +85,9 @@ export const merge = (a: Hash, ...b: Hash[]) : Hash => ({ ...a, ...(def(head(b))
  * @param b
  */
 export const mergeIntersection = (a: Hash, b: Hash) : Hash => {
-  const [a2, b2] = [a, b].map((o: Hash) => pick(o, intersect(keys(a), keys(b))))
+  const [a2, b2] = [a, b].map((o: Hash) => pick(o, getSharedKeys(a, b)))
   return merge(a2, b2);
 };
-
-/**
- * Gets a list of keys that exist in both provided objects and returns them as a new string array.
- * @param a
- * @param b
- */
-export const getSharedKeys = (a: Hash, b: Hash) : Array<string> => keys(a).filter((p) => keys(b).includes(p));
 
 /**
  * Provides a list of change types where the "from" object is `a` and the "to" object is `b`.

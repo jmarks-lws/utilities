@@ -1,7 +1,7 @@
 import {
-  pick, Hash,
+  pick, Hash, HashOf,
 } from './object';
-import { IMappableObject } from './functional';
+import { def } from './miscellaneous';
 
 interface FilterFn<T> {
   (el: T, i?: number, m?: T[]): boolean;
@@ -15,8 +15,6 @@ interface ReduceFn <T>{
  */
 export const head = ([x]: any[]) => x;
 export const tail = ([, ...xs]: any[]) => xs;
-export const def = (x: any) => typeof x !== 'undefined';
-export const undef = (x: any) => !def(x);
 export const copy = (arr: any[]) => [...arr];
 export const length = ([x, ...xs] : any[]) : number => (def(x) ? 1 + length(xs) : 0)
 export const reverse = ([x, ...xs] : any[]) : any[] => (def(x) ? [...reverse(xs), x] : []);
@@ -58,7 +56,7 @@ export const slice = ([x, ...xs] : any[], i: number, y: number, curr : number = 
  * @param array - The source array
  * @param mapFn - A function which returns a new value for each element of `array`.
  */
-export const map = (array: IMappableObject, mapFn: ((el: any, i: number) => any)) => array.map(mapFn);
+export const map = (array: any[], mapFn: ((el: any, i: number) => any)) => array.map(mapFn);
 /**
  * Prepares a reusable mapper which can run the same function on different sets of arrays using common arguments.
  *
@@ -67,7 +65,7 @@ export const map = (array: IMappableObject, mapFn: ((el: any, i: number) => any)
  *
  * @returns (array: IMappableObject) => T[]
  */
-export const preparedMap = <T>(mapFn: (<T>(el: any, i: number) => T)) => (ary: IMappableObject): T[] => map(ary, mapFn)
+export const preparedMap = <T>(mapFn: (<T>(el: any, i: number) => T)) => (ary: any[]): T[] => map(ary, mapFn)
 
 /**
  * Returns a new array which is the result of removing elements from `initialList` which are also in `pruneList`
@@ -209,7 +207,7 @@ export const hasAll = <T>(array: T[], fn: FilterFn<T>) => array.filter(fn).lengt
  * @param array - The source array
  * @param key - Which field to use as the ObjectHash key
  */
-export const hash = <T>(array: Array<T>, key: string) : Hash => (
+export const hash = <T>(array: Array<T>, key: string) : HashOf<T> => (
   array.reduce((prev, curr: Hash) => ({ ...prev, [curr[key] as string]: curr }), {})
 )
 

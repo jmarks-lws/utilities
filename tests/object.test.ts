@@ -4,6 +4,7 @@ import {
   merge,
   getSharedKeys,
   remapKeys,
+  mergeAll,
 } from '../src/object';
 import { tail } from '../src/array';
 

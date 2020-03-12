@@ -53,16 +53,6 @@ describe('Array utilities tests', () => {
       expect(added3).toMatchObject([ 4, 5, 6 ]);
     })
 
-    test('map() :: calls .map() on a contrived IMappable', () => {
-      const mappable: IMappableObject = {
-        map: (fn:(el: any, ix: number, sourceArray: any[]) => any) => [],
-      };
-
-      spyOn(mappable, 'map');
-      map(mappable, (item: any) => null);
-      expect(mappable.map).toHaveBeenCalled();
-    })
-
     test('preparedMap :: Returns mapping function', () => {
       expect.assertions(2);
       const add3Map = preparedMap((el: any, i: number) => el + 3);
