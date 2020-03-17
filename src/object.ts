@@ -4,11 +4,12 @@ import {
   arrayEmpty,
 } from './array';
 
-
 export interface Hash { [index:string]: any }
 export interface HashOf<T> { [index:string]: T }
 
 export const { keys, values } = Object;
+
+export const isObject = (x: any) => (!Array.isArray(x)) && (typeof x === 'object');
 
 /**
  * Returns a new object that is the result of projecting only the properties specified by `fields`
@@ -193,3 +194,35 @@ export const remapKeys = (obj: Hash, remap: Hash, returnAll: boolean = false) : 
 export const invert = (
   obj: Hash,
 ): Hash => reduce(keys(obj), (acc: Hash, key: string) => ({ ...acc, [acc[key]]: key }), {} as Hash);
+
+/**
+ * Loop over a JS object as if it were an array where the property names are associative keys.
+ * @param hash
+ * @param fn
+ */
+export const forEach = (
+  hash: Hash,
+  fn: ((key: string, value: any) => void),
+) => mapKeys(hash || {}, (key) => fn(key, hash[key]));
+
+/**
+ * Similar to `forEach`, but allows short-circuiting by calling the provided `_break` callback function.
+ * Loop over a JS object as if it were an array where the property names are associative keys.
+ *
+ * @param hash
+ * @param fn
+ */
+export const forEachWithBreak = (
+  hash: Hash,
+  fn: ((key: string, value: any, _break: () => void) => void),
+) => {
+  reduce(keys(hash), (acc: Hash, key) => {
+    let done: boolean = false || acc.done;
+    if (!acc.done) {
+      fn(key, hash[key], () => {
+        done = true;
+      });
+    }
+    return { done };
+  }, { done: false });
+};

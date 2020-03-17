@@ -1,5 +1,8 @@
 import { isArray } from './array';
 
+export type Nullable<T> = T | null;
+export type Optional<T> = T | null | undefined;
+
 export const def = (x: any) => typeof x !== 'undefined';
 export const undef = (x: any) => !def(x);
 export const isNull = (x: any) => x === null;

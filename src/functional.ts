@@ -1,10 +1,24 @@
 import { hasKey, HashOf } from './object';
 import { reverse, head, tail } from './array';
-import { undef } from './miscellaneous';
+import { undef, def } from './miscellaneous';
 
+/**
+ * Interface used to identify a mappable object. According to most sources, this qualifies as
+ * a "functor", but want to verify.
+ */
 export interface IMappableObject {
-  map: (fn: (element: any, index: number, sourceArray: any[]) => any) => any[];
+  map: (fn: (value: any, index: number, array: any[]) => any, thisArg?: any) => any[]
 }
+
+/**
+ * Determines if the provided object or the key of the provided object is a function.
+ * If only `x` is provided, then it will be the target. If both `x` and `key` are provided, `x[key]` is the target.
+ * @param x
+ * @param key
+ */
+export const isFunction = (x: any, key?: string) => (
+  def(key) ? key && hasKey(x, key) && (typeof x[key as string] === 'function') : (typeof x === 'function')
+);
 
 /**
  * Returns a curried version of the provided function.
@@ -27,11 +41,21 @@ export const curry = (fn: Function) => {
   };
 }
 
+/**
+ * Like `map()`, but awaitable. This way you can ensure mapped async functions have resolved, if desired.
+ * @param list
+ * @param fn
+ */
 export const mapAsync = async <T, U>(
   list: T[],
   fn: ((x: T) => Promise<U>),
 ) => Promise.all(list.map(async (id) => fn(id)))
 
+/**
+ * Deprecate: Hindsight being what it is, this isn't the greatest idea.
+ * @param key
+ * @param defaultValue
+ */
 export const take = <T>(key: string, defaultValue?: T) => ({
   from: (object: HashOf<T>) => (hasKey(object, key) ? object[key] : defaultValue),
 });
@@ -43,7 +67,6 @@ export const take = <T>(key: string, defaultValue?: T) => ({
  */
 export const identity = (id: any) => id;
 
-
 /**
  * Partially apply a function by filling in any number of its arguments.
  * Note: We will often lose some of typescript's intellisense when using `partial()`
@@ -52,9 +75,16 @@ export const identity = (id: any) => id;
  */
 export const partial = (fn: CallableFunction, ...args: any[]) => (...newArgs: any[]) => fn(...args, ...newArgs);
 
+/**
+ * Wraps a function that normally accepts a single array as an argument so that elements can be provided as individual parameters
+ * @param fn
+ */
+export const spreadArgs = (fn: (arg: any[]) => any) => (...args: any[]) => fn(args);
 
-export const spreadArgs = (fn: CallableFunction) => (...args: any[]) => fn(args);
-
+/**
+ * Reverses the order of arguments in a function call. Helpful for many 'functional programming' tasks.
+ * @param fn
+ */
 export const reverseArgs = (fn: CallableFunction) => (...args: any[]) => fn(...reverse(args));
 
 /**
@@ -91,6 +121,7 @@ export const tryCatch = <T>(
     }
   }
 
+// TODO: Test more thoroughly before using in prod.
 export const tryCatchManyAsync = <T>(
   initialPath: ((x: T, error?: any) => Promise<any>),
   ...catchPaths: Array<((x: T, error?: any) => Promise<any>)>
@@ -104,3 +135,26 @@ export const tryCatchManyAsync = <T>(
       return tryCatchManyAsync(init, ...tail(catchPaths))(x, error);
     }
   }
+
+/**
+ * Wrap a function so that it will only run `times` times when called from the resulting wrapper
+ * @param times - Number of times to allow this function to run
+ * @param fn - Function to wrap
+ * @param context - An optional context to provide `this` for the enclosed function.
+ */
+export const doTimes = (times: number = 1, fn: (...args: any[]) => any, context: any) => {
+  let ranTimes: number = 0;
+
+  return function someFunction(this: any, ...args: any[]) {
+    if (ranTimes >= times) return null;
+    ranTimes += 1;
+    return fn.apply(context || this, args);
+  };
+}
+
+/**
+ * Convenience method providing a wrapper that can only run an enclosed function once. Delegates to `doTimes`
+ * @param fn - Function to wrap
+ * @param context - An optional context to provide `this` for the enclosed function.
+ */
+export const doOnce = (fn: (...args: any[]) => any, context: any) => doTimes(1, fn, context)

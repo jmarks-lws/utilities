@@ -28,6 +28,8 @@ export const isArray = (x: any) : boolean => Array.isArray(x);
 export const concat = <T>(a: T[], b: T[]) : T[] => a.concat(b);
 export const reduce = <T>(a: any[], fn: ReduceFn<T>, init?: any) => a.reduce(fn, init);
 export const reduceRight = <T>(a: any[], fn: ReduceFn<T>, init?: any) => reduce(reverse(a), fn, init);
+export const join = (array: any[], delimiter: string) => array.join(delimiter);
+export const includes = (haystack: any[], needle: any): boolean => haystack.includes(needle);
 
 /**
  * Returns an array using the following rules:

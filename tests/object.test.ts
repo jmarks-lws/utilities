@@ -4,6 +4,9 @@ import {
   merge,
   getSharedKeys,
   remapKeys,
+  forEachWithBreak,
+  keys,
+  Hash,
 } from '../src/object';
 import { tail } from '../src/array';
 
@@ -17,6 +20,28 @@ describe('Object utilities tests', () => {
     weight: 220,
     height: 6.25,
   }
+
+  test('forEach can be broken', () => {
+    let runs = 0;
+    const out: Hash = {};
+    const myObj = {
+      fn: (key: string, val: any, done: CallableFunction) => {
+        runs += 1;
+        out[key] = val;
+        console.log({ key, val, out })
+        if (runs === 3) {
+          done();
+        }
+      },
+    }
+
+    // const spy = spyOn(myObj, 'fn');
+
+    forEachWithBreak(testPerson1, myObj.fn);
+
+    // expect(spy).toHaveBeenCalledTimes(7);
+    expect(keys(out).length).toBe(3);
+  })
 
   test('pick correctly picks a subset', () => {
     expect(pick(testPerson1, ['id', 'name'])).toMatchObject({
