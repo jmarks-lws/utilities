@@ -7,6 +7,7 @@ import {
   forEachWithBreak,
   keys,
   Hash,
+  forEach,
 } from '../src/object';
 import { tail } from '../src/array';
 
@@ -41,6 +42,17 @@ describe('Object utilities tests', () => {
 
     // expect(spy).toHaveBeenCalledTimes(7);
     expect(keys(out).length).toBe(3);
+  })
+
+  test('forEach can loop over an everyday array', async () => {
+    const out: Hash = {};
+    forEach([1, 2, 3, 4, 5], (k, v) => {
+      out[k] = v;
+    })
+    console.log('OUT: ', out);
+    expect(out).toMatchObject({
+      0: 1, 1: 2, 2: 3, 3: 4, 4: 5,
+    })
   })
 
   test('pick correctly picks a subset', () => {

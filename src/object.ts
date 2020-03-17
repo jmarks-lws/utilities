@@ -201,9 +201,15 @@ export const invert = (
  * @param fn
  */
 export const forEach = (
-  hash: Hash,
+  hash: Hash | any[],
   fn: ((key: string, value: any) => void),
-) => mapKeys(hash || {}, (key) => fn(key, hash[key]));
+) => {
+  if (Array.isArray(hash)) {
+    let i = 0;
+    return map(hash, (value) => fn(`${i++}`, value));
+  }
+  return mapKeys(hash || {}, (key) => fn(key, hash[key]));
+};
 
 /**
  * Similar to `forEach`, but allows short-circuiting by calling the provided `_break` callback function.
