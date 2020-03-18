@@ -21,6 +21,7 @@ import {
   hasAll,
   hash,
   compactArray,
+  slice,
 } from '../src/array';
 import { IMappableObject } from '../src/functional';
 
@@ -39,6 +40,18 @@ describe('Array utilities tests', () => {
       id: 128, name: 'Roxanne', age: 18, favColor: '#0000FF',
     },
   ];
+
+  describe('Array dot methods', () => {
+    test('slice does what is expected', async () => {
+      expect.assertions(6);
+      expect(slice(testPeopleList1)).toMatchObject(testPeopleList1);
+      expect(slice(testPeopleList1, 0, 1)).toHaveLength(1);
+      expect(slice(testPeopleList1, 0, 3)).toHaveLength(3);
+      expect(slice(testPeopleList1, 3, 4)).toHaveLength(1);
+      expect(slice(testPeopleList1, 0, 1)[0].name).toMatch('Forest');
+      expect(slice(testPeopleList1, 0, 1)[1]).toBeUndefined();
+    })
+  })
 
   describe('Basic Transformations', () => {
     test('map() :: calls array\'s .map()', () => {

@@ -47,11 +47,7 @@ export const arrayWrap = (input: any) : any[] => {
 }
 
 // eslint-disable-next-line no-nested-ternary
-export const slice = ([x, ...xs] : any[], i: number, y: number, curr : number = 0) : any[] => (def(x)
-  ? (curr === i
-    ? [y, x, ...slice(xs, i, y, curr + 1)]
-    : [x, ...slice(xs, i, y, curr + 1)])
-  : [])
+export const slice = (array : any[], start?: number, end?: number) : any[] => array.slice(start, end);
 
 /**
  * Utility mapping function for functional style programming.

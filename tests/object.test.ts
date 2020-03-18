@@ -8,6 +8,7 @@ import {
   keys,
   Hash,
   iterate,
+  values,
 } from '../src/object';
 import { tail } from '../src/array';
 
@@ -45,14 +46,13 @@ describe('Object utilities tests', () => {
   })
 
   test('iterate can loop over an everyday array', async () => {
+    const input: Array<number> = [1, 2, 3, 4, 5];
     const out: Hash = {};
-    iterate([1, 2, 3, 4, 5], (k, v) => {
-      out[k] = v;
-    })
-    console.log('OUT: ', out);
+    iterate(input, (k, v) => { out[k] = v; })
     expect(out).toMatchObject({
       0: 1, 1: 2, 2: 3, 3: 4, 4: 5,
     })
+    expect(input).toMatchObject(values(out));
   })
 
   test('pick correctly picks a subset', () => {
