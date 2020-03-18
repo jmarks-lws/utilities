@@ -4,10 +4,10 @@ import {
   merge,
   getSharedKeys,
   remapKeys,
-  forEachWithBreak,
+  iterateWithBreak,
   keys,
   Hash,
-  forEach,
+  iterate,
 } from '../src/object';
 import { tail } from '../src/array';
 
@@ -22,7 +22,7 @@ describe('Object utilities tests', () => {
     height: 6.25,
   }
 
-  test('forEach can be broken', () => {
+  test('iterate can be short circiuted', () => {
     let runs = 0;
     const out: Hash = {};
     const myObj = {
@@ -38,15 +38,15 @@ describe('Object utilities tests', () => {
 
     // const spy = spyOn(myObj, 'fn');
 
-    forEachWithBreak(testPerson1, myObj.fn);
+    iterateWithBreak(testPerson1, myObj.fn);
 
     // expect(spy).toHaveBeenCalledTimes(7);
     expect(keys(out).length).toBe(3);
   })
 
-  test('forEach can loop over an everyday array', async () => {
+  test('iterate can loop over an everyday array', async () => {
     const out: Hash = {};
-    forEach([1, 2, 3, 4, 5], (k, v) => {
+    iterate([1, 2, 3, 4, 5], (k, v) => {
       out[k] = v;
     })
     console.log('OUT: ', out);

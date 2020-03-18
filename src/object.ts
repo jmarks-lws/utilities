@@ -196,11 +196,12 @@ export const invert = (
 ): Hash => reduce(keys(obj), (acc: Hash, key: string) => ({ ...acc, [acc[key]]: key }), {} as Hash);
 
 /**
- * Loop over a JS object as if it were an array where the property names are associative keys.
+ * Loop over an Array or over a JS object (as if it were an array) where the property names are associative
+ * keys. Inspired by the PHP implementation of `foreach`
  * @param hash
  * @param fn
  */
-export const forEach = (
+export const iterate = (
   hash: Hash | any[],
   fn: ((key: string, value: any) => void),
 ) => {
@@ -218,7 +219,7 @@ export const forEach = (
  * @param hash
  * @param fn
  */
-export const forEachWithBreak = (
+export const iterateWithBreak = (
   hash: Hash,
   fn: ((key: string, value: any, _break: () => void) => void),
 ) => {
