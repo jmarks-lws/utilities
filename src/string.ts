@@ -1,5 +1,5 @@
 
-export const leftPad = (subject: string, desiredLength: number, prefixCharacter: string = ' ') => {
+export const padLeft = (subject: string, desiredLength: number, prefixCharacter: string = ' ') => {
   const sourceLength = subject.length;
   const targetLength = parseInt(`${desiredLength}`, 10);
 
