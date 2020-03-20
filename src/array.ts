@@ -6,8 +6,8 @@ import { def } from './miscellaneous';
 interface FilterFn<T> {
   (el: T, i?: number, m?: T[]): boolean;
 }
-interface ReduceFn <T>{
-  (previousValue: T, currentValue: any, currentIndex?: number, array?: any[]): T;
+interface ReduceFn<TEelement, TResult> {
+  (previousValue: TResult, currentValue: TEelement, currentIndex?: number, array?: TEelement[]): TResult;
 }
 
 /**
@@ -16,18 +16,28 @@ interface ReduceFn <T>{
 export const head = ([x]: any[]) => x;
 export const tail = ([, ...xs]: any[]) => xs;
 export const copy = (arr: any[]) => [...arr];
-export const length = ([x, ...xs] : any[]) : number => (def(x) ? 1 + length(xs) : 0)
-export const reverse = ([x, ...xs] : any[]) : any[] => (def(x) ? [...reverse(xs), x] : []);
+export const length = ([x, ...xs]: any[]): number => (def(x) ? 1 + length(xs) : 0)
+export const reverse = ([x, ...xs]: any[]): any[] => (def(x) ? [...reverse(xs), x] : []);
 export const chopFirst = ([x, ...xs]: any[], n: number = 1): any => (def(x) && n ? [x, ...chopFirst(xs, n - 1)] : []);
 export const chopLast = (xs: any[], n: number = 1): any => reverse(chopFirst(reverse(xs), n));
 
 /**
  * Abstractions of Array dot methods, with some additional typescript annotation.
  */
-export const isArray = (x: any) : boolean => Array.isArray(x);
-export const concat = <T>(a: T[], b: T[]) : T[] => a.concat(b);
-export const reduce = <T>(a: any[], fn: ReduceFn<T>, init?: any) => a.reduce(fn, init);
-export const reduceRight = <T>(a: any[], fn: ReduceFn<T>, init?: any) => reduce(reverse(a), fn, init);
+export const isArray = (x: any): boolean => Array.isArray(x);
+export const concat = <T>(a: T[], b: T[]): T[] => a.concat(b);
+export const reduce = <TElement, TResult>(
+  a: TElement[],
+  fn: ReduceFn<TElement, TResult>,
+  init: TResult
+) => a.reduce(fn, init);
+
+export const reduceRight = <TElement, TResult>(
+  a: TElement[],
+  fn: ReduceFn<TElement, TResult>,
+  init?: TResult
+) => reverse(a).reduce(fn, init);
+
 export const join = (array: any[], delimiter: string) => array.join(delimiter);
 export const includes = (haystack: any[], needle: any): boolean => haystack.includes(needle);
 
@@ -39,15 +49,15 @@ export const includes = (haystack: any[], needle: any): boolean => haystack.incl
  *    original provided value as its only element.
  * @param input - The value to transform
  */
-export const arrayWrap = (input: any) : any[] => {
+export const arrayWrap = (input: any): any[] => {
   if (Array.isArray(input)) {
     return input.slice();
   }
-  return (input === null || input === undefined) ? [] : [ input ];
+  return (input === null || input === undefined) ? [] : [input];
 }
 
 // eslint-disable-next-line no-nested-ternary
-export const slice = (array : any[], start?: number, end?: number) : any[] => array.slice(start, end);
+export const slice = (array: any[], start?: number, end?: number): any[] => array.slice(start, end);
 
 /**
  * Utility mapping function for functional style programming.
@@ -205,7 +215,7 @@ export const hasAll = <T>(array: T[], fn: FilterFn<T>) => array.filter(fn).lengt
  * @param array - The source array
  * @param key - Which field to use as the ObjectHash key
  */
-export const hash = <T>(array: Array<T>, key: string) : HashOf<T> => (
+export const hash = <T>(array: Array<T>, key: string): HashOf<T> => (
   array.reduce((prev, curr: Hash) => ({ ...prev, [curr[key] as string]: curr }), {})
 )
 
