@@ -6,6 +6,14 @@ import {
 
 export interface Hash { [index: string]: any }
 export interface HashOf<T> { [index: string]: T }
+// export interface KeyValuePair<T, U> {
+//   key: T,
+//   value: U,
+// }
+// export type Dictionary<T, U> = Array<{
+//   key: T,
+//   value: U,
+// }>;
 
 export const { keys, values } = Object;
 
@@ -275,3 +283,5 @@ export const transformValues = (o: Hash, fn: (value: any) => any) => reduce(
   (acc: Hash, key) => ({ ...acc, [key]: fn(o[key]) }),
   {} as Hash,
 )
+
+export const addProp = <T>(o: HashOf<T>, key: string, val: T) => merge(o, { [key]: val });
