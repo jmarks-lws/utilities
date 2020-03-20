@@ -1,4 +1,5 @@
 import { isArray } from './array';
+import { isObject } from 'util';
 
 export type Nullable<T> = T | null;
 export type Optional<T> = T | null | undefined;
@@ -15,3 +16,4 @@ export const notEmpty = (x: any) => !empty(x);
 export const boolVal = (x: any): boolean => !!x;
 export const floatVal = (x: any): number => parseFloat(x);
 export const intVal = (x: any): number => parseInt(x, 10);
+export const strVal = (x: any): string => isObject(x) ? JSON.stringify(x) : `${x}`;
