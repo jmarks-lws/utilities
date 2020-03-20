@@ -15,9 +15,13 @@ export interface HashOf<T> { [index: string]: T }
 //   value: U,
 // }>;
 
-export const { keys, values } = Object;
+export const { keys } = Object;
 
 export const isObject = (x: any) => (!Array.isArray(x)) && (typeof x === 'object');
+
+export const values = <T>(o: HashOf<T>): T[] => {
+  return Object.values(o);
+}
 
 /**
  * Returns a new object that is the result of projecting only the properties specified by `fields`
