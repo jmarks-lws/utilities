@@ -61,7 +61,7 @@ export const hasKey = (o: Hash, k: string): boolean => keys(o).includes(k);
  * @param o
  * @param fn
  */
-export const mapKeys = (o: Hash, fn: ((k: string, i: number) => any)) => map(keys(o), fn);
+export const mapKeys = <T, U>(o: HashOf<T>, fn: ((k: string, i: number) => U)): U[] => map(keys(o), fn);
 
 /**
  * Returns a new object with a subset of properties where properties which have null or undefined values have been removed.
@@ -211,20 +211,22 @@ export const invert = (
 ): Hash => reduce(keys(obj), (acc: Hash, key: string) => ({ ...acc, [acc[key]]: key }), {} as Hash);
 
 /**
- * Loop over an Array or over a JS object (as if it were an array) where the property names are associative
- * keys. Inspired by the PHP implementation of `foreach`
+ * Loop over an Array or over a JS object as if it were an associative array. Inspired by the PHP implementation
+ * of `foreach`, returning an array result similar to what you might get from `Array.prototype.map()`
  * @param hash
  * @param fn
+ *
+ * @returns {Array<U>}
  */
-export const iterate = <T>(
+export const iterate = <T, U>(
   hash: HashOf<T> | T[],
-  fn: ((key: string, value: T) => void),
-) => {
+  fn: ((key: string, value: T) => U),
+): U[] => {
   if (Array.isArray(hash)) {
     let i = 0;
     return map(hash, (value) => fn(`${i++}`, value));
   }
-  return mapKeys(hash || {}, (key) => fn(key, hash[key]));
+  return mapKeys(hash || {} as HashOf<T>, (key) => fn(key, hash[key]));
 };
 
 /**
