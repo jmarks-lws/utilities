@@ -16,12 +16,12 @@ export const isObject = (x: any) => (!Array.isArray(x)) && (typeof x === 'object
  * @param obj - The object to project
  * @param fields - The fields to project from that object
  */
-export const pick = (obj: Hash, fields: string[]) : Hash => intersect(
-  keys(obj),
-  fields,
-).reduce(
-  (prev: Hash, f: any) => ({ ...prev, [f]: obj[f] }),
-  {} as Hash,
+export const pick = (obj: Hash, fields: string[]) : Hash => (
+  reduce(
+    intersect(keys(obj), fields),
+    (prev: Hash, f: any) => ({ ...prev, [f]: obj[f] }),
+    {} as Hash,
+  )
 );
 
 /**
@@ -169,7 +169,10 @@ export const noDiff = (a: Hash, b: Hash) => !hasDiff(a, b);
  * @param obj
  * @param field
  */
-export const pluck = (obj: Hash, field: string) : Hash => (hasKey(obj, field) ? pick(obj, [ field ])[field] : null);
+export const pluck = <T extends any>(
+  obj: Hash,
+  field: string,
+) : T => (hasKey(obj, field) ? pick(obj, [ field ])[field] : null);
 
 /**
  * Returns a new object derived from `obj` where the keys are changed as described by `remap`, optionally including or omitting remaining data.
@@ -264,4 +267,11 @@ export const arraysToObject = (
   valuesArray: any[],
 ): Hash => keysArray.reduce(
   (acc: Hash, key: string, index: number) => merge(acc, { [key]: valuesArray[index] }), {} as Hash,
+)
+
+
+export const transformValues = (o: Hash, fn: (value: any) => any) => reduce(
+  keys(o),
+  (acc: Hash, key) => ({ ...acc, [key]: fn(o[key]) }),
+    {} as Hash,
 )
