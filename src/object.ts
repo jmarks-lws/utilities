@@ -4,8 +4,8 @@ import {
   arrayEmpty,
 } from './array';
 
-export interface Hash { [index:string]: any }
-export interface HashOf<T> { [index:string]: T }
+export interface Hash { [index: string]: any }
+export interface HashOf<T> { [index: string]: T }
 
 export const { keys, values } = Object;
 
@@ -16,7 +16,7 @@ export const isObject = (x: any) => (!Array.isArray(x)) && (typeof x === 'object
  * @param obj - The object to project
  * @param fields - The fields to project from that object
  */
-export const pick = (obj: Hash, fields: string[]) : Hash => (
+export const pick = (obj: Hash, fields: string[]): Hash => (
   reduce(
     intersect(keys(obj), fields),
     (prev: Hash, f: any) => ({ ...prev, [f]: obj[f] }),
@@ -30,7 +30,7 @@ export const pick = (obj: Hash, fields: string[]) : Hash => (
  * @param fields - A string array containing the names of fields to remove
  * @param o - The source object from which to construct a result with its fields removed.
  */
-export const pickNot = (obj: Hash, fields: string[]) : Hash => pick(obj, prune(keys(obj), fields));
+export const pickNot = (obj: Hash, fields: string[]): Hash => pick(obj, prune(keys(obj), fields));
 
 /**
  * Fun trick to remove a field from an object by name.
@@ -42,7 +42,7 @@ export const removeField = (field: string, { [field]: _, ...rest }) => rest;
  * @param o
  * @param k
  */
-export const hasKey = (o: Hash, k: string) : boolean => keys(o).includes(k);
+export const hasKey = (o: Hash, k: string): boolean => keys(o).includes(k);
 
 /**
  * Performs a map operation on all keys of the provided object
@@ -62,21 +62,21 @@ export const compactObject = (o: any) => pick(o, keys(o).filter((key) => ![undef
  * overwrite values before them.
  * @param {Hash[]} a - As many hashes as you like to merge together from left to right.
  */
-export const merge = (...a: Hash[]) : Hash => ({ ...head(a), ...(!arrayEmpty(tail(a)) ? merge(...tail(a)) : null) })
+export const merge = (...a: Hash[]): Hash => ({ ...head(a), ...(!arrayEmpty(tail(a)) ? merge(...tail(a)) : null) })
 
 /**
  * Returns a new object that is the result of merging together a series of objects going from the last to
  * the first objects. Values to the left overwrite values to their right.
  * @param {Hash[]} a - As many hashes as you like to merge together from left to right.
  */
-export const mergeRight = (...a: Hash[]) : Hash => merge(...reverse(a));
+export const mergeRight = (...a: Hash[]): Hash => merge(...reverse(a));
 
 /**
  * Gets a list of keys that exist in both provided objects and returns them as a new string array.
  * @param a
  * @param b
  */
-export const getSharedKeys = (a: Hash, b: Hash) : Array<string> => intersect(keys(a), keys(b));
+export const getSharedKeys = (a: Hash, b: Hash): Array<string> => intersect(keys(a), keys(b));
 
 /**
  * Returns a new object that is the result of merging together two objects ONLY on keys that both share.
@@ -85,7 +85,7 @@ export const getSharedKeys = (a: Hash, b: Hash) : Array<string> => intersect(key
  * @param a
  * @param b
  */
-export const mergeIntersection = (a: Hash, b: Hash) : Hash => {
+export const mergeIntersection = (a: Hash, b: Hash): Hash => {
   const [a2, b2] = [a, b].map((o: Hash) => pick(o, getSharedKeys(a, b)))
   return merge(a2, b2);
 };
@@ -172,7 +172,7 @@ export const noDiff = (a: Hash, b: Hash) => !hasDiff(a, b);
 export const pluck = <T extends any>(
   obj: Hash,
   field: string,
-) : T => (hasKey(obj, field) ? pick(obj, [ field ])[field] : null);
+): T => (hasKey(obj, field) ? obj[field] : null);
 
 /**
  * Returns a new object derived from `obj` where the keys are changed as described by `remap`, optionally including or omitting remaining data.
@@ -182,7 +182,7 @@ export const pluck = <T extends any>(
  * @param returnAll Default `false`. If this is true, all data from the source object will be returned with only the key names in
  *                  `remap` being changed. All other keys and values will remain as they were in the source object.
  */
-export const remapKeys = (obj: Hash, remap: Hash, returnAll: boolean = false) : Hash => reduce(
+export const remapKeys = (obj: Hash, remap: Hash, returnAll: boolean = false): Hash => reduce(
   keys(obj),
   (acc: Hash, k: string) => merge(
     { ...acc },
@@ -204,9 +204,9 @@ export const invert = (
  * @param hash
  * @param fn
  */
-export const iterate = (
-  hash: Hash | any[],
-  fn: ((key: string, value: any) => void),
+export const iterate = <T>(
+  hash: HashOf<T> | T[],
+  fn: ((key: string, value: T) => void),
 ) => {
   if (Array.isArray(hash)) {
     let i = 0;
@@ -254,8 +254,8 @@ export const zip = <T>(
   keysArray: string[],
   valuesArray: T[],
 ): Array<[string, T]> => keysArray.reduce(
-    (acc: [string, T][], key: string, i) => acc.concat([key, valuesArray[i]]), [] as [string, T][],
-  )
+  (acc: [string, T][], key: string, i) => acc.concat([key, valuesArray[i]]), [] as [string, T][],
+)
 
 /**
  * Creates an object having keys from `keysArray` matching values from `valuesArray`. Assumes both arrays are the length of `keysArray`.
@@ -273,5 +273,5 @@ export const arraysToObject = (
 export const transformValues = (o: Hash, fn: (value: any) => any) => reduce(
   keys(o),
   (acc: Hash, key) => ({ ...acc, [key]: fn(o[key]) }),
-    {} as Hash,
+  {} as Hash,
 )
