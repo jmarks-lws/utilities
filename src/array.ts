@@ -1,7 +1,7 @@
 import {
-  pick, Hash, HashOf,
+  pick, Hash, HashOf, addProp, hasKey,
 } from './object';
-import { def } from './miscellaneous';
+import { def, strVal } from './miscellaneous';
 
 interface FilterFn<T> {
   (el: T, i?: number, m?: T[]): boolean;
@@ -215,8 +215,11 @@ export const hasAll = <T>(array: T[], fn: FilterFn<T>) => array.filter(fn).lengt
  * @param array - The source array
  * @param key - Which field to use as the ObjectHash key
  */
-export const hash = <T>(array: Array<T>, key: string): HashOf<T> => (
-  array.reduce((prev, curr: Hash) => ({ ...prev, [curr[key] as string]: curr }), {})
+export const hash = <T extends any>(array: Array<T>, key: string): HashOf<T> => (
+  array.reduce(
+    (prev: HashOf<T>, curr: T): HashOf<T> => addProp(prev, strVal(curr[key]), curr) as HashOf<T>,
+    {} as HashOf<T>
+  )
 )
 
 /**
@@ -236,3 +239,4 @@ export const flatten = (arr: any[], d = 1): any[] => (d > 0
 )
 
 export const arrayEmpty = (array: any[]) => count(array) === 0;
+
