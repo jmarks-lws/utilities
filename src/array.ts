@@ -64,7 +64,7 @@ export const slice = (array: any[], start?: number, end?: number): any[] => arra
  * @param array - The source array
  * @param mapFn - A function which returns a new value for each element of `array`.
  */
-export const map = (array: any[], mapFn: ((el: any, i: number) => any)) => array.map(mapFn);
+export const map = <T, U>(array: T[], mapFn: ((el: T, i: number) => U)): U[] => array.map(mapFn);
 /**
  * Prepares a reusable mapper which can run the same function on different sets of arrays using common arguments.
  *
