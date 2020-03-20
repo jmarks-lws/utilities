@@ -73,7 +73,7 @@ export const map = <T, U>(array: T[], mapFn: ((el: T, i: number) => U)): U[] => 
  *
  * @returns (array: IMappableObject) => T[]
  */
-export const preparedMap = <T>(mapFn: (<T>(el: any, i: number) => T)) => (ary: any[]): T[] => map(ary, mapFn)
+export const preparedMap = <T, U>(mapFn: (<T>(el: T, i: number) => U)) => (ary: T[]): U[] => map(ary, mapFn)
 
 /**
  * Returns a new array which is the result of removing elements from `initialList` which are also in `pruneList`
