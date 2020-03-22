@@ -1,8 +1,8 @@
 import {
-  pick, Hash, HashOf, addProp, hasKey,
+  pick, Hash, HashOf, addProp,
 } from './object';
 import {
-  def, strVal, Optional,
+  def, strVal, undef, intVal,
 } from './miscellaneous';
 
 interface FilterFn<T> {
@@ -17,56 +17,104 @@ interface ReduceFn<TEelement, TResult> {
  */
 export const head = ([x]: any[]) => x;
 export const tail = ([, ...xs]: any[]) => xs;
-export const copy = (arr: any[]) => [...arr];
-export const length = ([x, ...xs]: any[]): number => (def(x) ? 1 + length(xs) : 0)
-export const reverse = ([x, ...xs]: any[]): any[] => (def(x) ? [...reverse(xs), x] : []);
-export const chopFirst = ([x, ...xs]: any[], n: number = 1): any => (def(x) && n ? [x, ...chopFirst(xs, n - 1)] : []);
+export const arrayCopy = (arr: any[]) => [...arr];
+/**
+ * Returns number of elements in `array`.
+ * @param array - The source array
+ */
+export const count = (array: any[]): number => (def(head(array)) ? 1 + count(tail(array)) : 0);
+export const reverse = (array: any[]): any[] => (def(head(array)) ? [...reverse(tail(array)), head(array)] : []);
+export const chopFirst = (array: any[], n: number = 1): any => (
+  def(head(array)) && n ? [head(array), ...chopFirst(tail(array), n - 1)] : []
+);
 export const chopLast = (xs: any[], n: number = 1): any => reverse(chopFirst(reverse(xs), n));
 
 /**
  * Abstractions of Array dot methods, with some additional typescript annotation.
  */
-export const isArray = (x: any): boolean => Array.isArray(x);
-export const concat = <T>(a: T[], b: T[]): T[] => a.concat(b);
-export const reduce = <TElement, TResult>(
-  a: TElement[],
+export const isArray = (x: any): boolean => Array.isArray(x); // NOTE: This is a static function, so not going to attempt to rewrite.
+export const concat = <T>(a: T[], b: T[]): T[] => [...a, ...b]; // TODO: Rewrite
+const internalReduce = <TElement, TResult>(
+  array: TElement[],
   fn: ReduceFn<TElement, TResult>,
   init: TResult,
-) => a.reduce(fn, init);
+  currentIndex: number = 0,
+): TResult => (
+    count(array) === 0
+      ? init
+      : internalReduce(tail(array), fn, fn(init, head(array), currentIndex || 0))
+  )
+
+export const reduce = <TElement, TResult>(
+  array: TElement[],
+  fn: ReduceFn<TElement, TResult>,
+  init: TResult,
+): TResult => (internalReduce(array, fn, init, 0));
+
+// export const reduce = <TElement, TResult>(
+//   a: TElement[],
+//   fn: ReduceFn<TElement, TResult>,
+//   init: TResult,
+// ) => a.reduce(fn, init);
 
 export const reduceRight = <TElement, TResult>(
-  a: TElement[],
+  array: TElement[],
   fn: ReduceFn<TElement, TResult>,
   init?: TResult,
-) => reverse(a).reduce(fn, init);
+) => reduce(
+    reverse(array),
+    (a, b, c) => fn(a as TResult, b, c),
+    init,
+  );
 
-export const join = (array: any[], delimiter: string) => array.join(delimiter);
-export const includes = (haystack: any[], needle: any): boolean => haystack.includes(needle);
+export const join = (
+  [x, y, ...rest]: any[],
+  delimiter: string,
+): string => (y ? strVal(x) + delimiter + join([y, ...rest], delimiter) : x);
+export const includes = (
+  haystack: any[],
+  needle: any,
+): boolean => reduce(haystack, (acc: boolean, el) => (acc || el === needle), false);
+
+// export const slice = <T>(array: T[], start?: number, end?: number): T[] => array.slice(start, end);
+
+// export const count = <T>(array: Array<T>) => reduce(array, (acc: number) => acc + 1, 0);
+/**
+ * Compares all values in an array returning the lowest element. Elements should be naturally comparable by the `<` operator.
+ * @param {Array<T>} array Array to compare values from.
+ */
+export const min = <T>([a, b, ...rest]: T[]): T => (undef(b) ? a : min([(a < b ? a : b), ...rest]))
+
+export const slice = <T>(
+  array: T[],
+  start: number = 0,
+  end: number = Infinity,
+): T[] => chopFirst(chopLast(array, count(array) - min([count(array), end])), start)
 
 /**
  * Returns an array using the following rules:
- *  - If an array is provided, the return array will be a copy of the input array. (via `slice()`)
+ *  - If an array is provided, the return array will be a clone of the input array
  *  - If a null or undefined value is provided, a new empty array will be returned.
  *  - If any other value is provided, the return value will be a new array with the
  *    original provided value as its only element.
  * @param input - The value to transform
  */
 export const arrayWrap = (input: any): any[] => {
-  if (Array.isArray(input)) {
-    return input.slice();
+  if (isArray(input)) {
+    return arrayCopy(input);
   }
   return (input === null || input === undefined) ? [] : [input];
 }
-
-// eslint-disable-next-line no-nested-ternary
-export const slice = (array: any[], start?: number, end?: number): any[] => array.slice(start, end);
 
 /**
  * Utility mapping function for functional style programming.
  * @param array - The source array
  * @param mapFn - A function which returns a new value for each element of `array`.
  */
-export const map = <T, U>(array: T[], mapFn: ((el: T, i: number) => U)): U[] => array.map(mapFn);
+export const map = <T, U>(
+  array: T[],
+  mapFn: ((el: T, i: number) => U),
+): U[] => reduce(array, (acc: U[], el, i) => concat(arrayCopy(acc), [ mapFn(el, intVal(i)) ]), []);
 /**
  * Prepares a reusable mapper which can run the same function on different sets of arrays using common arguments.
  *
@@ -78,66 +126,23 @@ export const map = <T, U>(array: T[], mapFn: ((el: T, i: number) => U)): U[] => 
 export const preparedMap = <T, U>(mapFn: (<T>(el: T, i: number) => U)) => (ary: T[]): U[] => map(ary, mapFn)
 
 /**
- * Returns a new array which is the result of removing elements from `initialList` which are also in `pruneList`
- * @param initialList - List to prune from. The source list is not affected. A new array will be returned.
- * @param pruneList - List of elements to remove.
- */
-export const prune = <T>(initialList: T[], pruneList: T[]) => initialList.filter((el: T) => !pruneList.includes(el));
-
-/**
- * Returns a new array consisting of elements that exist in both `a` and `b`
- * @param a
- * @param b
- */
-export const intersect = <T>(a: T[], b: T[]) => a.filter((el: T) => b.includes(el));
-
-/**
- * Returns a new array consisting of elements that exist only in `a` and only in `b`, but not in both `a` and `b`
- * @param a
- * @param b
- */
-export const notIntersect = <T>(a: T[], b: T[]) => concat(prune(a, intersect(a, b)), prune(b, intersect(a, b)));
-
-/**
- * Returns a new array that is the result of removing `element` from `array`
- * @param array - The source array
- * @param element - The element to omit from the resulting array.
- */
-export const omit = <T>(array: Array<T>, element: T) => array.filter((e) => e !== element);
-
-/**
- * Returns a new array that is the result of inserting `element` to `array` at position `index`
- * @param array - The source array
- * @param element - The element to add to the resulting array
- * @param index - Where to place the element
- */
-export const insertAt = <T>(array: Array<T>, element: T, index: number) => [
-  ...array.slice(0, index), element, ...array.slice(index),
-];
-
-/**
- * Returns a new array that is the result of removing the element at position `index` from `array`
- * @param array - The source array
- * @param index - The index of the element to remove
- */
-export const removeAt = <T>(array: Array<T>, index: number) => [
-  ...array.slice(0, index), ...array.slice(index + 1),
-];
-
-/**
  * Returns a new array of objects containing a subset of fields from an original array of objects.
  * @param array - The source array
- * @param fields - A list of property names to keep from each object in the array. If the array does not contain any of the expected elements, they will not exist in the resulting output array.
+ * @param fields - A list of property names to keep from each object in `array`. If the array does not contain any of
+ *                 the expected elements, they will not exist in the resulting output array
  */
 export const pickEach = <T>(array: Array<T>, fields: string[]) => map(array, (e: Hash) => pick(e, fields));
 /**
- * Returns a new array of objects containing filtered from an original array of objects. Bare wrapper around `array.filter()` for functional
+ * Returns a new array of objects containing filtered from an original array of objects.
  * @param array - The source array
  * @param whereFn - Function used to filter the source list.
  */
-export const where = <T>(array: Array<T>, whereFn: FilterFn<T>) => array.filter(whereFn);
+export const where = <T>(
+  array: Array<T>,
+  whereFn: FilterFn<T>,
+) => reduce(array, (acc: T[], el, i) => (whereFn(el) ? [...acc, el] : [...acc]), []);
 
-export const whereNot = <T>(array: Array<T>, whereFn: FilterFn<T>) => array.filter((x, i, a) => !whereFn(x, i, a));
+export const whereNot = <T>(array: Array<T>, whereFn: FilterFn<T>) => where(array, (x, i, m) => !whereFn(x, i, m));
 
 export const partition = <T>(array: T[], fn: FilterFn<T>) => [where(array, fn), whereNot(array, fn)];
 
@@ -145,7 +150,7 @@ export const partition = <T>(array: T[], fn: FilterFn<T>) => [where(array, fn), 
  * Returns the first T from an Array<T>
  * @param array - The source array
  */
-export const first = <T>(array: Array<T>) => array[0];
+export const first = <T>([x]: Array<T>) => x;
 /**
  * Returns the first T that matches a provided condition from an Array<T>
  * @param array - The source array
@@ -157,7 +162,7 @@ export const findFirst = <T>(array: Array<T>, whereFn: ((testElement: T) => bool
  * Returns the last T from an Array<T>
  * @param array - The source array
  */
-export const last = <T>(array: Array<T>) => array[array.length - 1];
+export const last = <T>(array: Array<T>) => first(reverse(array));
 /**
  * Returns the last T that matches a provided condition from an Array<T>
  * @param array - The source array
@@ -166,47 +171,38 @@ export const last = <T>(array: Array<T>) => array[array.length - 1];
 export const findLast = <T>(array: Array<T>, whereFn: ((testElement: T) => boolean)) => last(where(array, whereFn))
 
 /**
- * Returns number of elements in an array. Bare wrapper around `array.length` for functional
- * @param array - The source array
- */
-export const count = <T>(array: Array<T>) => array.length;
-/**
- * Returns number of elements in an array matching a given condition.
+ * Returns number of elements in `array` matching a given condition.
  * @param array - The source array
  * @param fn - Function used to filter the source list.
  */
-export const countWhere = <T>(array: Array<T>, fn: FilterFn<T>) => array.filter(fn).length
+export const countWhere = <T>(array: Array<T>, fn: FilterFn<T>) => where(array, fn).length
 
 /**
- * Returns a sum of a provided field from the elements in an array.
+ * Returns a sum of a provided field from the elements in `array`.
  * @param array - The source array
  * @param field - Which field to sum. If the value of any instance of this property in any element cannot be parsed to an Integer, the result will be NaN
  */
-export const sum = <T>(array: T[], field: string) => array.reduce(
-  (prev, cur) => prev + parseInt((cur as Hash)[field], 10), 0,
-)
+export const sum = <T>(array: T[], field: string) => reduce(array,
+  (prev, cur) => prev + parseInt((cur as Hash)[field], 10), 0)
 /**
- * Returns a sum of a provided field matching a given condition from the elements in an array.
+ * Returns a sum of a provided field matching a given condition from the elements in `array`.
  * @param array - The source array
  * @param fn - Function used to filter the source list.
  * @param field - Which field to sum. If the value of any instance of this property in any element cannot be parsed to an Integer, the result will be NaN
  */
-export const sumWhere = <T>(array: Array<T>, fn: FilterFn<T>, field: string) => sum(array.filter(fn), field);
-
-export const min = <T>(array: Array<T>, field: Optional<string> = null) => Math.min(
-  ...(field ? (array.map((e: Hash) => e[field])) : array),
-)
-
-export const max = <T>(array: Array<T>, field: Optional<string> = null) => Math.max(
-  ...(field ? (array.map((e: Hash) => e[field])) : array),
-)
+export const sumWhere = <T>(array: Array<T>, fn: FilterFn<T>, field: string) => sum(where(array, fn), field);
+/**
+ * Compares all values in an array returning the highest element. Elements should be naturally comparable by the `>` operator.
+ * @param {Array<T>} array Array to compare values from.
+ */
+export const max = <T>([a, b, ...rest]: T[]): T => (undef(b) ? a : min([(a > b ? a : b), ...rest]))
 
 /**
  * Asserts that an array has any elements matching a condition
  * @param array - The source array
  * @param fn - Function used to filter the source list.
  */
-export const hasAny = <T>(array: Array<T>, fn: FilterFn<T>) => array.filter(fn).length > 0;
+export const hasAny = <T>(array: Array<T>, fn: FilterFn<T>) => where(array, fn).length > 0;
 /**
  * Asserts that an array does not have any elements matching a condition
  * @param array - The source array
@@ -218,7 +214,53 @@ export const hasNone = <T>(array: Array<T>, fn: FilterFn<T>) => !hasAny(array, f
  * @param array - The source array
  * @param fn - Function used to filter the source list.
  */
-export const hasAll = <T>(array: T[], fn: FilterFn<T>) => array.filter(fn).length === array.length;
+export const hasAll = <T>(array: T[], fn: FilterFn<T>) => count(where(array, fn)) === count(array);
+/**
+ * Returns a new array which is the result of removing elements from `initialList` which are also in `pruneList`
+ * @param initialList - List to prune from. The source list is not affected. A new array will be returned.
+ * @param pruneList - List of elements to remove.
+ */
+export const prune = <T>(initialList: T[], pruneList: T[]) => where(initialList, (el: T) => !includes(pruneList, el));
+
+/**
+ * Returns a new array consisting of elements that exist in both `a` and `b`
+ * @param a
+ * @param b
+ */
+export const intersect = <T>(a: T[], b: T[]) => where(a, (el: T) => includes(b, el));
+
+/**
+ * Returns a new array consisting of elements that exist only in `a` and only in `b`, but not in both `a` and `b`
+ * @param a
+ * @param b
+ */
+export const notIntersect = <T>(a: T[], b: T[]) => concat(prune(a, intersect(a, b)), prune(b, intersect(a, b)));
+
+/**
+ * Returns a new array that is the result of removing `element` from `array`
+ * @param array - The source array
+ * @param element - The element to omit from the resulting array
+ */
+export const omit = <T>(array: Array<T>, element: T) => where(array, (e) => e !== element);
+
+/**
+ * Returns a new array that is the result of inserting `element` to `array` at position `index`
+ * @param array - The source array
+ * @param element - The element to add to the resulting array
+ * @param index - Where to place the element
+ */
+export const insertAt = <T>(array: Array<T>, element: T, index: number) => [
+  ...slice(array, 0, index), element, ...slice(array, index),
+];
+
+/**
+ * Returns a new array that is the result of removing the element at position `index` from `array`
+ * @param array - The source array
+ * @param index - The index of the element to remove
+ */
+export const removeAt = <T>(array: Array<T>, index: number) => [
+  ...slice(array, 0, index), ...slice(array, index + 1),
+];
 
 /**
  * Returns a hash from an array of objects where the key is the value of the provided field name.
@@ -226,7 +268,8 @@ export const hasAll = <T>(array: T[], fn: FilterFn<T>) => array.filter(fn).lengt
  * @param key - Which field to use as the ObjectHash key
  */
 export const hash = <T extends any>(array: Array<T>, key: string): HashOf<T> => (
-  array.reduce(
+  reduce(
+    array,
     (prev: HashOf<T>, curr: T): HashOf<T> => addProp(prev, strVal(curr[key]), curr) as HashOf<T>,
     {} as HashOf<T>,
   )
@@ -236,7 +279,7 @@ export const hash = <T extends any>(array: Array<T>, key: string): HashOf<T> => 
  * Removes elements which are null or undefined.
  * @param array - The source array
  */
-export const compactArray = (array: any[]) => array.filter((el) => ![null, undefined].includes(el))
+export const compactArray = (array: any[]) => where(array, (el) => !includes([null, undefined], el))
 
 /**
  * Returns a new array with all sub-array elements concatenated into it recursively up to the specified depth.
@@ -244,8 +287,8 @@ export const compactArray = (array: any[]) => array.filter((el) => ![null, undef
  * @param d
  */
 export const flatten = (arr: any[], d = 1): any[] => (d > 0
-  ? arr.reduce((acc, val) => acc.concat(isArray(val) ? flatten(val, d - 1) : val), [])
-  : arr.slice()
+  ? reduce(arr, (acc, val) => acc.concat(isArray(val) ? flatten(val, d - 1) : val), [])
+  : slice(arr)
 )
 
 export const arrayEmpty = (array: any[]) => count(array) === 0;

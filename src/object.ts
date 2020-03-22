@@ -19,9 +19,7 @@ export const { keys } = Object;
 
 export const isObject = (x: any) => (!Array.isArray(x)) && (typeof x === 'object');
 
-export const values = <T>(o: HashOf<T>): T[] => {
-  return Object.values(o);
-}
+export const values = <T>(o: HashOf<T>): T[] => Object.values(o)
 
 /**
  * Returns a new object that is the result of projecting only the properties specified by `fields`
@@ -268,8 +266,8 @@ export const zip = <T>(
   keysArray: string[],
   valuesArray: T[],
 ): Array<[string, T]> => keysArray.reduce(
-  (acc: [string, T][], key: string, i) => acc.concat([key, valuesArray[i]]), [] as [string, T][],
-)
+    (acc: [string, T][], key: string, i) => acc.concat([key, valuesArray[i]]), [] as [string, T][],
+  )
 
 /**
  * Creates an object having keys from `keysArray` matching values from `valuesArray`. Assumes both arrays are the length of `keysArray`.
