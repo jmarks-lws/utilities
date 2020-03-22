@@ -1,7 +1,9 @@
 import {
   pick, Hash, HashOf, addProp, hasKey,
 } from './object';
-import { def, strVal } from './miscellaneous';
+import {
+  def, strVal, Optional,
+} from './miscellaneous';
 
 interface FilterFn<T> {
   (el: T, i?: number, m?: T[]): boolean;
@@ -29,13 +31,13 @@ export const concat = <T>(a: T[], b: T[]): T[] => a.concat(b);
 export const reduce = <TElement, TResult>(
   a: TElement[],
   fn: ReduceFn<TElement, TResult>,
-  init: TResult
+  init: TResult,
 ) => a.reduce(fn, init);
 
 export const reduceRight = <TElement, TResult>(
   a: TElement[],
   fn: ReduceFn<TElement, TResult>,
-  init?: TResult
+  init?: TResult,
 ) => reverse(a).reduce(fn, init);
 
 export const join = (array: any[], delimiter: string) => array.join(delimiter);
@@ -191,6 +193,14 @@ export const sum = <T>(array: T[], field: string) => array.reduce(
  */
 export const sumWhere = <T>(array: Array<T>, fn: FilterFn<T>, field: string) => sum(array.filter(fn), field);
 
+export const min = <T>(array: Array<T>, field: Optional<string> = null) => Math.min(
+  ...(field ? (array.map((e: Hash) => e[field])) : array),
+)
+
+export const max = <T>(array: Array<T>, field: Optional<string> = null) => Math.max(
+  ...(field ? (array.map((e: Hash) => e[field])) : array),
+)
+
 /**
  * Asserts that an array has any elements matching a condition
  * @param array - The source array
@@ -218,7 +228,7 @@ export const hasAll = <T>(array: T[], fn: FilterFn<T>) => array.filter(fn).lengt
 export const hash = <T extends any>(array: Array<T>, key: string): HashOf<T> => (
   array.reduce(
     (prev: HashOf<T>, curr: T): HashOf<T> => addProp(prev, strVal(curr[key]), curr) as HashOf<T>,
-    {} as HashOf<T>
+    {} as HashOf<T>,
   )
 )
 
@@ -239,4 +249,3 @@ export const flatten = (arr: any[], d = 1): any[] => (d > 0
 )
 
 export const arrayEmpty = (array: any[]) => count(array) === 0;
-
