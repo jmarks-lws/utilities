@@ -2,7 +2,7 @@ import {
   pick, Hash, HashOf, addProp,
 } from './object';
 import {
-  def, strVal, undef, intVal,
+  def, strVal, undef, intVal, Nullable,
 } from './miscellaneous';
 
 interface FilterFn<T> {
@@ -17,17 +17,20 @@ interface ReduceFn<TEelement, TResult> {
  */
 export const head = ([x]: any[]) => x;
 export const tail = ([, ...xs]: any[]) => xs;
-export const arrayCopy = (arr: any[]) => [...arr];
+export const arrayCopy = <T>(arr: T[]): Nullable<Array<T>> => (Array.isArray(arr) ? [...arr] : null);
 /**
  * Returns number of elements in `array`.
  * @param array - The source array
  */
-export const count = (array: any[]): number => (def(head(array)) ? 1 + count(tail(array)) : 0);
+export const count = (array: any[]): number => (array.filter((x) => def(x)).length > 0 ? 1 + count(tail(array)) : 0);
 export const reverse = (array: any[]): any[] => (def(head(array)) ? [...reverse(tail(array)), head(array)] : []);
 export const chopFirst = (array: any[], n: number = 1): any => (
   def(head(array)) && n ? [head(array), ...chopFirst(tail(array), n - 1)] : []
 );
 export const chopLast = (xs: any[], n: number = 1): any => reverse(chopFirst(reverse(xs), n));
+
+export const dropFirst = <T>(array: T[], n: number = 0): T[] => chopLast([...array], count([...array]) - n);
+export const dropLast = <T>(array: T[], n: number = 0): T[] => chopFirst([...array], count([...array]) - n);
 
 /**
  * Abstractions of Array dot methods, with some additional typescript annotation.
@@ -38,18 +41,19 @@ const internalReduce = <TElement, TResult>(
   array: TElement[],
   fn: ReduceFn<TElement, TResult>,
   init: TResult,
-  currentIndex: number = 0,
+  currentIndex: number,
+  initialArray: TElement[],
 ): TResult => (
     count(array) === 0
       ? init
-      : internalReduce(tail(array), fn, fn(init, head(array), currentIndex || 0))
+      : internalReduce(tail(array), fn, fn(init, head(array), currentIndex || 0), currentIndex || 0, initialArray)
   )
 
 export const reduce = <TElement, TResult>(
   array: TElement[],
   fn: ReduceFn<TElement, TResult>,
   init: TResult,
-): TResult => (internalReduce(array, fn, init, 0));
+): TResult => internalReduce(array, fn, init, 0, array);
 
 // export const reduce = <TElement, TResult>(
 //   a: TElement[],
@@ -76,9 +80,6 @@ export const includes = (
   needle: any,
 ): boolean => reduce(haystack, (acc: boolean, el) => (acc || el === needle), false);
 
-// export const slice = <T>(array: T[], start?: number, end?: number): T[] => array.slice(start, end);
-
-// export const count = <T>(array: Array<T>) => reduce(array, (acc: number) => acc + 1, 0);
 /**
  * Compares all values in an array returning the lowest element. Elements should be naturally comparable by the `<` operator.
  * @param {Array<T>} array Array to compare values from.
@@ -89,22 +90,22 @@ export const slice = <T>(
   array: T[],
   start: number = 0,
   end: number = Infinity,
-): T[] => chopFirst(chopLast(array, count(array) - min([count(array), end])), start)
+): T[] => (
+    dropLast(dropFirst(array, start), count(array) - min([ count(array), end ]))
+  );
 
 /**
  * Returns an array using the following rules:
- *  - If an array is provided, the return array will be a clone of the input array
+ *  - If an array is provided, the return array will be a copy of the input array
  *  - If a null or undefined value is provided, a new empty array will be returned.
  *  - If any other value is provided, the return value will be a new array with the
  *    original provided value as its only element.
  * @param input - The value to transform
  */
-export const arrayWrap = (input: any): any[] => {
-  if (isArray(input)) {
-    return arrayCopy(input);
-  }
-  return (input === null || input === undefined) ? [] : [input];
-}
+export const arrayWrap = (input: any): any[] => (
+  arrayCopy(input) ?? ((input === null || input === undefined) ? [] : [input])
+);
+
 
 /**
  * Utility mapping function for functional style programming.
@@ -114,7 +115,7 @@ export const arrayWrap = (input: any): any[] => {
 export const map = <T, U>(
   array: T[],
   mapFn: ((el: T, i: number) => U),
-): U[] => reduce(array, (acc: U[], el, i) => concat(arrayCopy(acc), [ mapFn(el, intVal(i)) ]), []);
+): U[] => reduce(array, (acc: U[], el, i) => concat(arrayCopy(acc) as any[], [ mapFn(el, intVal(i)) ]), []);
 /**
  * Prepares a reusable mapper which can run the same function on different sets of arrays using common arguments.
  *
@@ -195,7 +196,7 @@ export const sumWhere = <T>(array: Array<T>, fn: FilterFn<T>, field: string) => 
  * Compares all values in an array returning the highest element. Elements should be naturally comparable by the `>` operator.
  * @param {Array<T>} array Array to compare values from.
  */
-export const max = <T>([a, b, ...rest]: T[]): T => (undef(b) ? a : min([(a > b ? a : b), ...rest]))
+export const max = <T>([a, b, ...rest]: T[]): T => (undef(b) ? a : max([(a > b ? a : b), ...rest]))
 
 /**
  * Asserts that an array has any elements matching a condition
@@ -279,7 +280,7 @@ export const hash = <T extends any>(array: Array<T>, key: string): HashOf<T> => 
  * Removes elements which are null or undefined.
  * @param array - The source array
  */
-export const compactArray = (array: any[]) => where(array, (el) => !includes([null, undefined], el))
+export const compactArray = (array: any[]) => where(array, (x) => !includes([undefined, null], x))
 
 /**
  * Returns a new array with all sub-array elements concatenated into it recursively up to the specified depth.

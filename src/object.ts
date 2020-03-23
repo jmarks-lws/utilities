@@ -45,7 +45,7 @@ export const pickNot = (obj: Hash, fields: string[]): Hash => pick(obj, prune(ke
 /**
  * Fun trick to remove a field from an object by name.
  */
-export const removeField = (field: string, { [field]: _, ...rest }) => rest;
+export const removeField = (o: Hash, field: string) => ((fld: string, { [fld]: _, ...rest }) => rest)(field, o);
 
 /**
  * Returns a boolean indicating whether a given key exists in the provided object.
@@ -206,7 +206,7 @@ export const remapKeys = (obj: Hash, remap: Hash, returnAll: boolean = false): H
  */
 export const invert = (
   obj: Hash,
-): Hash => reduce(keys(obj), (acc: Hash, key: string) => ({ ...acc, [acc[key]]: key }), {} as Hash);
+): Hash => reduce(keys(obj), (acc: Hash, key: string) => ({ ...acc, [obj[key]]: key }), {} as Hash);
 
 /**
  * Loop over an Array or over a JS object as if it were an associative array. Inspired by the PHP implementation

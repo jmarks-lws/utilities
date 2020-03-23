@@ -22,6 +22,26 @@ import {
   hash,
   compactArray,
   slice,
+  includes,
+  head,
+  tail,
+  arrayCopy,
+  reverse,
+  chopFirst,
+  chopLast,
+  dropFirst,
+  dropLast,
+  isArray,
+  reduceRight,
+  reduce,
+  join,
+  arrayWrap,
+  whereNot,
+  partition,
+  min,
+  max,
+  notIntersect,
+  flatten,
 } from '../src/array';
 import { IMappableObject } from '../src/functional';
 
@@ -41,7 +61,99 @@ describe('Array utilities tests', () => {
     },
   ];
 
-  describe('Array dot methods', () => {
+  describe('Functional utility methods', () => {
+    test('head', () => {
+      expect(head([1, 2, 3, 4, 5])).toBe(1);
+    });
+    test('tail', () => {
+      expect(tail([1, 2, 3, 4, 5])).toMatchObject([2, 3, 4, 5]);
+    });
+    test('arrayCopy', () => {
+      const original = [1, 2, 3, 4];
+      const copy = arrayCopy(original);
+      expect.assertions(2);
+      expect(copy).not.toBe(original);
+      expect(copy).toMatchObject(original);
+    });
+    test('arrayCopy returns null for non-array', () => {
+      const original = 'some string';
+      const copy = arrayCopy(original as any);
+      expect.assertions(2);
+      expect(copy).not.toBe(original);
+      expect(copy).toBeNull();
+    });
+    test('count', () => {
+      expect.assertions(2);
+      expect(count([1, 2, 3, 4, 5])).toBe(5);
+      expect(count([78, 12, 3])).toBe(3);
+    });
+    test('reverse', () => {
+      const original = [1, 3, 5, 7, 9];
+      const reversed = reverse(original);
+      expect(reversed).toMatchObject([9, 7, 5, 3, 1]);
+    });
+    test('chopFirst', () => {
+      const original = [1, 3, 5, 7, 9];
+      const chopped = chopFirst(original, 2);
+      expect(chopped).toMatchObject([1, 3]);
+    });
+    test('default chopFirst', () => {
+      const original = [1, 3, 5, 7, 9];
+      const chopped = chopFirst(original);
+      expect(chopped).toMatchObject([1]);
+    });
+    test('chopLast', () => {
+      const original = [1, 3, 5, 7, 9];
+      const chopped = chopLast(original, 2);
+      expect(chopped).toMatchObject([7, 9]);
+    });
+    test('default chopLast', () => {
+      const original = [1, 3, 5, 7, 9];
+      const chopped = chopLast(original);
+      expect(chopped).toMatchObject([9]);
+    });
+    test('dropFirst', () => {
+      const original = [1, 3, 5, 7, 9];
+      const chopped = dropFirst(original, 2);
+      expect(chopped).toMatchObject([5, 7, 9]);
+    });
+    test('default dropFirst', () => {
+      const original = [1, 3, 5, 7, 9];
+      const chopped = dropFirst(original);
+      expect(chopped).toMatchObject([1, 3, 5, 7, 9]);
+    });
+    test('dropLast', () => {
+      const original = [1, 3, 5, 7, 9];
+      const chopped = dropLast(original, 2);
+      expect(chopped).toMatchObject([1, 3, 5]);
+    });
+    test('default dropLast', () => {
+      const original = [1, 3, 5, 7, 9];
+      const chopped = dropLast(original);
+      expect(chopped).toMatchObject([1, 3, 5, 7, 9]);
+    });
+    test('arrayWrap', async () => {
+      expect.assertions(4);
+      const originalArray = [1, 3, 5, 7, 9];
+      expect(arrayWrap(originalArray)).toMatchObject([1, 3, 5, 7, 9])
+      const originalString = '1';
+      expect(arrayWrap(originalString)).toMatchObject(['1']);
+      const originalNull = null;
+      expect(arrayWrap(originalNull)).toMatchObject([]);
+      const originalUndefined = undefined;
+      expect(arrayWrap(originalUndefined)).toMatchObject([]);
+    })
+  })
+
+  describe('Array dot method substitutes, proxies and variations', () => {
+    test('isArray', async () => {
+      expect.assertions(5);
+      expect(isArray([])).toBe(true);
+      expect(isArray(1)).toBe(false);
+      expect(isArray(false)).toBe(false);
+      expect(isArray(true)).toBe(false);
+      expect(isArray([true])).toBe(true);
+    })
     test('slice does what is expected', async () => {
       expect.assertions(6);
       expect(slice(testPeopleList1)).toMatchObject(testPeopleList1);
@@ -50,16 +162,35 @@ describe('Array utilities tests', () => {
       expect(slice(testPeopleList1, 3, 4)).toHaveLength(1);
       expect(slice(testPeopleList1, 0, 1)[0].name).toMatch('Forest');
       expect(slice(testPeopleList1, 0, 1)[1]).toBeUndefined();
+    });
+    test('reduce', async () => {
+      const start = [ 1, 2, 3, 4 ];
+      const subtract = (acc: number, current: number) => acc - current;
+      const buildArray = (acc: any[], current: any) => [...acc, current];
+      const subtracted = reduce(start, subtract, 4);
+      expect(subtracted).toBe(-6);
+      const built = reduce(start, buildArray, []);
+      expect(built).toMatchObject([1, 2, 3, 4]);
+    })
+    test('reduceRight', async () => {
+      const start = [ 1, 2, 3, 4 ];
+      const subtract = (acc: number, current: number) => acc - current;
+      const buildArray = (acc: any[], current: any) => [...acc, current];
+      const subtracted = reduceRight(start, subtract, 4);
+      expect(subtracted).toBe(-6);
+      const built = reduceRight(start, buildArray, []);
+      expect(built).toMatchObject([4, 3, 2, 1]);
+    })
+    test('join', async () => {
+      expect.assertions(4);
+      expect(join([1, 2, 3, 4, 5], '')).toBe('12345');
+      expect(join([1, 2, 3, 4, 5], ', ')).toBe('1, 2, 3, 4, 5');
+      expect(join([1, 2, 3, 4, 5], '| ')).toBe('1| 2| 3| 4| 5');
+      expect(join([1, 2, 3, 4, 5], ' | ')).toBe('1 | 2 | 3 | 4 | 5');
     })
   })
 
   describe('Basic Transformations', () => {
-    test('map() :: calls array\'s .map()', () => {
-      const array: number[] = [1, 2, 3]
-      spyOn(array, 'map');
-      map(array, (item: number) => item + 3);
-      expect(array.map).toHaveBeenCalled();
-    });
     test('map() :: gets correct result', () => {
       const array: number[] = [1, 2, 3]
       const added3 = map(array, (item: number) => item + 3);
@@ -81,14 +212,20 @@ describe('Array utilities tests', () => {
       expect(intersect([1, 2, 3], [4, 5, 6])).toMatchObject([]);
       expect(intersect([1, 2, 3, 4, 5, 6, 7], [4, 6, 7, 9])).toMatchObject([4, 6, 7]);
     });
+    test('notIntersect', async () => {
+      expect(notIntersect([1, 2, 3, 4], [4, 5, 6, 7])).toMatchObject([1, 2, 3, 5, 6, 7]);
+      expect(notIntersect([1, 2, 3, 4], [1, 2, 3, 4, 5, 6, 7])).toMatchObject([5, 6, 7]);
+    });
     test('omit', () => {
       expect(omit([1, 2, 3, 4, 5, 6, 7], 4)).toMatchObject([1, 2, 3, 5, 6, 7]);
     });
     test('insertAt', () => {
-      expect(insertAt([1, 2, 3, 4], 5, 1)).toMatchObject([1, 5, 2, 3, 4]);
+      const result = insertAt([1, 2, 3, 4], 5, 1);
+      expect(result).toMatchObject([1, 5, 2, 3, 4]);
     });
     test('removeAt', () => {
-      expect(removeAt([1, 2, 3, 4], 1)).toMatchObject([1, 3, 4]);
+      const result = removeAt([1, 2, 3, 4], 1);
+      expect(result).toMatchObject([1, 3, 4]);
     });
   });
 
@@ -111,7 +248,20 @@ describe('Array utilities tests', () => {
     });
     test('compactArray', () => {
       const compacter = [ 1, 2, 3, undefined, undefined, 4, 5, null, 6, null, 7, undefined, null, 8 ];
-      expect(compactArray(compacter)).toMatchObject([1, 2, 3, 4, 5, 6, 7, 8]);
+      const compacted = compactArray(compacter);
+      expect(compacted).toMatchObject([1, 2, 3, 4, 5, 6, 7, 8]);
+    });
+    test('flatten', async () => {
+      expect(
+        flatten(
+          [1, [2, [3, 4]], 5, 5, [7, 7, [8]]],
+          3,
+        ),
+      ).toMatchObject([
+        1, 2, 3, 4, 5, 5, 7, 7, 8,
+      ]);
+      expect(flatten([1, 2, 3])).toMatchObject([1, 2, 3]);
+      expect(flatten([1, 2, 3, 4], 0)).toMatchObject([1, 2, 3, 4]);
     });
   });
 
@@ -133,6 +283,37 @@ describe('Array utilities tests', () => {
           id: 125, name: 'Tiffany', age: 53, favColor: '#FFFF00',
         },
       ])
+    });
+    test('whereNot', async () => {
+      expect(whereNot(testPeopleList1, (person) => person.age < 40)).toMatchObject([
+        {
+          id: 123, name: 'Forest', age: 40, favColor: '#FF0000',
+        },
+        {
+          id: 125, name: 'Tiffany', age: 53, favColor: '#FFFF00',
+        },
+      ])
+    });
+    test('partition', async () => {
+      const partitioned = partition(testPeopleList1, (el) => el.age > 40);
+      const expectedOutput = [
+        [
+          {
+            id: 125, name: 'Tiffany', age: 53, favColor: '#FFFF00',
+          },
+        ], [
+          {
+            id: 123, name: 'Forest', age: 40, favColor: '#FF0000',
+          },
+          {
+            id: 124, name: 'Lump', age: 25, favColor: '#FF00FF',
+          },
+          {
+            id: 128, name: 'Roxanne', age: 18, favColor: '#0000FF',
+          },
+        ],
+      ];
+      expect(partitioned).toMatchObject(expectedOutput);
     });
     test('first', () => {
       expect(first(testPeopleList1)).toMatchObject({
@@ -172,6 +353,12 @@ describe('Array utilities tests', () => {
     });
     test('sumWhere', () => {
       expect(sumWhere(testPeopleList1, (person) => person.age > 20, 'age')).toBe(40 + 53 + 25);
+    });
+    test('min', async () => {
+      expect(min([8, 4, 3, 1, 2, -2, 7])).toBe(-2);
+    });
+    test('max', async () => {
+      expect(max([8, 4, 3, 1, 2, -2, 9])).toBe(9);
     });
   })
 
