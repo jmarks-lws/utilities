@@ -1,5 +1,5 @@
 import {
-  pick, Hash, HashOf, addProp,
+  pick, Hash, HashOf, addProp, hasKey,
 } from './object';
 import {
   def, strVal, undef, intVal, Nullable,
@@ -85,6 +85,11 @@ export const includes = (
  * @param {Array<T>} array Array to compare values from.
  */
 export const min = <T>([a, b, ...rest]: T[]): T => (undef(b) ? a : min([(a < b ? a : b), ...rest]))
+/**
+ * Compares all values in an array returning the highest element. Elements should be naturally comparable by the `>` operator.
+ * @param {Array<T>} array Array to compare values from.
+ */
+export const max = <T>([a, b, ...rest]: T[]): T => (undef(b) ? a : max([(a > b ? a : b), ...rest]))
 
 export const slice = <T>(
   array: T[],
@@ -192,11 +197,10 @@ export const sum = <T>(array: T[], field: string) => reduce(array,
  * @param field - Which field to sum. If the value of any instance of this property in any element cannot be parsed to an Integer, the result will be NaN
  */
 export const sumWhere = <T>(array: Array<T>, fn: FilterFn<T>, field: string) => sum(where(array, fn), field);
-/**
- * Compares all values in an array returning the highest element. Elements should be naturally comparable by the `>` operator.
- * @param {Array<T>} array Array to compare values from.
- */
-export const max = <T>([a, b, ...rest]: T[]): T => (undef(b) ? a : max([(a > b ? a : b), ...rest]))
+
+export const distinct = <T>(
+  array: Array<T>,
+) => reduce(array, (acc, el) => (includes(acc, el) ? [...acc] : [ ...acc, el ]), [] as T[]);
 
 /**
  * Asserts that an array has any elements matching a condition

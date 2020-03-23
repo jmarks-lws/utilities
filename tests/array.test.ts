@@ -42,6 +42,7 @@ import {
   max,
   notIntersect,
   flatten,
+  distinct,
 } from '../src/array';
 import { IMappableObject } from '../src/functional';
 
@@ -360,6 +361,11 @@ describe('Array utilities tests', () => {
     test('max', async () => {
       expect(max([8, 4, 3, 1, 2, -2, 9])).toBe(9);
     });
+    test('distinct', async () => {
+      expect(distinct([1, 1, 1, 1])).toMatchObject([1]);
+      expect(distinct([1, 2, 3, 1])).toMatchObject([1, 2, 3]);
+      expect(distinct([1, 2, 1, 2])).toMatchObject([1, 2]);
+    })
   })
 
   describe('Assertions', () => {
