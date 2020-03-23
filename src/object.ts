@@ -219,7 +219,7 @@ export const invert = (
  * @returns {Array<U>}
  */
 export const iterate = <T, U>(
-  hash: HashOf<T> | T[] | any,
+  hash: HashOf<T> | T[],
   fn: ((key: string, value: T) => U),
 ): U[] => {
   if (Array.isArray(hash)) {
@@ -236,7 +236,7 @@ export const iterate = <T, U>(
  * @param hash
  * @param fn
  */
-export const iterateWithBreak = (
+export const iterateWithBreak = ( // TODO: Make so it works with arrays too (like `iterate()` above)
   hash: Hash,
   fn: ((key: string, value: any, _break: () => void) => void),
 ) => {

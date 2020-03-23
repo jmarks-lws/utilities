@@ -80,7 +80,7 @@ describe('Object utilities tests', () => {
 
 
   test('iterate doesn\'t cause errors for empty input: ', async () => {
-    const out = iterate(null, (k: string, v: number) => v);
+    const out = iterate(null as any, (k: string, v: number) => v);
     expect(out).toMatchObject([]);
   });
 
