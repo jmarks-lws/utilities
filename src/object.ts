@@ -2,7 +2,9 @@ import {
   intersect, map, prune, reduce, head, tail,
   reverse,
   arrayEmpty,
+  count,
 } from './array';
+import { empty } from './miscellaneous';
 
 export interface Hash { [index: string]: any }
 export interface HashOf<T> { [index: string]: T }
@@ -217,14 +219,14 @@ export const invert = (
  * @returns {Array<U>}
  */
 export const iterate = <T, U>(
-  hash: HashOf<T> | T[],
+  hash: HashOf<T> | T[] | any,
   fn: ((key: string, value: T) => U),
 ): U[] => {
   if (Array.isArray(hash)) {
     let i = 0;
     return map(hash, (value) => fn(`${i++}`, value));
   }
-  return mapKeys(hash || {} as HashOf<T>, (key) => fn(key, hash[key]));
+  return isObject(hash) ? mapKeys(hash || {} as HashOf<T>, (key) => fn(key, hash[key])) : [];
 };
 
 /**

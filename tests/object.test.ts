@@ -17,6 +17,7 @@ import {
   mergeIntersection,
   pluck,
   invert,
+  HashOf,
 } from '../src/object';
 import { tail } from '../src/array';
 
@@ -60,6 +61,23 @@ describe('Object utilities tests', () => {
       0: 1, 1: 2, 2: 3, 3: 4, 4: 5,
     })
     expect(input).toMatchObject(values(out));
+  })
+
+  test('iterate can loop over a hash effectively: ', async () => {
+    const input: HashOf<number> = {
+      a: 1, b: 2, c: 3, d: 4, e: 5,
+    };
+    const outKeys: string[] = [];
+    let out = 0;
+    iterate(input, (k: string, v: number) => { out += v; outKeys.push(k); });
+    expect(out).toBe(1 + 2 + 3 + 4 + 5);
+    expect(outKeys).toMatchObject(['a', 'b', 'c', 'd', 'e']);
+  })
+
+
+  test('iterate doesn\'t cause errors for empty input: ', async () => {
+    const out = iterate(null, (k: string, v: number) => v);
+    expect(out).toMatchObject([]);
   })
 
   test('pick correctly picks a subset', () => {
