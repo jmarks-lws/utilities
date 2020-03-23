@@ -2,9 +2,9 @@ import {
   intersect, map, prune, reduce, head, tail,
   reverse,
   arrayEmpty,
-  count,
 } from './array';
-import { empty } from './miscellaneous';
+import { isNull } from './miscellaneous';
+
 
 export interface Hash { [index: string]: any }
 export interface HashOf<T> { [index: string]: T }
@@ -19,7 +19,7 @@ export interface HashOf<T> { [index: string]: T }
 
 export const { keys } = Object;
 
-export const isObject = (x: any) => (!Array.isArray(x)) && (typeof x === 'object');
+export const isDefinedObject = (x: any) => (!Array.isArray(x)) && (typeof x === 'object') && !isNull(x);
 
 export const values = <T>(o: HashOf<T>): T[] => Object.values(o)
 
@@ -226,7 +226,7 @@ export const iterate = <T, U>(
     let i = 0;
     return map(hash, (value) => fn(`${i++}`, value));
   }
-  return isObject(hash) ? mapKeys(hash || {} as HashOf<T>, (key) => fn(key, hash[key])) : [];
+  return isDefinedObject(hash) ? mapKeys(hash, (key) => fn(key, hash[key])) : [];
 };
 
 /**

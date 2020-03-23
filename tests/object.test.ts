@@ -9,7 +9,7 @@ import {
   Hash,
   iterate,
   values,
-  isObject,
+  isDefinedObject,
   pickNot,
   removeField,
   mapKeys,
@@ -18,6 +18,14 @@ import {
   pluck,
   invert,
   HashOf,
+  prop,
+  zip,
+  arraysToObject,
+  transformValues,
+  hasDiff,
+  noDiff,
+  diff,
+  fullDiff,
 } from '../src/object';
 import { tail } from '../src/array';
 
@@ -35,23 +43,19 @@ describe('Object utilities tests', () => {
   test('iterate can be short circiuted', () => {
     let runs = 0;
     const out: Hash = {};
-    const myObj = {
-      fn: (key: string, val: any, done: CallableFunction) => {
-        runs += 1;
-        out[key] = val;
-        if (runs === 3) {
-          done();
-        }
-      },
-    }
 
-    // const spy = spyOn(myObj, 'fn');
+    const fn = (key: string, val: any, done: CallableFunction) => {
+      runs += 1;
+      out[key] = val;
+      if (runs === 3) {
+        done();
+      }
+    };
 
-    iterateWithBreak(testPerson1, myObj.fn);
+    iterateWithBreak(testPerson1, fn);
 
-    // expect(spy).toHaveBeenCalledTimes(7);
     expect(keys(out).length).toBe(3);
-  })
+  });
 
   test('iterate can loop over an everyday array', async () => {
     const input: Array<number> = [1, 2, 3, 4, 5];
@@ -61,7 +65,7 @@ describe('Object utilities tests', () => {
       0: 1, 1: 2, 2: 3, 3: 4, 4: 5,
     })
     expect(input).toMatchObject(values(out));
-  })
+  });
 
   test('iterate can loop over a hash effectively: ', async () => {
     const input: HashOf<number> = {
@@ -72,13 +76,13 @@ describe('Object utilities tests', () => {
     iterate(input, (k: string, v: number) => { out += v; outKeys.push(k); });
     expect(out).toBe(1 + 2 + 3 + 4 + 5);
     expect(outKeys).toMatchObject(['a', 'b', 'c', 'd', 'e']);
-  })
+  });
 
 
   test('iterate doesn\'t cause errors for empty input: ', async () => {
     const out = iterate(null, (k: string, v: number) => v);
     expect(out).toMatchObject([]);
-  })
+  });
 
   test('pick correctly picks a subset', () => {
     expect(pick(testPerson1, ['id', 'name'])).toMatchObject({
@@ -93,6 +97,83 @@ describe('Object utilities tests', () => {
         id: 123,
         name: 'Forest',
       });
+  });
+
+  test('prop', async () => {
+    const p = prop({ a: 1, p: 23 }, 'p');
+    const ba = prop({ a: 1, p: 23, c: 34 }, 'b');
+    const bb = prop({ a: 1, p: 23, c: 34 }, 'b', 'test');
+    expect(p).toBe(23);
+    expect(ba).toBe(null);
+    expect(bb).toBe('test');
+  });
+
+  test('zip', async () => {
+    const ks = ['a', 'b', 'c'];
+    const vs = [1, 2, 3];
+    expect(zip(ks, vs)).toMatchObject([
+      'a', 1, 'b', 2, 'c', 3,
+    ])
+  });
+  test('arraysToObject', async () => {
+    const ks = ['a', 'b', 'c'];
+    const vs = [1, 2, 3];
+    expect(arraysToObject(ks, vs)).toMatchObject({
+      a: 1, b: 2, c: 3,
+    })
+  });
+  test('transformValues', async () => {
+    const timesTwo = (v: number) => v * 2;
+    expect(transformValues({
+      a: 1, b: 2, c: 3,
+    }, timesTwo)).toMatchObject({
+      a: 2, b: 4, c: 6,
+    })
+  });
+
+  test('hasDiff', async () => {
+    const a = { a: 1 };
+    const b = { b: 1 };
+    const c = { a: 1 };
+    expect(hasDiff(a, b)).toBe(true);
+    expect(hasDiff(a, c)).toBe(false);
+    expect(hasDiff(b, c)).toBe(true);
+  });
+  test('noDiff', async () => {
+    const a = { a: 1 };
+    const b = { b: 1 };
+    const c = { a: 1 };
+    expect(noDiff(a, b)).toBe(false);
+    expect(noDiff(a, c)).toBe(true);
+    expect(noDiff(b, c)).toBe(false);
+  });
+  test('simple diff', async () => {
+    const a = { a: 1 };
+    const b = { b: 1 };
+    expect(diff(a, b)).toMatchObject({
+      a: '-',
+      b: '+',
+    })
+  });
+  // TODO: Finish writing tests and adjusting `diff`
+  // test('diff with subobject', async () => {
+  //   const a = { a: 1, b: { a: 1, b: 2 } };
+  //   const b = { b: 1 };
+  //   expect(diff(a, b)).toMatchObject({
+  //     a: '-',
+  //     b: {
+  //       '-': 1,
+  //       '+': { a: 1, b: 2 },
+  //     },
+  //   })
+  // });
+  test('fullDiff', async () => {
+    const a = { a: 1 };
+    const b = { b: 1 };
+    expect(fullDiff(a, b)).toMatchObject({
+      a: { '-': 1 },
+      b: { '+': 1 },
+    })
   });
 
   test('compactObject removes null or undefined properties', () => {
@@ -135,7 +216,7 @@ describe('Object utilities tests', () => {
       HP: 100,
       maxHP: 100,
     })
-  })
+  });
 
   test('getSharedKeys returns only keys that both objects have', () => {
     expect(getSharedKeys(testPerson1, { id: 'id', dob: 'dob', test: 'test' })).toMatchObject([
@@ -172,9 +253,9 @@ describe('Object utilities tests', () => {
     const o = { a: 1, b: 2 };
     const no = '123';
     const ar = [ 1, 2, 3 ];
-    expect(isObject(o)).toBe(true);
-    expect(isObject(no)).toBe(false);
-    expect(isObject(ar)).toBe(false);
+    expect(isDefinedObject(o)).toBe(true);
+    expect(isDefinedObject(no)).toBe(false);
+    expect(isDefinedObject(ar)).toBe(false);
   });
 
   test('pickNot', async () => {
@@ -223,5 +304,5 @@ describe('Object utilities tests', () => {
 
   test('invert', async () => {
     expect(invert({ a: 1, b: 2, c: 3 })).toMatchObject({ 1: 'a', 2: 'b', 3: 'c' })
-  })
-})
+  });
+});
