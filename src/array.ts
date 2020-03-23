@@ -36,7 +36,7 @@ export const dropLast = <T>(array: T[], n: number = 0): T[] => chopFirst([...arr
  * Abstractions of Array dot methods, with some additional typescript annotation.
  */
 export const isArray = (x: any): boolean => Array.isArray(x); // NOTE: This is a static function, so not going to attempt to rewrite.
-export const concat = <T>(a: T[], b: T[]): T[] => [...a, ...b]; // TODO: Rewrite
+export const concat = <T, U>(a: T[], b: U[]): (T | U)[] => [...a, ...b]; // TODO: Rewrite
 const internalReduce = <TElement, TResult>(
   array: TElement[],
   fn: ReduceFn<TElement, TResult>,
@@ -54,12 +54,6 @@ export const reduce = <TElement, TResult>(
   fn: ReduceFn<TElement, TResult>,
   init: TResult,
 ): TResult => internalReduce(array, fn, init, 0, array);
-
-// export const reduce = <TElement, TResult>(
-//   a: TElement[],
-//   fn: ReduceFn<TElement, TResult>,
-//   init: TResult,
-// ) => a.reduce(fn, init);
 
 export const reduceRight = <TElement, TResult>(
   array: TElement[],
