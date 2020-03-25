@@ -180,7 +180,7 @@ export const countWhere = <T>(array: Array<T>, fn: FilterFn<T>) => where(array, 
 export const countDefined = (array: Array<any>) => countWhere(map(array, (i) => def(i)), (defined) => defined === true);
 export const hasOneDefined = (array: Array<any>) => countDefined(array) === 1;
 export const hasSomeDefined = (array: Array<any>) => countDefined(array) > 0;
-export const hasAllDefined = (array: Array<any>) => countDefined(array) > count(array);
+export const hasAllDefined = (array: Array<any>) => countDefined(array) === count(array);
 export const hasNoneDefined = (array: Array<any>) => countDefined(array) === 0;
 
 /**
