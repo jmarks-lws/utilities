@@ -7,6 +7,18 @@ export const isNumber = (x: any) => (typeof x === 'number');
 export type Nullable<T> = T | null;
 export type Optional<T> = T | null | undefined;
 
+/** Require at least one of the provided properties in the provided object. */
+export type RequireAtLeastOne<T, Keys extends keyof T = keyof T> =
+  Pick<T, Exclude<keyof T, Keys>> & {
+      [K in Keys]-?: Required<Pick<T, K>> & Partial<Pick<T, Exclude<Keys, K>>>
+  }[Keys]
+
+/** Require EXACTLY ONE of the provided properties in the provided object */
+export type RequireOnlyOne<T, Keys extends keyof T = keyof T> =
+  Pick<T, Exclude<keyof T, Keys>> & {
+      [K in Keys]-?: Required<Pick<T, K>> & Partial<Record<Exclude<Keys, K>, undefined>>
+  }[Keys]
+
 export const def = (x: any) => typeof x !== 'undefined';
 export const undef = (x: any) => !def(x);
 export const isNull = (x: any) => x === null;
