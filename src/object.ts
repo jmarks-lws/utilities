@@ -12,10 +12,7 @@ export interface HashOf<T> { [index: string]: T }
 //   key: T,
 //   value: U,
 // }
-// export type Dictionary<T, U> = Array<{
-//   key: T,
-//   value: U,
-// }>;
+// export type Dictionary<T, U> = Array<KeyValuePair<T, U>>;
 
 export const { keys } = Object;
 
