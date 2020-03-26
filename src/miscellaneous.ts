@@ -17,7 +17,7 @@ export type RequireOnlyOne<T, Keys extends keyof T = keyof T> =
       [K in Keys]-?: Required<Pick<T, K>> & Partial<Record<Exclude<Keys, K>, undefined>>
   }[Keys]
 
-export const isNumber = (x: any) => (typeof x === 'number') && !Number.isNaN(x);
+export const isNumber = (x: any) => (typeof x === 'number');
 export const isValidNumber = (x: any) => isNumber(x) && !Number.isNaN(x);
 export const isBigInt = (x: any) => (typeof x === 'bigint');
 export const isString = (x: any) => (typeof x === 'string');
