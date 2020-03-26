@@ -2,6 +2,7 @@ import {
   intersect, map, prune, reduce, head, tail,
   reverse,
   arrayEmpty,
+  where,
 } from './array';
 import { isNull } from './miscellaneous';
 
@@ -64,7 +65,10 @@ export const mapKeys = <T, U>(o: HashOf<T>, fn: ((k: string, i: number) => U)): 
  * Returns a new object with a subset of properties where properties which have null or undefined values have been removed.
  * @param o
  */
-export const compactObject = (o: any) => pick(o, keys(o).filter((key) => ![undefined, null].includes(o[key])));
+export const compactObject = (o: Hash, keepNulls = false) => pick(o, where(
+  keys(o),
+  (key) => o[key] !== undefined && (keepNulls || o[key] !== null),
+));
 
 /**
  * Returns a new object that is the result of merging together a series of objects. Values to the right

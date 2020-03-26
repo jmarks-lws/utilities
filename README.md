@@ -25,7 +25,7 @@ Some of these merely wrap common tasks with a declarative word or two to better 
 
 ### Arrays
 
-A series of simple functional array utilities.
+*A series of simple functional array utilities.*
   - head
   - tail
   - copy
@@ -34,7 +34,7 @@ A series of simple functional array utilities.
   - chopFirst
   - chopLast
 
-Abstractions of Array dot methods, with some additional typescript annotation.
+*Abstractions of Array dot methods, with some additional typescript annotation.*
   - isArray
   - concat
   - reduce
@@ -43,7 +43,7 @@ Abstractions of Array dot methods, with some additional typescript annotation.
   - map
   - preparedMap - Partially applies an array mapping function, by loading it up with the function, returning a function that can be called with only the array afterward.
 
-List/Item manipulation methods:
+*List/Item manipulation methods:*
   - arrayWrap
   - prune
   - intersect
@@ -56,7 +56,7 @@ List/Item manipulation methods:
   - compactArray - Removes null or undefined items from an array and returns the result.
   - flatten - Takes multidimensional arrays and flattens them out into fewer dimensions. By default will flatten to one dimension completely.
 
-Filtering methods:
+*Filtering methods:*
   - where
   - whereNot
   - partition
@@ -65,18 +65,18 @@ Filtering methods:
   - last - get the last element from an array
   - findLast - get the last element from an array that matches a condition
 
-Aggregation functions:
+*Aggregation functions:*
   - count
   - countWhere
   - sum
   - sumWhere
 
-Assertions:
+*Assertions:*
   - hasAny
   - hasNone
   - hasAll
 
-types:
+*types:*
   - FilterFn<T>
   - ReduceFn<T>
 
@@ -101,7 +101,7 @@ types:
   - remapKeys
   - invert
 
-types:
+*types:*
   - Hash
   - HashOf<T>
 
@@ -117,14 +117,14 @@ types:
   - tryCatch
   - tryCatchManyAsync
 
-types:
+*types:*
   - IMappableObject - ???? keep ????
 
 ### Pipes
   - pipe
   - asyncPipe
 
-types:
+*types:*
   - IPipe
   - IPipeCaller<T>
   - IPipeAsync<T>
