@@ -36,7 +36,7 @@ export const notNull = (x: any) => !isNull(x);
  * */
 export const empty = (x: any) => (
   undef(x) || isNull(x) || x === 0 || x === '' || x === '0' || x === false
-  || (isArray(x) && x.length === 0) || (isDefinedObject(x) && count(keys(x)) === 0)
+  || (isArray(x) && count(x) === 0) || (isDefinedObject(x) && count(keys(x)) === 0)
 );
 export const notEmpty = (x: any) => !empty(x);
 

@@ -12,6 +12,9 @@ interface ReduceFn<TEelement, TResult> {
   (previousValue: TResult, currentValue: TEelement, currentIndex?: number, array?: TEelement[]): TResult;
 }
 
+export const isArray = (x: any): boolean => Array.isArray(x); // NOTE: This is a static function, so not going to attempt to rewrite.
+export const concat = <T, U>(a: T[], b: U[]): (T | U)[] => [...a, ...b]; // TODO: Rewrite
+
 /**
  * A series of simple functional array utilities
  */
@@ -22,7 +25,16 @@ export const arrayCopy = <T>(arr: T[]): Nullable<Array<T>> => (Array.isArray(arr
  * Returns number of elements in `array`.
  * @param array - The source array
  */
-export const count = (array: any[]): number => (array.filter((x) => def(x)).length > 0 ? 1 + count(tail(array)) : 0);
+export const count = (array: any[]): number => (
+  // eslint-disable-next-line no-nested-ternary
+  !isArray(array)
+    ? count([array])
+    : (
+      array.filter((x) => def(x)).length > 0
+        ? 1 + count(tail(array))
+        : 0
+    )
+);
 export const reverse = (array: any[]): any[] => (def(head(array)) ? [...reverse(tail(array)), head(array)] : []);
 export const chopFirst = (array: any[], n: number = 1): any => (
   def(head(array)) && n ? [head(array), ...chopFirst(tail(array), n - 1)] : []
@@ -35,8 +47,6 @@ export const dropLast = <T>(array: T[], n: number = 0): T[] => chopFirst([...arr
 /**
  * Abstractions of Array dot methods, with some additional typescript annotation.
  */
-export const isArray = (x: any): boolean => Array.isArray(x); // NOTE: This is a static function, so not going to attempt to rewrite.
-export const concat = <T, U>(a: T[], b: U[]): (T | U)[] => [...a, ...b]; // TODO: Rewrite
 const internalReduce = <TElement, TResult>(
   array: TElement[],
   fn: ReduceFn<TElement, TResult>,
