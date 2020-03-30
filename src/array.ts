@@ -161,7 +161,7 @@ export const partition = <T>(array: T[], fn: FilterFn<T>) => [where(array, fn), 
  * Returns the first T from an Array<T>
  * @param array - The source array
  */
-export const first = <T>([x]: Array<T>) => x;
+export const first = <T>([x]: Array<T>) : T | undefined => x;
 /**
  * Returns the first T that matches a provided condition from an Array<T>
  * @param array - The source array
