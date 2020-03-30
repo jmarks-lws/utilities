@@ -156,13 +156,17 @@ describe('Array utilities tests', () => {
       expect(isArray([true])).toBe(true);
     })
     test('slice does what is expected', async () => {
-      expect.assertions(6);
-      expect(slice(testPeopleList1)).toMatchObject(testPeopleList1);
-      expect(slice(testPeopleList1, 0, 1)).toHaveLength(1);
-      expect(slice(testPeopleList1, 0, 3)).toHaveLength(3);
-      expect(slice(testPeopleList1, 3, 4)).toHaveLength(1);
-      expect(slice(testPeopleList1, 0, 1)[0].name).toMatch('Forest');
-      expect(slice(testPeopleList1, 0, 1)[1]).toBeUndefined();
+      const sliceTestList = [1, 2, 3, 4];
+
+      expect.assertions(7);
+      expect(slice(sliceTestList)).toMatchObject(sliceTestList);
+      expect(slice(sliceTestList, 0, 1)).toHaveLength(1);
+      expect(slice(sliceTestList, 0, 3)).toHaveLength(3);
+      expect(slice(sliceTestList, 3, 4)).toHaveLength(1);
+      // expect(slice(sliceTestList, 0, 1)[0].name).toMatch('Forest');
+      expect(slice(sliceTestList, 0, 1)[1]).toBeUndefined();
+      expect(slice(sliceTestList, 10, 15)).toHaveLength(0);
+      expect(slice(sliceTestList, 10, 5)).toHaveLength(0);
     });
     test('reduce', async () => {
       const start = [ 1, 2, 3, 4 ];

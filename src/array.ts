@@ -21,6 +21,18 @@ export const concat = <T, U>(a: T[], b: U[]): (T | U)[] => [...a, ...b]; // TODO
 export const head = ([x]: any[]) => x;
 export const tail = ([, ...xs]: any[]) => xs;
 export const arrayCopy = <T>(arr: T[]): Nullable<Array<T>> => (Array.isArray(arr) ? [...arr] : null);
+
+/**
+ * Compares all values in an array returning the lowest element. Elements should be naturally comparable by the `<` operator.
+ * @param {Array<T>} array Array to compare values from.
+ */
+export const min = <T>([a, b, ...rest]: T[]): T => (undef(b) ? a : min([(a < b ? a : b), ...rest]))
+/**
+ * Compares all values in an array returning the highest element. Elements should be naturally comparable by the `>` operator.
+ * @param {Array<T>} array Array to compare values from.
+ */
+export const max = <T>([a, b, ...rest]: T[]): T => (undef(b) ? a : max([(a > b ? a : b), ...rest]))
+
 /**
  * Returns number of elements in `array`.
  * @param array - The source array
@@ -41,8 +53,8 @@ export const chopFirst = (array: any[], n: number = 1): any => (
 );
 export const chopLast = (xs: any[], n: number = 1): any => reverse(chopFirst(reverse(xs), n));
 
-export const dropFirst = <T>(array: T[], n: number = 0): T[] => chopLast([...array], count([...array]) - n);
-export const dropLast = <T>(array: T[], n: number = 0): T[] => chopFirst([...array], count([...array]) - n);
+export const dropFirst = <T>(array: T[], n: number = 0): T[] => chopLast(array, count(array) - min([n, count(array)]));
+export const dropLast = <T>(array: T[], n: number = 0): T[] => chopFirst(array, count(array) - min([n, count(array)]));
 
 /**
  * Abstractions of Array dot methods, with some additional typescript annotation.
@@ -84,24 +96,13 @@ export const includes = (
   needle: any,
 ): boolean => reduce(haystack, (acc: boolean, el) => (acc || el === needle), false);
 
-/**
- * Compares all values in an array returning the lowest element. Elements should be naturally comparable by the `<` operator.
- * @param {Array<T>} array Array to compare values from.
- */
-export const min = <T>([a, b, ...rest]: T[]): T => (undef(b) ? a : min([(a < b ? a : b), ...rest]))
-/**
- * Compares all values in an array returning the highest element. Elements should be naturally comparable by the `>` operator.
- * @param {Array<T>} array Array to compare values from.
- */
-export const max = <T>([a, b, ...rest]: T[]): T => (undef(b) ? a : max([(a > b ? a : b), ...rest]))
-
 export const slice = <T>(
   array: T[],
   start: number = 0,
   end: number = Infinity,
 ): T[] => (
     dropLast(dropFirst(array, start), count(array) - min([ count(array), end ]))
-  );
+  )
 
 /**
  * Returns an array using the following rules:
@@ -282,9 +283,9 @@ export const removeAt = <T>(array: Array<T>, index: number) => [
  * @param array - The source array
  * @param key - Which field to use as the ObjectHash key
  */
-export const hash = <T extends any>(array: Array<T>, key: string): HashOf<T> => (
+export const hash = <T extends Hash>(array: Array<T>, key: string): HashOf<T> => (
   reduce(
-    array,
+    array as T[],
     (prev: HashOf<T>, curr: T): HashOf<T> => addProp(prev, strVal(curr[key]), curr) as HashOf<T>,
     {} as HashOf<T>,
   )
