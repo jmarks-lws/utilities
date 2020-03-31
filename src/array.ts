@@ -13,7 +13,7 @@ interface ReduceFn<TEelement, TResult> {
 }
 
 export const isArray = (x: any): boolean => Array.isArray(x); // NOTE: This is a static function, so not going to attempt to rewrite.
-export const concat = <T, U>(a: T[], b: U[]): (T | U)[] => [...a, ...b]; // TODO: Rewrite
+
 
 /**
  * A series of simple functional array utilities
@@ -21,6 +21,10 @@ export const concat = <T, U>(a: T[], b: U[]): (T | U)[] => [...a, ...b]; // TODO
 export const head = ([x]: any[]) => x;
 export const tail = ([, ...xs]: any[]) => xs;
 export const arrayCopy = <T>(arr: T[]): Nullable<Array<T>> => (Array.isArray(arr) ? [...arr] : null);
+
+export const concat = <T>(...args: T[][]): T[] => (
+  args.length > 0 ? [...head(args), ...concat(...tail(args))] : []
+);
 
 /**
  * Compares all values in an array returning the lowest element. Elements should be naturally comparable by the `<` operator.
