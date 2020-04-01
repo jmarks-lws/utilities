@@ -142,7 +142,7 @@ export const tryCatchManyAsync = <T>(
  * @param fn - Function to wrap
  * @param context - An optional context to provide `this` for the enclosed function.
  */
-export const doTimes = (times: number = 1, fn: (...args: any[]) => any, context: any) => {
+export const doTimes = (times: number = 1, fn: (...args: any[]) => any, context?: any) => {
   let ranTimes: number = 0;
 
   return function someFunction(this: any, ...args: any[]) {
