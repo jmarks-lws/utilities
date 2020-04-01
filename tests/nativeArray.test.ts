@@ -1,5 +1,6 @@
 import * as A from '../src/array';
 import * as N from '../src/nativeArray';
+import { doRepeat } from '../src/miscellaneous';
 
 
 const generateSourceData = <T>(numItems: number, generatorFn: (() => T)): T[] => [
@@ -37,11 +38,6 @@ const sourceData = generateSourceData(1000, () => ({
 
 const c = getRandomCharacterFromString('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890')
 const g = generateRandomString(1000);
-
-const doRepeat = (repeatTimes: number, fn: CallableFunction, ...args: any[]) => {
-  fn(...args);
-  if (repeatTimes > 1) doRepeat(repeatTimes - 1, fn, ...args);
-}
 
 const getBenchmark = (repeatTimes: number, fn: CallableFunction, ...args: any[]) => {
   const startTime = performance.now();
