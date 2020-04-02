@@ -164,6 +164,15 @@ export const repeat = (repeatTimes: number, fn: CallableFunction, ...args: any[]
   if (repeatTimes > 1) repeat(repeatTimes - 1, fn, ...args);
 }
 
+export const repeatAsync = async (
+  repeatTimes: number,
+  fn: (...args: any[]) => Promise<any>,
+  ...args: any[]
+) => {
+  await fn(...args);
+  if (repeatTimes > 1) await repeatAsync(repeatTimes - 1, fn, ...args);
+}
+
 export const repeatWithBreak = (
   repeatTimes: number,
   fn: ((done: CallableFunction, ...fnargs: any[]) => any),
@@ -172,4 +181,14 @@ export const repeatWithBreak = (
   let isDone = false;
   fn((() => { isDone = true }), ...args);
   if (repeatTimes > 1 && !isDone) repeatWithBreak(repeatTimes - 1, fn, ...args);
+}
+
+export const repeatAsyncWithBreak = async (
+  repeatTimes: number,
+  fn: ((done: CallableFunction, ...fnargs: any[]) => Promise<any>),
+  ...args: any[]
+) => {
+  let isDone = false;
+  await fn((() => { isDone = true }), ...args);
+  if (repeatTimes > 1 && !isDone) await repeatAsyncWithBreak(repeatTimes - 1, fn, ...args);
 }
