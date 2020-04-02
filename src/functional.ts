@@ -159,7 +159,17 @@ export const maxTimes = (times: number = 1, fn: (...args: any[]) => any, context
  */
 export const maxOnce = (fn: (...args: any[]) => any, context: any) => maxTimes(1, fn, context)
 
-export const doRepeat = (repeatTimes: number, fn: CallableFunction, ...args: any[]) => {
+export const repeat = (repeatTimes: number, fn: CallableFunction, ...args: any[]) => {
   fn(...args);
-  if (repeatTimes > 1) doRepeat(repeatTimes - 1, fn, ...args);
+  if (repeatTimes > 1) repeat(repeatTimes - 1, fn, ...args);
+}
+
+export const repeatWithBreak = (
+  repeatTimes: number,
+  fn: ((done: CallableFunction, ...fnargs: any[]) => any),
+  ...args: any[]
+) => {
+  let isDone = false;
+  fn((() => { isDone = true }), ...args);
+  if (repeatTimes > 1 && !isDone) repeatWithBreak(repeatTimes - 1, fn, ...args);
 }
