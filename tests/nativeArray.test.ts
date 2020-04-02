@@ -1,6 +1,6 @@
 import * as A from '../src/array';
 import * as N from '../src/nativeArray';
-import { doRepeat } from '../src/miscellaneous';
+import { repeat } from '../src/functional';
 
 
 const generateSourceData = <T>(numItems: number, generatorFn: (() => T)): T[] => [
@@ -41,14 +41,14 @@ const g = generateRandomString(1000);
 
 const getBenchmark = (repeatTimes: number, fn: CallableFunction, ...args: any[]) => {
   const startTime = performance.now();
-  doRepeat(repeatTimes, fn, ...(args));
+  repeat(repeatTimes, fn, ...(args));
   const endTime = performance.now();
   return endTime - startTime;
 }
 
 const getXRandomFromArray = <T>(numToGet: number, array: T[]): T[] => {
   const out: T[] = [] as T[];
-  doRepeat(numToGet, () => out.push(getRandomElementFromArray(array)));
+  repeat(numToGet, () => out.push(getRandomElementFromArray(array)));
   return out;
 }
 
@@ -84,10 +84,10 @@ describe('Benchmark tests', () => {
     const nativeTestResult = nativeTest();
     const customTestResult = customTest();
 
-    console.log({
-      nativeTestResult,
-      customTestResult,
-    })
+    // console.log({
+    //   nativeTestResult,
+    //   customTestResult,
+    // })
 
     expect(nativeTestResult).toBeLessThan(customTestResult);
   })
@@ -104,10 +104,10 @@ describe('Benchmark tests', () => {
     const nativeTestResult = nativeTest();
     const customTestResult = customTest();
 
-    console.log({
-      nativeTestResult,
-      customTestResult,
-    })
+    // console.log({
+    //   nativeTestResult,
+    //   customTestResult,
+    // })
 
     expect(nativeTestResult).toBeLessThan(customTestResult);
   })
