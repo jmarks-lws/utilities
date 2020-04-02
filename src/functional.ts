@@ -137,12 +137,12 @@ export const tryCatchManyAsync = <T>(
   }
 
 /**
- * Wrap a function so that it will only run `times` times when called from the resulting wrapper
+ * Wrap a function so that it will only run at most `times` times when called from the resulting wrapper
  * @param times - Number of times to allow this function to run
  * @param fn - Function to wrap
  * @param context - An optional context to provide `this` for the enclosed function.
  */
-export const doTimes = (times: number = 1, fn: (...args: any[]) => any, context?: any) => {
+export const maxTimes = (times: number = 1, fn: (...args: any[]) => any, context?: any) => {
   let ranTimes: number = 0;
 
   return function someFunction(this: any, ...args: any[]) {
@@ -157,4 +157,9 @@ export const doTimes = (times: number = 1, fn: (...args: any[]) => any, context?
  * @param fn - Function to wrap
  * @param context - An optional context to provide `this` for the enclosed function.
  */
-export const doOnce = (fn: (...args: any[]) => any, context: any) => doTimes(1, fn, context)
+export const maxOnce = (fn: (...args: any[]) => any, context: any) => maxTimes(1, fn, context)
+
+export const doRepeat = (repeatTimes: number, fn: CallableFunction, ...args: any[]) => {
+  fn(...args);
+  if (repeatTimes > 1) doRepeat(repeatTimes - 1, fn, ...args);
+}
