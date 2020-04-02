@@ -159,36 +159,63 @@ export const maxTimes = (times: number = 1, fn: (...args: any[]) => any, context
  */
 export const maxOnce = (fn: (...args: any[]) => any, context: any) => maxTimes(1, fn, context)
 
-export const repeat = (repeatTimes: number, fn: CallableFunction, ...args: any[]) => {
-  fn(...args);
-  if (repeatTimes > 1) repeat(repeatTimes - 1, fn, ...args);
+const internalRepeat = (repeatTimes: number, fn: CallableFunction, index: number, ...args: any[]) => {
+  fn(index, ...args);
+  if (repeatTimes > 1) internalRepeat(repeatTimes - 1, fn, index + 1, ...args);
+}
+export const repeat = (repeatTimes: number, fn: (index: number, ...fnArgs: any[]) => void, ...args: any[]) => {
+  internalRepeat(repeatTimes, fn, 0, ...args);
 }
 
+const internalRepeatAsync = async (
+  repeatTimes: number,
+  fn: (...args: any[]) => Promise<any>,
+  index: number,
+  ...args: any[]
+) => {
+  await fn(index, ...args);
+  if (repeatTimes > 1) await internalRepeatAsync(repeatTimes - 1, fn, index + 1, ...args);
+}
 export const repeatAsync = async (
   repeatTimes: number,
   fn: (...args: any[]) => Promise<any>,
   ...args: any[]
 ) => {
-  await fn(...args);
-  if (repeatTimes > 1) await repeatAsync(repeatTimes - 1, fn, ...args);
+  await internalRepeatAsync(repeatTimes, fn, 0, ...args);
 }
 
+const internalRepeatWithBreak = (
+  repeatTimes: number,
+  fn: ((i: number, done: CallableFunction, ...fnargs: any[]) => any),
+  index: number,
+  ...args: any[]
+) => {
+  let isDone = false;
+  fn(index, (() => { isDone = true }), ...args);
+  if (repeatTimes > 1 && !isDone) internalRepeatWithBreak(repeatTimes - 1, fn, index + 1, ...args);
+}
 export const repeatWithBreak = (
   repeatTimes: number,
-  fn: ((done: CallableFunction, ...fnargs: any[]) => any),
+  fn: ((i: number, done: CallableFunction, ...fnargs: any[]) => any),
   ...args: any[]
 ) => {
-  let isDone = false;
-  fn((() => { isDone = true }), ...args);
-  if (repeatTimes > 1 && !isDone) repeatWithBreak(repeatTimes - 1, fn, ...args);
+  internalRepeatWithBreak(repeatTimes, fn, 0, ...args);
 }
 
-export const repeatAsyncWithBreak = async (
+const internalRepeatAsyncWithBreak = async (
   repeatTimes: number,
-  fn: ((done: CallableFunction, ...fnargs: any[]) => Promise<any>),
+  fn: ((i: number, done: CallableFunction, ...fnargs: any[]) => Promise<any>),
+  index: number,
   ...args: any[]
 ) => {
   let isDone = false;
-  await fn((() => { isDone = true }), ...args);
-  if (repeatTimes > 1 && !isDone) await repeatAsyncWithBreak(repeatTimes - 1, fn, ...args);
+  await fn(index, (() => { isDone = true }), ...args);
+  if (repeatTimes > 1 && !isDone) await internalRepeatAsyncWithBreak(repeatTimes - 1, fn, index + 1, ...args);
+}
+export const repeatAsyncWithBreak = async (
+  repeatTimes: number,
+  fn: ((i: number, done: CallableFunction, ...fnargs: any[]) => Promise<any>),
+  ...args: any[]
+) => {
+  await internalRepeatAsyncWithBreak(repeatTimes, fn, 0, ...args);
 }

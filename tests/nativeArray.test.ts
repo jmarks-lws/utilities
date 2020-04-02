@@ -39,7 +39,7 @@ const sourceData = generateSourceData(1000, () => ({
 const c = getRandomCharacterFromString('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890')
 const g = generateRandomString(1000);
 
-const getBenchmark = (repeatTimes: number, fn: CallableFunction, ...args: any[]) => {
+const getBenchmark = (repeatTimes: number, fn: (...args: any[]) => any, ...args: any[]) => {
   const startTime = performance.now();
   repeat(repeatTimes, fn, ...(args));
   const endTime = performance.now();
