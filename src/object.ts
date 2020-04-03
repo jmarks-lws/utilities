@@ -1,8 +1,6 @@
 import {
   intersect, map, prune, reduce, head, tail,
-  reverse,
-  arrayEmpty,
-  where,
+  reverse, arrayEmpty, filter,
 } from './array';
 import { isNull } from './miscellaneous';
 
@@ -15,7 +13,7 @@ export interface HashOf<T> { [index: string]: T }
 // }
 // export type Dictionary<T, U> = Array<KeyValuePair<T, U>>;
 
-export const { keys } = Object;
+export const { keys, freeze } = Object;
 
 export const isDefinedObject = (x: any) => (!Array.isArray(x)) && (typeof x === 'object') && !isNull(x);
 
@@ -66,7 +64,7 @@ export const mapKeys = <T, U>(o: HashOf<T>, fn: ((k: string, i: number) => U)): 
  * @param o
  */
 export const compactObject = (o: Hash, keepNulls = false) => pick(
-  o, where(
+  o, filter(
     keys(o),
     (key) => o[key] !== undefined && (keepNulls || o[key] !== null),
   ),
