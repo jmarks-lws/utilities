@@ -369,8 +369,14 @@ describe('Array utilities tests', () => {
     test('min', async () => {
       expect(min([8, 4, 3, 1, 2, -2, 7])).toBe(-2);
     });
+    test('min', async () => {
+      expect(min(['b', 't', 'a'])).toBe('a');
+    });
     test('max', async () => {
       expect(max([8, 4, 3, 1, 2, -2, 9])).toBe(9);
+    });
+    test('max', async () => {
+      expect(max(['b', 't', 'a'])).toBe('t');
     });
     test('distinct', async () => {
       expect(distinct([1, 1, 1, 1])).toMatchObject([1]);

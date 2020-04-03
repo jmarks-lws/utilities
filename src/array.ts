@@ -1,5 +1,5 @@
 import {
-  pick, Hash, HashOf, addProp, hasKey,
+  pick, Hash, HashOf, addProp,
 } from './object';
 import {
   def, strVal, undef, intVal, Nullable,
@@ -8,8 +8,8 @@ import {
 interface FilterFn<T> {
   (el: T, i?: number, m?: T[]): boolean;
 }
-interface ReduceFn<TEelement, TResult> {
-  (previousValue: TResult, currentValue: TEelement, currentIndex?: number, array?: TEelement[]): TResult;
+interface ReduceFn<TElement, TResult> {
+  (previousValue: TResult, currentValue: TElement, currentIndex?: number, array?: TElement[]): TResult;
 }
 
 export const isArray = (x: any): boolean => Array.isArray(x); // NOTE: This is a static function, so not going to attempt to rewrite.
@@ -22,9 +22,7 @@ export const head = ([x]: any[]) => x;
 export const tail = ([, ...xs]: any[]) => xs;
 export const arrayCopy = <T>(arr: T[]): Nullable<Array<T>> => (Array.isArray(arr) ? [...arr] : null);
 
-export const concat = <T>(...args: T[][]): T[] => (
-  args.length > 0 ? [...head(args), ...concat(...tail(args))] : []
-);
+export const concat = <T>(...args: T[][]): T[] => (([] as T[]).concat(...args));
 
 /**
  * Compares all values in an array returning the lowest element. Elements should be naturally comparable by the `<` operator.
@@ -63,49 +61,35 @@ export const dropLast = <T>(array: T[], n: number = 0): T[] => chopFirst(array, 
 /**
  * Abstractions of Array dot methods, with some additional typescript annotation.
  */
-const internalReduce = <TElement, TResult>(
-  array: TElement[],
-  fn: ReduceFn<TElement, TResult>,
-  init: TResult,
-  currentIndex: number,
-  initialArray: TElement[],
-): TResult => (
-    count(array) === 0
-      ? init
-      : internalReduce(tail(array), fn, fn(init, head(array), currentIndex || 0), currentIndex + 1, initialArray)
-  )
-
 export const reduce = <TElement, TResult>(
   array: TElement[],
   fn: ReduceFn<TElement, TResult>,
   init: TResult,
-): TResult => internalReduce(array, fn, init, 0, array);
+): TResult => array.reduce(fn, init);
 
 export const reduceRight = <TElement, TResult>(
   array: TElement[],
   fn: ReduceFn<TElement, TResult>,
-  init?: TResult,
-) => reduce(
-    reverse(array),
-    (a, b, c) => fn(a as TResult, b, c),
-    init,
-  );
+  init: TResult,
+) => array.reduceRight(fn, init);
 
 export const join = (
-  [x, y, ...rest]: any[],
+  array: any[],
   delimiter: string,
-): string => (y ? strVal(x) + delimiter + join([y, ...rest], delimiter) : x);
-export const includes = (
-  haystack: any[],
-  needle: any,
-): boolean => reduce(haystack, (acc: boolean, el) => (acc || el === needle), false);
+): string => array.join(delimiter);
+
+export const includes = <T>(
+  haystack: T[],
+  needle: T,
+  fromIndex: number = 0,
+): boolean => haystack.includes(needle, fromIndex);
 
 export const slice = <T>(
   array: T[],
   start: number = 0,
   end: number = Infinity,
 ): T[] => (
-    dropLast(dropFirst(array, start), count(array) - min([ count(array), end ]))
+    array.slice(start, end)
   )
 
 /**
@@ -150,16 +134,26 @@ export const pickEach = <T>(array: Array<T>, fields: string[]) => map(array, (e:
 /**
  * Returns a new array of objects containing filtered from an original array of objects.
  * @param array - The source array
- * @param whereFn - Function used to filter the source list.
+ * @param filterFn - Function used to filter the source list.
  */
-export const where = <T>(
+export const filter = <T>(
   array: Array<T>,
-  whereFn: FilterFn<T>,
-) => reduce(array, (acc: T[], el, i) => (whereFn(el) ? [...acc, el] : [...acc]), []);
+  filterFn: FilterFn<T>,
+) => array.filter(filterFn);
 
+/**
+ * Alias for `filter()`
+ */
+export const where = filter;
 export const whereNot = <T>(array: Array<T>, whereFn: FilterFn<T>) => where(array, (x, i, m) => !whereFn(x, i, m));
 
-export const partition = <T>(array: T[], fn: FilterFn<T>) => [where(array, fn), whereNot(array, fn)];
+/**
+ * Returns a two element array. The first element is an array of items that match the provided query function, the second
+ * is the items from the original array that do not match the function query.
+ * @param array - The source array to query against.
+ * @param filterFn - A lambda that describes elements to match.
+ */
+export const partition = <T>(array: T[], filterFn: FilterFn<T>) => [where(array, filterFn), whereNot(array, filterFn)];
 
 /**
  * Returns the first T from an Array<T>
@@ -171,7 +165,9 @@ export const first = <T>([x]: Array<T>) : T | undefined => x;
  * @param array - The source array
  * @param whereFn - Function used to filter the source list.
  */
-export const findFirst = <T>(array: Array<T>, whereFn: ((testElement: T) => boolean)) => first(where(array, whereFn))
+export const findFirst = <T>(array: Array<T>, whereFn: ((testElement: T) => boolean)) => first(where(array, whereFn));
+
+export const findIndex = <T>(array: T[], filterFn: FilterFn<T>) => array.findIndex(filterFn);
 
 /**
  * Returns the last T from an Array<T>
@@ -287,13 +283,17 @@ export const removeAt = <T>(array: Array<T>, index: number) => [
  * @param array - The source array
  * @param key - Which field to use as the ObjectHash key
  */
-export const hash = <T extends Hash>(array: Array<T>, key: string): HashOf<T> => (
+export const table = <T extends Hash>(array: Array<T>, key: string): HashOf<T> => (
   reduce(
     array as T[],
     (prev: HashOf<T>, curr: T): HashOf<T> => addProp(prev, strVal(curr[key]), curr) as HashOf<T>,
     {} as HashOf<T>,
   )
 )
+/**
+ * Alias for `table()`
+ */
+export const hash = table;
 
 /**
  * Removes elements which are null or undefined.
