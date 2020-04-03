@@ -72,7 +72,7 @@ const internalReduce = <TElement, TResult>(
 ): TResult => (
     count(array) === 0
       ? init
-      : internalReduce(tail(array), fn, fn(init, head(array), currentIndex || 0), currentIndex || 0, initialArray)
+      : internalReduce(tail(array), fn, fn(init, head(array), currentIndex || 0), currentIndex + 1, initialArray)
   )
 
 export const reduce = <TElement, TResult>(

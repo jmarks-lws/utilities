@@ -200,6 +200,13 @@ describe('Array utilities tests', () => {
       const array: number[] = [1, 2, 3]
       const added3 = map(array, (item: number) => item + 3);
       expect(added3).toMatchObject([ 4, 5, 6 ]);
+    });
+
+    test('map() :: provides correct indexes', () => {
+      const array: number[] = [1, 2, 3]
+      const indexes: number[] = [];
+      const added3 = map(array, (item: number, index: number) => { indexes.push(index) });
+      expect(indexes).toMatchObject([ 0, 1, 2 ]);
     })
 
     test('preparedMap :: Returns mapping function', () => {
