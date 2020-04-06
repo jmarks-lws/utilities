@@ -164,58 +164,90 @@ const internalRepeat = (repeatTimes: number, fn: CallableFunction, index: number
   if (repeatTimes > 1) internalRepeat(repeatTimes - 1, fn, index + 1, ...args);
 }
 export const repeat = (repeatTimes: number, fn: (index: number, ...fnArgs: any[]) => void, ...args: any[]) => {
-  internalRepeat(repeatTimes, fn, 0, ...args);
+  // Recursive: internalRepeat(repeatTimes, fn, 0, ...args);
+  // But we'll use a more practical method for now, since we don't want stack issues and we like performance:
+  for (let i = 0; i < repeatTimes; i++) { fn(i, ...args); }
 }
 
-const internalRepeatAsync = async (
-  repeatTimes: number,
-  fn: (...args: any[]) => Promise<any>,
-  index: number,
-  ...args: any[]
-) => {
-  await fn(index, ...args);
-  if (repeatTimes > 1) await internalRepeatAsync(repeatTimes - 1, fn, index + 1, ...args);
+export const repeatWhile = (repeatCondition: () => boolean, fn: (...fnArgs: any[]) => void, ...args: any[]) => {
+  while (repeatCondition()) { fn(...args); }
 }
+
+// const internalRepeatAsync = async (
+//   repeatTimes: number,
+//   fn: (...args: any[]) => Promise<any>,
+//   index: number,
+//   ...args: any[]
+// ) => {
+//   await fn(index, ...args);
+//   if (repeatTimes > 1) await internalRepeatAsync(repeatTimes - 1, fn, index + 1, ...args);
+// }
 export const repeatAsync = async (
   repeatTimes: number,
   fn: (...args: any[]) => Promise<any>,
   ...args: any[]
 ) => {
-  await internalRepeatAsync(repeatTimes, fn, 0, ...args);
+  // await internalRepeatAsync(repeatTimes, fn, 0, ...args);
+  // eslint-disable-next-line no-await-in-loop
+  for (let i = 0; i < repeatTimes; i++) { await fn(i, ...args); }
 }
 
-const internalRepeatWithBreak = (
-  repeatTimes: number,
-  fn: ((i: number, done: CallableFunction, ...fnargs: any[]) => any),
-  index: number,
+export const repeatWhileAsync = async (
+  repeatCondition: () => boolean,
+  fn: (...args: any[]) => Promise<any>,
   ...args: any[]
 ) => {
-  let isDone = false;
-  fn(index, (() => { isDone = true }), ...args);
-  if (repeatTimes > 1 && !isDone) internalRepeatWithBreak(repeatTimes - 1, fn, index + 1, ...args);
+  // eslint-disable-next-line no-await-in-loop
+  while (repeatCondition()) { await fn(...args); }
 }
+
+// const internalRepeatWithBreak = (
+//   repeatTimes: number,
+//   fn: ((i: number, done: CallableFunction, ...fnargs: any[]) => any),
+//   index: number,
+//   ...args: any[]
+// ) => {
+//   let isDone = false;
+//   fn(index, (() => { isDone = true }), ...args);
+//   if (repeatTimes > 1 && !isDone) internalRepeatWithBreak(repeatTimes - 1, fn, index + 1, ...args);
+// }
 export const repeatWithBreak = (
   repeatTimes: number,
   fn: ((i: number, done: CallableFunction, ...fnargs: any[]) => any),
   ...args: any[]
 ) => {
-  internalRepeatWithBreak(repeatTimes, fn, 0, ...args);
+  // Recursive: internalRepeatWithBreak(repeatTimes, fn, 0, ...args);
+  // But we'll use a more practical method for now, since we don't want stack issues and we like performance:
+  let isDone = false;
+  for (let i = 0; i < repeatTimes; i++) {
+    // eslint-disable-next-line no-loop-func
+    fn(i, () => { isDone = true }, ...args);
+    if (isDone) break;
+  }
 }
 
-const internalRepeatAsyncWithBreak = async (
-  repeatTimes: number,
-  fn: ((i: number, done: CallableFunction, ...fnargs: any[]) => Promise<any>),
-  index: number,
-  ...args: any[]
-) => {
-  let isDone = false;
-  await fn(index, (() => { isDone = true }), ...args);
-  if (repeatTimes > 1 && !isDone) await internalRepeatAsyncWithBreak(repeatTimes - 1, fn, index + 1, ...args);
-}
+// const internalRepeatAsyncWithBreak = async (
+//   repeatTimes: number,
+//   fn: ((i: number, done: CallableFunction, ...fnargs: any[]) => Promise<any>),
+//   index: number,
+//   ...args: any[]
+// ) => {
+//   let isDone = false;
+//   await fn(index, (() => { isDone = true }), ...args);
+//   if (repeatTimes > 1 && !isDone) await internalRepeatAsyncWithBreak(repeatTimes - 1, fn, index + 1, ...args);
+// }
 export const repeatAsyncWithBreak = async (
   repeatTimes: number,
   fn: ((i: number, done: CallableFunction, ...fnargs: any[]) => Promise<any>),
   ...args: any[]
 ) => {
-  await internalRepeatAsyncWithBreak(repeatTimes, fn, 0, ...args);
+  // Recursive: await internalRepeatAsyncWithBreak(repeatTimes, fn, 0, ...args);
+  // But we'll use a more practical method for now, since we don't want stack issues and we like performance:
+  let isDone = false;
+  const setDone = () => { isDone = true };
+  for (let i = 0; i < repeatTimes; i++) {
+    // eslint-disable-next-line no-await-in-loop
+    await fn(i, setDone, ...args);
+    if (isDone) break;
+  }
 }
