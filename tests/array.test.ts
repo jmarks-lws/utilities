@@ -43,6 +43,7 @@ import {
   notIntersect,
   flatten,
   distinct,
+  series,
 } from '../src/array';
 import { IMappableObject } from '../src/functional';
 
@@ -399,4 +400,13 @@ describe('Array utilities tests', () => {
       expect(hasAll(testPeopleList1, (person) => person.age < 50)).toBe(false);
     });
   });
+
+  describe('Jet fuel', () => {
+    test('`series` creates series 0 to 4', async () => {
+      expect(series(5)).toMatchObject([0, 1, 2, 3, 4]);
+    })
+    test('`series` creates series 5 to 10', async () => {
+      expect(series(5, 5)).toMatchObject([5, 6, 7, 8, 9]);
+    })
+  })
 })

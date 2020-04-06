@@ -52,9 +52,10 @@ export const mapAsync = async <T, U>(
 ) => Promise.all(list.map(async (id) => fn(id)))
 
 /**
- * Deprecate: Hindsight being what it is, this isn't the greatest idea.
+ * (Don't use this - deprecation incoming quickly) Provides an English-esque interface for getting a key from an object with a default value.
  * @param key
  * @param defaultValue
+ * @deprecated Hindsight being what it is, this isn't the best. Doesn't really match the rest of the methodology throughout this project.
  */
 export const take = <T>(key: string, defaultValue?: T) => ({
   from: (object: HashOf<T>) => (hasKey(object, key) ? object[key] : defaultValue),

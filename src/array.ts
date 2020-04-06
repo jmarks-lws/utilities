@@ -312,3 +312,5 @@ export const flatten = (arr: any[], d = 1): any[] => (d > 0
 )
 
 export const arrayEmpty = (array: any[]) => count(array) === 0;
+
+export const series = (n: number, startAt: number = 0) => Array.from(Array(n).keys(), (k) => k + startAt);
