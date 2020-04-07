@@ -4,8 +4,9 @@ import {
 } from './array';
 import { isNull } from './miscellaneous';
 
-
+/** Type representing a tabular flat object. Most reference types in javascript can be a Hash. */
 export interface Hash { [index: string]: any }
+/** Type representing a tabular flat object, where the values are all of a given type `T`. */
 export interface HashOf<T> { [index: string]: T }
 // export interface KeyValuePair<T, U> {
 //   key: T,
@@ -13,11 +14,10 @@ export interface HashOf<T> { [index: string]: T }
 // }
 // export type Dictionary<T, U> = Array<KeyValuePair<T, U>>;
 
-export const { keys, freeze } = Object;
+export const { keys, values, freeze } = Object;
 
+/** Returns a boolean indicating whether `x` is a non null object. Does not return true for an array or a null value. */
 export const isDefinedObject = (x: any) => (!Array.isArray(x)) && (typeof x === 'object') && !isNull(x);
-
-export const values = <T>(o: HashOf<T>): T[] => Object.values(o)
 
 /**
  * Returns a new object that is the result of projecting only the properties specified by `fields`
@@ -33,7 +33,7 @@ export const pick = (obj: Hash, fields: string[]): Hash => (
 );
 
 /**
- * Returns a new object that is the result of projecting only the properties of an object not listed in `fields`.
+ * Returns a new object that is the result of projecting only the properties of `o` not listed in `fields`.
  *
  * @param fields - A string array containing the names of fields to remove
  * @param o - The source object from which to construct a result with its fields removed.
@@ -41,7 +41,7 @@ export const pick = (obj: Hash, fields: string[]): Hash => (
 export const pickNot = (obj: Hash, fields: string[]): Hash => pick(obj, prune(keys(obj), fields));
 
 /**
- * Fun trick to remove a field from an object by name.
+ * Returns an object that is the result of removing a field from `o` by name.
  */
 export const removeField = (o: Hash, field: string) => ((fld: string, { [fld]: _, ...rest }) => rest)(field, o);
 
@@ -284,11 +284,20 @@ export const arraysToObject = (
   (acc: Hash, key: string, index: number) => merge(acc, { [key]: valuesArray[index] }), {} as Hash,
 )
 
-
+/**
+ * Works similarly to mapping an array, but maps the values of `o`, returning a new object that has
+ * the same keys with values each transformed by `fn`.
+ */
 export const transformValues = (o: Hash, fn: (value: any) => any) => reduce(
   keys(o),
   (acc: Hash, key) => ({ ...acc, [key]: fn(o[key]) }),
   {} as Hash,
 )
 
+/**
+ * Returns an object that is the result adding a property to `o`.
+ * @param o
+ * @param key
+ * @param val
+ */
 export const addProp = <T>(o: HashOf<T>, key: string, val: T) => merge(o, { [key]: val });
