@@ -23,6 +23,8 @@ export type RequireOnlyOne<T, Keys extends keyof T = keyof T> =
 export const isNumber = (x: any) => (typeof x === 'number');
 /** Returns true if `x` is a `number` that is not NaN. Does not return true for `BigInt`.  */
 export const isValidNumber = (x: any) => isNumber(x) && !Number.isNaN(x);
+/** Returns true if `x` is a `number` with no fractional data. */
+export const isIntegerNumber = (x: any) => (typeof x === 'number') && x === Math.floor(x);
 /** Returns true if `x` is a `number` or a string that can be successfully parsed to a `number` that is not `NaN` */
 export const isNumeric = (x: any) => isValidNumber(Number.parseFloat(`${x}`));
 

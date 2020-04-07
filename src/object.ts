@@ -2,7 +2,7 @@ import {
   intersect, map, prune, reduce, head, tail,
   reverse, arrayEmpty, filter,
 } from './array';
-import { isNull } from './miscellaneous';
+import { isNull, Nullable } from './miscellaneous';
 
 /** Type representing a tabular flat object. Most reference types in javascript can be a Hash. */
 export interface Hash { [index: string]: any }
@@ -185,7 +185,7 @@ export const noDiff = (a: Hash, b: Hash) => !hasDiff(a, b);
 export const pluck = <T extends any>(
   obj: Hash,
   field: string,
-): T => (hasKey(obj, field) ? obj[field] : null);
+): Nullable<T> => (hasKey(obj, field) ? obj[field] : null);
 
 /**
  * Returns a new object derived from `obj` where the keys are changed as described by `remap`, optionally including or omitting remaining data.
