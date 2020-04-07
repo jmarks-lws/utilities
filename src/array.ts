@@ -5,24 +5,36 @@ import {
   def, strVal, undef, intVal, Nullable,
 } from './miscellaneous';
 
+/**
+ * Function signature used in `filter()` and other filtering functions.
+ */
 interface FilterFn<T> {
   (el: T, i?: number, m?: T[]): boolean;
 }
+/**
+ * Function signature used in `reduce()` and `reduceRight()`
+ */
 interface ReduceFn<TElement, TResult> {
   (previousValue: TResult, currentValue: TElement, currentIndex?: number, array?: TElement[]): TResult;
 }
 
+/** Wrapper for native `Array.isArray()` */
 export const isArray = (x: any): boolean => Array.isArray(x); // NOTE: This is a static function, so not going to attempt to rewrite.
 
-
 /**
- * A series of simple functional array utilities
+ * A set of simple functional array utilities
  */
+/** Returns the first element of an array */
 export const head = ([x]: any[]) => x;
+/** Returns all elements other than the first element of an array */
 export const tail = ([, ...xs]: any[]) => xs;
+/** Shallow copy of an array. References remain intact. If a non-array is supplied, null is returned. */
 export const arrayCopy = <T>(arr: T[]): Nullable<Array<T>> => (Array.isArray(arr) ? [...arr] : null);
-
-export const concat = <T>(...args: T[][]): T[] => (([] as T[]).concat(...args));
+/**
+ * Returns an array that is the result of appending each array to the end of the one before it in sequence
+ * @param {Array<T>[]} args: Each argument should be an array.
+ * */
+export const concat = <T>(...args: Array<T>[]): T[] => (([] as T[]).concat(...args));
 
 /**
  * Compares all values in an array returning the lowest element. Elements should be naturally comparable by the `<` operator.
@@ -49,41 +61,85 @@ export const count = (array: any[]): number => (
         : 0
     )
 );
+/**
+ * Returns a new array that is the result of reversing the order of the elements in `array`
+ */
 export const reverse = (array: any[]): any[] => (def(head(array)) ? [...reverse(tail(array)), head(array)] : []);
+/**
+ * Retreives the first `n` elements from `array` and returns as a new Array.
+ */
 export const chopFirst = (array: any[], n: number = 1): any => (
   def(head(array)) && n ? [head(array), ...chopFirst(tail(array), n - 1)] : []
 );
+/**
+ * Retreives the last `n` elements from `array` and returns as a new Array.
+ */
 export const chopLast = (xs: any[], n: number = 1): any => reverse(chopFirst(reverse(xs), n));
-
+/**
+ * Returns a new Array consisting of the elements of `array` that would remain after dropping the first `n` elements.
+ */
 export const dropFirst = <T>(array: T[], n: number = 0): T[] => chopLast(array, count(array) - min([n, count(array)]));
+/**
+ * Returns a new Array consisting of the elements of `array` that would remain after dropping the last `n` elements.
+ */
 export const dropLast = <T>(array: T[], n: number = 0): T[] => chopFirst(array, count(array) - min([n, count(array)]));
 
 /**
  * Abstractions of Array dot methods, with some additional typescript annotation.
+ */
+
+/**
+ * Step over each element in `array`, building a new output object which is initialized as `init`.
+ * `fn` should return a new representation of the aggregate object after applying changes based
+ * on an array element.
+ *
+ * @param array - An array to step over for source information
+ * @param fn - A function to process each element in the array. It should return a new object that is the result of adding changes based on an array element.
+ * @param init - The initial value for the object being built by `fn`. Represents the initial state of the object.
  */
 export const reduce = <TElement, TResult>(
   array: TElement[],
   fn: ReduceFn<TElement, TResult>,
   init: TResult,
 ): TResult => array.reduce(fn, init);
-
+/**
+ * Similar to `reduce()` but array elements are processed from last to first. (See `reduce()`)
+ */
 export const reduceRight = <TElement, TResult>(
   array: TElement[],
   fn: ReduceFn<TElement, TResult>,
   init: TResult,
 ) => array.reduceRight(fn, init);
 
+/**
+ * Create a string which is the result of concatenating the string values of each `array` element, using `delimiter` as a separator.
+ * @param array
+ * @param delimiter
+ */
 export const join = (
   array: any[],
-  delimiter: string,
+  delimiter: string = ',',
 ): string => array.join(delimiter);
 
+/**
+ * Determines whether an array includes a certain element, returning true or false as appropriate.
+ * Wrapper around `<array>.includes()`.
+ * @param array - The array to search through.
+ * @param needle - The element to search for
+ * @param fromIndex - The position in this array at which to begin searching for searchElement
+ */
 export const includes = <T>(
-  haystack: T[],
+  array: T[],
   needle: T,
   fromIndex: number = 0,
-): boolean => haystack.includes(needle, fromIndex);
+): boolean => array.includes(needle, fromIndex);
 
+/**
+ * Returns a section of an array.
+ * @param array - The array to source the section from.
+ * @param start — The beginning of the specified portion of the array.
+ * @param end — The end of the specified portion of the array. This is exclusive of the element at the index 'end'.
+ */
 export const slice = <T>(
   array: T[],
   start: number = 0,
@@ -103,7 +159,6 @@ export const slice = <T>(
 export const arrayWrap = (input: any): any[] => (
   arrayCopy(input) ?? ((input === null || input === undefined) ? [] : [input])
 );
-
 
 /**
  * Utility mapping function for functional style programming.
@@ -166,7 +221,13 @@ export const first = <T>([x]: Array<T>) : T | undefined => x;
  * @param whereFn - Function used to filter the source list.
  */
 export const findFirst = <T>(array: Array<T>, whereFn: ((testElement: T) => boolean)) => first(where(array, whereFn));
-
+/**
+ * Returns the index of the first element in the array where predicate is true, and -1 otherwise.
+ * @param array - Array to search.
+ * @param filterFn — find calls predicate once for each element of the array, in ascending order, until it finds
+ *    one where predicate returns true. If such an element is found, findIndex immediately returns that element index.
+ *    Otherwise, findIndex returns -1.
+ */
 export const findIndex = <T>(array: T[], filterFn: FilterFn<T>) => array.findIndex(filterFn);
 
 /**
@@ -188,10 +249,15 @@ export const findLast = <T>(array: Array<T>, whereFn: ((testElement: T) => boole
  */
 export const countWhere = <T>(array: Array<T>, fn: FilterFn<T>) => where(array, fn).length
 
+/** Helper method: Determines how many elements in an array are a value other than undefined. */
 export const countDefined = (array: Array<any>) => countWhere(map(array, (i) => def(i)), (defined) => defined === true);
+/** Helper method: Determines if an array contains exactly one defined value */
 export const hasOneDefined = (array: Array<any>) => countDefined(array) === 1;
+/** Helper method: Determines if an array contains one or more defined values */
 export const hasSomeDefined = (array: Array<any>) => countDefined(array) > 0;
+/** Helper method: Determines if an array contains no undefined values */
 export const hasAllDefined = (array: Array<any>) => countDefined(array) === count(array);
+/** Helper method: Determines if an array contains only undefined values */
 export const hasNoneDefined = (array: Array<any>) => countDefined(array) === 0;
 
 /**
@@ -209,6 +275,10 @@ export const sum = <T>(array: T[], field: string) => reduce(array,
  */
 export const sumWhere = <T>(array: Array<T>, fn: FilterFn<T>, field: string) => sum(where(array, fn), field);
 
+/**
+ * Helper method: Returns an array consisting only of distinct values.
+ * @param array - array to filter
+ */
 export const distinct = <T>(
   array: Array<T>,
 ) => reduce(array, (acc, el) => (includes(acc, el) ? [...acc] : [ ...acc, el ]), [] as T[]);
@@ -311,6 +381,15 @@ export const flatten = (arr: any[], d = 1): any[] => (d > 0
   : slice(arr)
 )
 
+/**
+ * Tests `array` to determine if it has a zero length.
+ * @param array - array to test
+ */
 export const arrayEmpty = (array: any[]) => count(array) === 0;
 
+/**
+ * Creates an array consisting of a series of sequential numbers.
+ * @param n - How many elements to generate
+ * @param startAt - Which number to start at. (default 0)
+ */
 export const series = (n: number, startAt: number = 0) => Array.from(Array(n).keys(), (k) => k + startAt);
