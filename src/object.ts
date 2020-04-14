@@ -24,11 +24,11 @@ export const isDefinedObject = (x: any) => (!Array.isArray(x)) && (typeof x === 
  * @param obj - The object to project
  * @param fields - The fields to project from that object
  */
-export const pick = (obj: Hash, fields: string[]): Hash => (
+export const pick = <T extends Hash>(obj: T, fields: string[]): Partial<T> => (
   reduce(
     intersect(keys(obj), fields),
     (prev: Hash, f: any) => ({ ...prev, [f]: obj[f] }),
-    {} as Hash,
+    {} as Partial<T>,
   )
 );
 
@@ -63,7 +63,7 @@ export const mapKeys = <T, U>(o: HashOf<T>, fn: ((k: string, i: number) => U)): 
  * Returns a new object with a subset of properties where properties which have null or undefined values have been removed.
  * @param o
  */
-export const compactObject = (o: Hash, keepNulls = false) => pick(
+export const compactObject = <T extends Hash>(o: T, keepNulls = false): Partial<T> => pick(
   o, filter(
     keys(o),
     (key) => o[key] !== undefined && (keepNulls || o[key] !== null),
