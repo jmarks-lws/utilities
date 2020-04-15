@@ -4,6 +4,7 @@ import {
 import {
   def, strVal, undef, intVal, Nullable,
 } from './miscellaneous';
+import { identity } from './functional';
 
 /**
  * Function signature used in `filter()` and other filtering functions.
@@ -353,23 +354,31 @@ export const removeAt = <T>(array: Array<T>, index: number) => [
  * @param array - The source array
  * @param key - Which field to use as the ObjectHash key
  */
-export const table = <T extends Hash>(array: Array<T>, key: string): HashOf<T> => (
-  reduce(
-    array as T[],
-    (prev: HashOf<T>, curr: T): HashOf<T> => addProp(prev, strVal(curr[key]), curr) as HashOf<T>,
-    {} as HashOf<T>,
+export const table = <TInitial extends Hash, TReturn>(
+  array: Array<TInitial>,
+  key: string,
+  transformFn: ((el: TInitial) => TReturn) = identity,
+): HashOf<TReturn> => (
+    reduce(
+      array as TInitial[],
+      (prev, curr) => addProp(prev, strVal(curr[key]), transformFn(curr)),
+      {} as HashOf<TReturn>,
+    )
   )
-)
-/**
- * Alias for `table()`
- */
+/** Alias for `table()` */
 export const hash = table;
+/** Alias for `table()` */
+export const hashTable = table;
+/** Alias for `table()` */
+export const associative = table;
 
 /**
  * Removes elements which are null or undefined.
  * @param array - The source array
  */
-export const compactArray = (array: any[]) => where(array, (x) => !includes([undefined, null], x))
+export const compactArray = (array: any[], allowNulls = false) => (
+  where(array, (x) => x !== undefined && (allowNulls || x !== null))
+);
 
 /**
  * Returns a new array with all sub-array elements concatenated into it recursively up to the specified depth.
