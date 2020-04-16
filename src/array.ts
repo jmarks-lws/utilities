@@ -394,9 +394,9 @@ export const group = <T extends Hash>(array: Array<T>, key: string) => {
   const grouped = reduce(
     array,
     (prev, curr) => (
-      hasKey(prev, curr[key])
-        ? { ...prev, [curr[key]]: concat(prev[curr[key]], [ curr ]) }
-        : { ...prev, [curr[key]]: [ curr ] }
+      hasKey(prev, `${curr[key]}`)
+        ? { ...prev, [`${curr[key]}`]: concat(prev[`${curr[key]}`], [ curr ]) }
+        : { ...prev, [`${curr[key]}`]: [ curr ] }
     ),
     {} as HashOf<Hash[]>,
   )
