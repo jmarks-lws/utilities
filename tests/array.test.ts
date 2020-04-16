@@ -44,6 +44,7 @@ import {
   flatten,
   distinct,
   series,
+  group,
 } from '../src/array';
 import { IMappableObject } from '../src/functional';
 
@@ -407,6 +408,35 @@ describe('Array utilities tests', () => {
     })
     test('`series` creates series 5 to 10', async () => {
       expect(series(5, 5)).toMatchObject([5, 6, 7, 8, 9]);
+    })
+    test('`group` groups correctly', async () => {
+      const start = [
+        { name: 'James', gender: 'male' },
+        { name: 'Jenny', gender: 'female' },
+        { name: 'Aesther', gender: 'female' },
+        { name: 'Johnny', gender: 'male' },
+        { name: 'Geraldine', gender: 'female' },
+        { name: 'Gerard', gender: 'male' },
+        { name: 'George', gender: 'male' },
+        { name: 'Djin', gender: 'unknown' },
+      ];
+
+      expect(group(start, 'gender')).toMatchObject({
+        male: [
+          { name: 'James', gender: 'male' },
+          { name: 'Johnny', gender: 'male' },
+          { name: 'Gerard', gender: 'male' },
+          { name: 'George', gender: 'male' },
+        ],
+        female: [
+          { name: 'Jenny', gender: 'female' },
+          { name: 'Aesther', gender: 'female' },
+          { name: 'Geraldine', gender: 'female' },
+        ],
+        unknown: [
+          { name: 'Djin', gender: 'unknown' },
+        ],
+      })
     })
   })
 })
