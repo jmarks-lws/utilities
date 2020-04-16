@@ -386,7 +386,7 @@ export const group = <T extends Hash>(array: Array<T>, key: string) => {
         ? { ...prev, [curr[key]]: concat(prev[curr[key]], [ curr ]) }
         : { ...prev, [curr[key]]: [ curr ] }
     ),
-    {} as Hash,
+    {} as HashOf<Hash[]>,
   )
   return grouped;
 }
