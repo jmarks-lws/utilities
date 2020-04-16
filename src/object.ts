@@ -1,6 +1,6 @@
 import {
   intersect, map, prune, reduce, head, tail,
-  reverse, arrayEmpty, filter,
+  reverse, arrayEmpty, filter, count,
 } from './array';
 import { isNull, Nullable } from './miscellaneous';
 
@@ -301,3 +301,5 @@ export const transformValues = <T, U>(o: HashOf<T>, fn: (value: T) => U) : HashO
  * @param val
  */
 export const addProp = <T>(o: HashOf<T>, key: string, val: T) => merge(o, { [key]: val });
+
+export const objectsHaveSameValues = (a: Hash, b: Hash) => count(keys(diff(a, b))) === 0

@@ -1,5 +1,5 @@
 import {
-  pick, Hash, HashOf, addProp, hasKey,
+  pick, Hash, HashOf, addProp, hasKey, objectsHaveSameValues,
 } from './object';
 import {
   def, strVal, undef, intVal, Nullable,
@@ -302,6 +302,18 @@ export const hasNone = <T>(array: Array<T>, fn: FilterFn<T>) => !hasAny(array, f
  * @param fn - Function used to filter the source list.
  */
 export const hasAll = <T>(array: T[], fn: FilterFn<T>) => count(where(array, fn)) === count(array);
+
+/**
+ * Helper method: Returns an array consisting only of distinct values.
+ * @param array - array to filter
+ */
+export const distinctObjects = <T extends Hash>(
+  array: Array<T>,
+) => reduce(array, (acc, el) => {
+    const alreadyProcessed = hasAny(acc, (curr) => objectsHaveSameValues(curr, el));
+    return alreadyProcessed ? [ ...acc ] : [ ...acc, el ];
+  }, [] as T[]);
+
 /**
  * Returns a new array which is the result of removing elements from `initialList` which are also in `pruneList`
  * @param initialList - List to prune from. The source list is not affected. A new array will be returned.

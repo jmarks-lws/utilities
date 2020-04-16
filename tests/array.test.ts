@@ -43,6 +43,7 @@ import {
   notIntersect,
   flatten,
   distinct,
+  distinctObjects,
   series,
   group,
 } from '../src/array';
@@ -437,6 +438,18 @@ describe('Array utilities tests', () => {
           { name: 'Djin', gender: 'unknown' },
         ],
       })
+    })
+    test('`distinctObjects`', async () => {
+      const original = [
+        { a: 1, b: 'abc', c: 2 },
+        { a: 12, b: 'abc', c: 2 },
+        { a: 1, b: 'abc', c: 2 },
+        { a: 1, b: 'abc', c: 2 },
+      ];
+      expect(distinctObjects(original)).toMatchObject([
+        { a: 1, b: 'abc', c: 2 },
+        { a: 12, b: 'abc', c: 2 },
+      ]);
     })
   })
 })
