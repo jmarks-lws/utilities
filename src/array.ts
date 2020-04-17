@@ -370,7 +370,7 @@ export const table = <TInitial extends Hash, TReturn>(
   array: Array<TInitial>,
   key: string,
   transformFn: ((el: TInitial) => TReturn | TInitial) = identity,
-): HashOf<TReturn> => (
+): HashOf<TInitial | TReturn> => (
     reduce(
       array as TInitial[],
       (prev, curr) => addProp(prev, strVal(curr[key]), transformFn(curr)),
