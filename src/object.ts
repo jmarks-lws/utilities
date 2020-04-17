@@ -6,6 +6,9 @@ import { isNull, Nullable } from './miscellaneous';
 
 /** Type representing a tabular flat object. Most reference types in javascript can be a Hash. */
 export interface Hash { [index: string]: any }
+/** Type representing a tabular flat object. Most reference types in javascript can be a Hash. */
+export interface ObjectLiteral { [index: string]: any }
+
 /** Type representing a tabular flat object, where the values are all of a given type `T`. */
 export interface HashOf<T> { [index: string]: T }
 // export interface KeyValuePair<T, U> {

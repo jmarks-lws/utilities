@@ -246,7 +246,8 @@ describe('Array utilities tests', () => {
 
   describe('Advanced Transformations', () => {
     test('hash', () => {
-      expect(hash(testPeopleList1, 'id')).toMatchObject({
+      const result = hash(testPeopleList1, 'id');
+      expect(result).toMatchObject({
         123: {
           id: 123, name: 'Forest', age: 40, favColor: '#FF0000',
         },

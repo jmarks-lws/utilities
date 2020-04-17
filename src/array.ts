@@ -366,15 +366,14 @@ export const removeAt = <T>(array: Array<T>, index: number) => [
  * @param array - The source array
  * @param key - Which field to use as the ObjectHash key
  */
-export const table = <TInitial extends Hash, TReturn>(
-  array: Array<TInitial>,
+export const table = <T extends Hash>(
+  array: Array<T>,
   key: string,
-  transformFn: ((el: TInitial) => TReturn | TInitial) = identity,
-): HashOf<TInitial | TReturn> => (
+): HashOf<T> => (
     reduce(
-      array as TInitial[],
-      (prev, curr) => addProp(prev, strVal(curr[key]), transformFn(curr)),
-      {} as HashOf<TReturn>,
+      array as T[],
+      (prev, curr) => addProp(prev, strVal(curr[key]), curr),
+      {} as HashOf<T>,
     )
   )
 /** Alias for `table()` */
