@@ -66,7 +66,7 @@ export const take = <T>(key: string, defaultValue?: T) => ({
  * we always return a function value to reduce complexity otherwise introduced with null checking, etc.
  * @param id
  */
-export const identity = (id: any) => id;
+export const identity = <T>(id: T) : T => id;
 
 /**
  * Partially apply a function by filling in any number of its arguments.

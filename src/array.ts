@@ -369,7 +369,7 @@ export const removeAt = <T>(array: Array<T>, index: number) => [
 export const table = <TInitial extends Hash, TReturn>(
   array: Array<TInitial>,
   key: string,
-  transformFn: ((el: TInitial) => TReturn) = identity,
+  transformFn: ((el: TInitial) => TReturn | TInitial) = identity,
 ): HashOf<TReturn> => (
     reduce(
       array as TInitial[],
