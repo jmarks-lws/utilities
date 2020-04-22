@@ -353,6 +353,16 @@ export const insertAt = <T>(array: Array<T>, element: T, index: number) => [
 ];
 
 /**
+ * Returns a new array that is the result of replacing the element at `index` in `array` with the new `element`
+ * @param array - The source array
+ * @param element - The element to add to the resulting array
+ * @param index - Where to place the element
+ */
+export const replaceAt = <T>(array: Array<T>, element: T, index: number) => [
+  ...slice(array, 0, index), element, ...slice(array, index + 1),
+];
+
+/**
  * Returns a new array that is the result of removing the element at position `index` from `array`
  * @param array - The source array
  * @param index - The index of the element to remove

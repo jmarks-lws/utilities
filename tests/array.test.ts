@@ -267,6 +267,11 @@ describe('Array utilities tests', () => {
       const compacted = compactArray(compacter);
       expect(compacted).toMatchObject([1, 2, 3, 4, 5, 6, 7, 8]);
     });
+    test('compactArray allowing nulls', () => {
+      const compacter = [ 1, 2, 3, undefined, undefined, 4, 5, null, 6, null, 7, undefined, null, 8 ];
+      const compacted = compactArray(compacter, true);
+      expect(compacted).toMatchObject([1, 2, 3, 4, 5, null, 6, null, 7, null, 8]);
+    });
     test('flatten', async () => {
       expect(
         flatten(
