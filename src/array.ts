@@ -348,7 +348,7 @@ export const omit = <T>(array: Array<T>, element: T) => where(array, (e) => e !=
  * @param element - The element to add to the resulting array
  * @param index - Where to place the element
  */
-export const insertAt = <T>(array: Array<T>, element: T, index: number) => [
+export const insertAt = <T>(array: Array<T>, index: number, element: T) => [
   ...slice(array, 0, index), element, ...slice(array, index),
 ];
 
@@ -358,7 +358,7 @@ export const insertAt = <T>(array: Array<T>, element: T, index: number) => [
  * @param element - The element to add to the resulting array
  * @param index - Where to place the element
  */
-export const replaceAt = <T>(array: Array<T>, element: T, index: number) => [
+export const replaceAt = <T>(array: Array<T>, index: number, element: T) => [
   ...slice(array, 0, index), element, ...slice(array, index + 1),
 ];
 
