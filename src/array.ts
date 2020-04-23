@@ -4,7 +4,6 @@ import {
 import {
   def, strVal, undef, intVal, Nullable,
 } from './miscellaneous';
-import { identity } from './functional';
 
 /**
  * Function signature used in `filter()` and other filtering functions.
@@ -103,6 +102,9 @@ export const reduce = <TElement, TResult>(
   fn: ReduceFn<TElement, TResult>,
   init: TResult,
 ): TResult => array.reduce(fn, init);
+/** Alias for `reduce()` */
+export const aggregate = reduce;
+
 /**
  * Similar to `reduce()` but array elements are processed from last to first. (See `reduce()`)
  */
@@ -111,6 +113,8 @@ export const reduceRight = <TElement, TResult>(
   fn: ReduceFn<TElement, TResult>,
   init: TResult,
 ) => array.reduceRight(fn, init);
+/** Alias for `reduceRight()` */
+export const aggregateRight = reduceRight;
 
 /**
  * Create a string which is the result of concatenating the string values of each `array` element, using `delimiter` as a separator.

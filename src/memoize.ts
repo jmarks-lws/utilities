@@ -3,7 +3,7 @@ import objectHash from 'object-hash';
 import { Hash, isDefinedObject } from './object';
 import { def, map } from '.';
 
-const memoizeWithCache = <T extends CallableFunction>(
+const memoizeWithProxy = <T extends CallableFunction>(
   f: T,
   cacheProxy: {
     get: (name: string) => any,
@@ -34,7 +34,7 @@ export const memoize = <T extends CallableFunction>(
     set: (name: string, value: any) => any,
   },
 ): T => {
-  if (def(cacheProxy)) return memoizeWithCache(fn, cacheProxy!);
+  if (def(cacheProxy)) return memoizeWithProxy(fn, cacheProxy!);
 
   const cache: Hash = {};
 

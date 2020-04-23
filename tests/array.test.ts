@@ -235,7 +235,7 @@ describe('Array utilities tests', () => {
       expect(omit([1, 2, 3, 4, 5, 6, 7], 4)).toMatchObject([1, 2, 3, 5, 6, 7]);
     });
     test('insertAt', () => {
-      const result = insertAt([1, 2, 3, 4], 5, 1);
+      const result = insertAt([1, 2, 3, 4], 1, 5);
       expect(result).toMatchObject([1, 5, 2, 3, 4]);
     });
     test('removeAt', () => {
