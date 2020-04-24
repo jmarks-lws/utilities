@@ -46,7 +46,7 @@ export const pickNot = (obj: Hash, fields: string[]): Hash => pick(obj, prune(ke
 /**
  * Returns an object that is the result of removing a field from `o` by name.
  */
-export const removeField = (o: Hash, field: string) => ((fld: string, { [fld]: _, ...rest }) => rest)(field, o);
+export const removeField = (o: Hash, field: string) => ((f: string, { [f]: _, ...rest }) => ({ ...rest }))(field, o);
 
 /**
  * Returns a boolean indicating whether a given key exists in the provided object.
@@ -122,7 +122,7 @@ export const diff = (a: Hash, b: Hash) => {
     } else if (typeof a[key] === 'object' && a[key] !== null) {
       const comparison = diff(a[key], b[key]);
       if (keys(comparison).length > 0) {
-        dif[key] = diff(a[key], b[key]);
+        dif[key] = comparison; // diff(a[key], b[key]);
       }
     } else if (typeof a[key] !== typeof b[key] || a[key] !== b[key]) {
       dif[key] = '~'
@@ -152,7 +152,7 @@ export const fullDiff = (a: Hash, b: Hash) => {
     } else if (typeof a[key] === 'object') {
       const comparison = diff(a[key], b[key]);
       if (keys(comparison).length > 0) {
-        dif[key] = comparison;
+        dif[key] = fullDiff(a[key], b[key]);
       }
     } else if (typeof a[key] !== typeof b[key] || a[key] !== b[key]) {
       dif[key] = { '-': a[key], '+': b[key] };

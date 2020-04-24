@@ -10,19 +10,19 @@ export const not = (x: boolean) => !x;
  * @param {boolean} a
  * @param {boolean} b
  */
-export const and = (a: boolean, b: boolean) => a && b;
+export const and = (a: boolean, b: boolean) => !!a && !!b;
 /**
  * Logical NAND operation. At least one value is not truthy.
  * @param {boolean} a
  * @param {boolean} b
  */
-export const nand = (a: boolean, b: boolean) => not(and(a, b)); // at least one is not true
+export const nand = (a: boolean, b: boolean) => not(and(!!a, !!b)); // at least one is not true
 /**
  * Logical OR operation. At least one value is truthy.
  * @param {boolean} a
  * @param {boolean} b
  */
-export const or = (a: boolean, b: boolean) => a || b;
+export const or = (a: boolean, b: boolean) => !!a || !!b;
 /**
  * Logical NOR operation. Neither value is truthy.
  * @param {boolean} a

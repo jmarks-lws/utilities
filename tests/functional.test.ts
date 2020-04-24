@@ -1,7 +1,9 @@
 
 import {
   repeat, repeatWithBreak, repeatAsync, repeatAsyncWithBreak, repeatWhile, repeatWhileAsync,
+  isFunction, curry, mapAsync, identity, partial, spreadArgs, reverseArgs, maxTimes, maxOnce, take, branch, tryCatch,
 } from '../src/functional';
+import { reduce } from '../src/array';
 
 describe('functional methods', () => {
   test('repeat runs 10 times', async () => {
@@ -91,4 +93,126 @@ describe('functional methods', () => {
     expect(c).toBe(5);
     expect(l).toMatchObject([0, 1, 2, 3, 4]);
   });
+
+  test('isFunction', async () => {
+    expect(isFunction(1)).toBe(false);
+    expect(isFunction('a')).toBe(false);
+    expect(isFunction(() => {})).toBe(true);
+    expect(isFunction(new Promise(() => {}))).toBe(false);
+  });
+
+  test('isFunction with key', async () => {
+    const obj = {
+      fn: () => {},
+    }
+    expect(isFunction(1, 'fn')).toBe(false);
+    expect(isFunction('a', 'fn')).toBe(false);
+    expect(isFunction(obj, 'fn')).toBe(true);
+    expect(isFunction(new Promise(() => {}), 'fn')).toBe(false);
+    expect(isFunction(new Promise(obj.fn), 'fn')).toBe(false);
+  });
+
+  test('curry', async () => {
+    const add = (a: number, b: number) => a + b
+    const curried = curry(add);
+    const step2 = curried(5);
+    expect(step2).toBeInstanceOf(Function);
+    expect(isFunction(step2)).toBe(true);
+    expect(step2(5)).toBe(10);
+    expect(curried(5, 5)).toBe(10);
+  });
+
+  test('mapAsync', async () => {
+    const result = await mapAsync(
+      [1, 2, 3],
+      async (value) => value * 2,
+    );
+    expect(result).toMatchObject([2, 4, 6]);
+  });
+
+  test('identity', async () => {
+    const a = { hello: 'world' };
+    expect(identity(5)).toBe(5);
+    expect(identity(a)).toBe(a);
+  })
+
+  test('partial', async () => {
+    const partway = partial((a: number, b: number, c: number) => a + b + c, 1, 2);
+    expect(partway).toBeInstanceOf(Function);
+    expect(isFunction(partway)).toBe(true);
+    expect(partway(3)).toBe(6);
+  })
+
+  test('spreadArgs', async () => {
+    const sumFunction = (sumValues: number[]) => reduce(sumValues, (a, b) => a + b, 0);
+    const spreadFunction = spreadArgs(sumFunction);
+    expect(sumFunction).toBeInstanceOf(Function);
+    const resultSum = sumFunction([1, 2, 3, 4]);
+    const resultSpread = spreadFunction(1, 2, 3, 4);
+    expect(resultSum).toBe(resultSpread);
+  });
+
+  test('reverseArgs', async () => {
+    const forwards = (dividend: number, divisor: number) => divisor / dividend;
+    const backwards = reverseArgs(forwards);
+    expect(forwards(1, 2)).toBe(backwards(2, 1));
+  })
+
+  test('maxTimes', async () => {
+    let start = 1; // 1
+    const addOne = () => { start += 1 };
+    const addOneLimited = maxTimes(2, addOne);
+    addOneLimited(); // 2
+    addOneLimited(); // 3
+    addOneLimited(); // 3
+    expect(start).toBe(3);
+  })
+
+  test('maxOnce', async () => {
+    let start = 1; // 1
+    const addOne = () => { start += 1 };
+    const addOneLimited = maxOnce(addOne);
+    addOneLimited(); // 2
+    addOneLimited(); // 2
+    addOneLimited(); // 2
+    expect(start).toBe(2);
+  })
+
+  test('take().from()', async () => {
+    const obj = {
+      name: 'James',
+      value: 'abc',
+      date: '2020-04-24',
+    }
+    expect(take('value', 'cba').from(obj)).toBe('abc');
+    expect(take('firstName', 'Friend').from(obj)).toBe('Friend');
+  });
+
+  test('branch', async () => {
+    const truePath = () => 'truth';
+    const falsePath = () => 'falsehood';
+    expect(branch(1 > 2, truePath, falsePath)(null)).toBe('falsehood');
+    expect(branch(1 < 2, truePath, falsePath)(null)).toBe('truth');
+  })
+
+  test('tryCatch', async () => {
+    let a = 0;
+    let b = 1;
+    tryCatch(
+      (x: any) => {
+        throw new Error('artificial error');
+        // eslint-disable-next-line no-unreachable
+        a += x;
+      },
+      (x: any, error: any) => {
+        b += x;
+        return error;
+      },
+      (x: any, results) => {
+        // console.log('Finally was called.');
+      },
+    )(1);
+    expect(a).toBe(0);
+    expect(b).toBe(2);
+  })
 })

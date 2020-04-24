@@ -155,6 +155,55 @@ describe('Object utilities tests', () => {
       b: '+',
     })
   });
+  test('flat diff', async () => {
+    const a = {
+      a: 'a', b: 'b', c: 3, p: 0,
+    };
+    const b = {
+      a: 'a', b: 'b', r: 2, d: 2,
+    };
+    expect(diff(a, b)).toMatchObject({
+      c: '-',
+      p: '-',
+      r: '+',
+      d: '+',
+    })
+  })
+
+  test('nested object diff', async () => {
+    const a = {
+      a: 'a',
+      b: 'b',
+      c: 3,
+      p: 0,
+      specs: {
+        height: 6.5,
+        languageCount: 100,
+      },
+    };
+    const b = {
+      a: 'a',
+      b: 'b',
+      r: 2,
+      d: 2,
+      specs: {
+        height: 1.5,
+        languageCount: 1,
+      },
+    };
+    const d = diff(a, b);
+    expect(diff(a, b)).toMatchObject({
+      c: '-',
+      p: '-',
+      r: '+',
+      d: '+',
+      specs: {
+        height: '~',
+        languageCount: '~',
+      },
+    })
+    expect(diff(a, a)).toMatchObject({});
+  })
   // TODO: Finish writing tests and adjusting `diff`
   // test('diff with subobject', async () => {
   //   const a = { a: 1, b: { a: 1, b: 2 } };
@@ -175,6 +224,56 @@ describe('Object utilities tests', () => {
       b: { '+': 1 },
     })
   });
+
+  test('flat fullDiff', async () => {
+    const a = {
+      a: 'a', b: 'b', c: 3, p: 0,
+    };
+    const b = {
+      a: 'a', b: 'b', r: 2, d: 2,
+    };
+    expect(fullDiff(a, b)).toMatchObject({
+      c: { '-': 3 },
+      p: { '-': 0 },
+      r: { '+': 2 },
+      d: { '+': 2 },
+    })
+  })
+
+  test('nested object fullDiff', async () => {
+    const a = {
+      a: 'a',
+      b: 'b',
+      c: 3,
+      p: 0,
+      specs: {
+        height: 6.5,
+        languageCount: 100,
+      },
+    };
+    const b = {
+      a: 'a',
+      b: 'b',
+      r: 2,
+      d: 2,
+      specs: {
+        height: 1.5,
+        languageCount: 1,
+      },
+    };
+    const d = fullDiff(a, b);
+    expect(fullDiff(a, b)).toMatchObject({
+      c: { '-': 3 },
+      p: { '-': 0 },
+      r: { '+': 2 },
+      d: { '+': 2 },
+      specs: {
+        height: { '-': 6.5, '+': 1.5 },
+        languageCount: { '-': 100, '+': 1 },
+      },
+    })
+    expect(fullDiff(a, a)).toMatchObject({});
+  })
 
   test('compactObject removes null or undefined properties', () => {
     expect(compactObject(testPerson1)).toMatchObject({

@@ -1,6 +1,6 @@
-import { isNull } from 'util';
 import {
-  notNull, empty, notEmpty, boolVal, floatVal, strVal,
+  isNull, notNull, empty, notEmpty, boolVal, floatVal, strVal, isValidNumber,
+  isIntegerNumber, isNumeric, isString, isBigInt, isSymbol, isBoolean,
 } from '../src/miscellaneous';
 
 describe('Miscellaneous functions', () => {
@@ -17,7 +17,7 @@ describe('Miscellaneous functions', () => {
     expect(notNull(null)).toBe(false);
   });
   test('empty', async () => {
-    expect.assertions(12);
+    expect.assertions(13);
     expect(empty([])).toBe(true);
     expect(empty([1])).toBe(false);
     expect(empty(0)).toBe(true);
@@ -30,6 +30,7 @@ describe('Miscellaneous functions', () => {
     expect(empty('  ')).toBe(false);
     expect(empty(undefined)).toBe(true);
     expect(empty(null)).toBe(true);
+    expect(empty({})).toBe(true);
   })
   test('notEmpty', async () => {
     expect.assertions(12);
@@ -52,10 +53,80 @@ describe('Miscellaneous functions', () => {
   })
   test('floatVal', async () => {
     expect(floatVal('123')).toBe(123);
+    expect(floatVal(123)).toBe(123);
     expect(floatVal('aaa')).toBeNaN();
   });
   test('strVal', async () => {
     expect(strVal([1, 2, 3])).toBe(JSON.stringify([1, 2, 3]));
     expect(strVal({ a: 1, b: 2, c: 3 })).toBe(JSON.stringify({ a: 1, b: 2, c: 3 }));
+    expect(strVal(undefined)).toBe('');
+    expect(strVal(null)).toBe('');
   });
+  test('isValidNumber returns correctly', async () => {
+    expect(isValidNumber(12)).toBe(true);
+    expect(isValidNumber(0.712)).toBe(true);
+    expect(isValidNumber('abc')).toBe(false);
+    expect(isValidNumber(NaN)).toBe(false);
+    expect(isValidNumber('123')).toBe(false);
+    expect(isValidNumber(BigInt(123))).toBe(false);
+    expect(isValidNumber(true)).toBe(false);
+    expect(isValidNumber(false)).toBe(false);
+  });
+  test('isIntegerNumber returns correctly', async () => {
+    expect(isIntegerNumber(12)).toBe(true);
+    expect(isIntegerNumber(0.712)).toBe(false);
+    expect(isIntegerNumber('abc')).toBe(false);
+    expect(isIntegerNumber(NaN)).toBe(false);
+    expect(isIntegerNumber('123')).toBe(false);
+    expect(isIntegerNumber(true)).toBe(false);
+    expect(isIntegerNumber(false)).toBe(false);
+  })
+  test('isNumeric returns correctly', async () => {
+    expect(isNumeric(12)).toBe(true);
+    expect(isNumeric(0.712)).toBe(true);
+    expect(isNumeric('abc')).toBe(false);
+    expect(isNumeric(NaN)).toBe(false);
+    expect(isNumeric('123')).toBe(true);
+    expect(isNumeric(true)).toBe(false);
+    expect(isNumeric(false)).toBe(false);
+  })
+  test('isString returns correctly', async () => {
+    expect(isString(12)).toBe(false);
+    expect(isString(0.712)).toBe(false);
+    expect(isString('abc')).toBe(true);
+    expect(isString(NaN)).toBe(false);
+    expect(isString('123')).toBe(true);
+    expect(isString(true)).toBe(false);
+    expect(isString(false)).toBe(false);
+  })
+  test('isBigInt returns correctly', async () => {
+    expect(isBigInt(12)).toBe(false);
+    expect(isBigInt(0.712)).toBe(false);
+    expect(isBigInt('abc')).toBe(false);
+    expect(isBigInt(NaN)).toBe(false);
+    expect(isBigInt('123')).toBe(false);
+    expect(isBigInt(BigInt(123))).toBe(true);
+    expect(isBigInt(true)).toBe(false);
+    expect(isBigInt(false)).toBe(false);
+  })
+  test('isSymbol returns correctly', async () => {
+    expect(isSymbol(12)).toBe(false);
+    expect(isSymbol(0.712)).toBe(false);
+    expect(isSymbol('abc')).toBe(false);
+    expect(isSymbol(NaN)).toBe(false);
+    expect(isSymbol('123')).toBe(false);
+    expect(isSymbol(BigInt(123))).toBe(false);
+    expect(isSymbol(true)).toBe(false);
+    expect(isSymbol(false)).toBe(false);
+  })
+  test('isBoolean returns correctly', async () => {
+    expect(isBoolean(12)).toBe(false);
+    expect(isBoolean(0.712)).toBe(false);
+    expect(isBoolean('abc')).toBe(false);
+    expect(isBoolean(NaN)).toBe(false);
+    expect(isBoolean('123')).toBe(false);
+    expect(isBoolean(BigInt(123))).toBe(false);
+    expect(isBoolean(true)).toBe(true);
+    expect(isBoolean(false)).toBe(true);
+  })
 });

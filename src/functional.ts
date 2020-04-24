@@ -122,51 +122,40 @@ export const tryCatch = <T>(
     }
   }
 
-// TODO: Test more thoroughly before using in prod.
-export const tryCatchManyAsync = <T>(
-  initialPath: ((x: T, error?: any) => Promise<any>),
-  ...catchPaths: Array<((x: T, error?: any) => Promise<any>)>
-) => async (x: T, err?: any): Promise<any> => {
-    try {
-      return await initialPath(x, err);
-    } catch (error) {
-      // TODO: Work with this until I can use a `branch()`/`branchAsync()`
-      const init = head(catchPaths);
-      if (undef(init)) throw err;
-      return tryCatchManyAsync(init, ...tail(catchPaths))(x, error);
-    }
-  }
-
 /**
- * Wrap a function so that it will only run at most `times` times when called from the resulting wrapper
+ * Wrap a function so that it will only run at most `times` times when called from the resulting wrapper.
+ *
+ * Note:
+ *   Contrary to this library's overall design philosophy, by its nature, `maxTimes()` often results in a
+ *   function which causes side effects.
+ *
+ * Warning:
+ *   Use cautiously. Calling the resulting function more than the allotted number of times will return `null`.
+ *
  * @param times - Number of times to allow this function to run
  * @param fn - Function to wrap
  * @param context - An optional context to provide `this` for the enclosed function.
  */
-export const maxTimes = (times: number = 1, fn: (...args: any[]) => any, context?: any) => {
+export const maxTimes = <T extends (...args: any[]) => any>(times: number, fn: T, context?: any) => {
   let ranTimes: number = 0;
 
   return function someFunction(this: any, ...args: any[]) {
     if (ranTimes >= times) return null;
     ranTimes += 1;
     return fn.apply(context || this, args);
-  };
+  } as T;
 }
 
 /**
- * Convenience method providing a wrapper that can only run an enclosed function once. Delegates to `doTimes`
+ * Convenience method providing a wrapper that can only run an enclosed function once. Delegates to `maxTimes`
+ * Warning:
+ *   Use cautiously. Calling the resulting function more than one time will return `null`.
  * @param fn - Function to wrap
  * @param context - An optional context to provide `this` for the enclosed function.
  */
-export const maxOnce = (fn: (...args: any[]) => any, context: any) => maxTimes(1, fn, context)
+export const maxOnce = <T extends (...args: any[]) => any>(fn: T, context?: any): T => maxTimes(1, fn, context)
 
-const internalRepeat = (repeatTimes: number, fn: CallableFunction, index: number, ...args: any[]) => {
-  fn(index, ...args);
-  if (repeatTimes > 1) internalRepeat(repeatTimes - 1, fn, index + 1, ...args);
-}
 export const repeat = (repeatTimes: number, fn: (index: number, ...fnArgs: any[]) => void, ...args: any[]) => {
-  // Recursive: internalRepeat(repeatTimes, fn, 0, ...args);
-  // But we'll use a more practical method for now, since we don't want stack issues and we like performance:
   for (let i = 0; i < repeatTimes; i++) { fn(i, ...args); }
 }
 
@@ -174,21 +163,11 @@ export const repeatWhile = (repeatCondition: () => boolean, fn: (...fnArgs: any[
   while (repeatCondition()) { fn(...args); }
 }
 
-// const internalRepeatAsync = async (
-//   repeatTimes: number,
-//   fn: (...args: any[]) => Promise<any>,
-//   index: number,
-//   ...args: any[]
-// ) => {
-//   await fn(index, ...args);
-//   if (repeatTimes > 1) await internalRepeatAsync(repeatTimes - 1, fn, index + 1, ...args);
-// }
 export const repeatAsync = async (
   repeatTimes: number,
   fn: (...args: any[]) => Promise<any>,
   ...args: any[]
 ) => {
-  // await internalRepeatAsync(repeatTimes, fn, 0, ...args);
   // eslint-disable-next-line no-await-in-loop
   for (let i = 0; i < repeatTimes; i++) { await fn(i, ...args); }
 }
@@ -202,23 +181,11 @@ export const repeatWhileAsync = async (
   while (repeatCondition()) { await fn(...args); }
 }
 
-// const internalRepeatWithBreak = (
-//   repeatTimes: number,
-//   fn: ((i: number, done: CallableFunction, ...fnargs: any[]) => any),
-//   index: number,
-//   ...args: any[]
-// ) => {
-//   let isDone = false;
-//   fn(index, (() => { isDone = true }), ...args);
-//   if (repeatTimes > 1 && !isDone) internalRepeatWithBreak(repeatTimes - 1, fn, index + 1, ...args);
-// }
 export const repeatWithBreak = (
   repeatTimes: number,
   fn: ((i: number, done: CallableFunction, ...fnargs: any[]) => any),
   ...args: any[]
 ) => {
-  // Recursive: internalRepeatWithBreak(repeatTimes, fn, 0, ...args);
-  // But we'll use a more practical method for now, since we don't want stack issues and we like performance:
   let isDone = false;
   for (let i = 0; i < repeatTimes; i++) {
     // eslint-disable-next-line no-loop-func
@@ -227,23 +194,11 @@ export const repeatWithBreak = (
   }
 }
 
-// const internalRepeatAsyncWithBreak = async (
-//   repeatTimes: number,
-//   fn: ((i: number, done: CallableFunction, ...fnargs: any[]) => Promise<any>),
-//   index: number,
-//   ...args: any[]
-// ) => {
-//   let isDone = false;
-//   await fn(index, (() => { isDone = true }), ...args);
-//   if (repeatTimes > 1 && !isDone) await internalRepeatAsyncWithBreak(repeatTimes - 1, fn, index + 1, ...args);
-// }
 export const repeatAsyncWithBreak = async (
   repeatTimes: number,
   fn: ((i: number, done: CallableFunction, ...fnargs: any[]) => Promise<any>),
   ...args: any[]
 ) => {
-  // Recursive: await internalRepeatAsyncWithBreak(repeatTimes, fn, 0, ...args);
-  // But we'll use a more practical method for now, since we don't want stack issues and we like performance:
   let isDone = false;
   const setDone = () => { isDone = true };
   for (let i = 0; i < repeatTimes; i++) {

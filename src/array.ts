@@ -2,7 +2,7 @@ import {
   pick, Hash, HashOf, addProp, hasKey, objectsHaveSameValues,
 } from './object';
 import {
-  def, strVal, undef, intVal, Nullable,
+  def, strVal, undef, intVal, Nullable, empty,
 } from './miscellaneous';
 
 /**
@@ -52,14 +52,9 @@ export const max = <T>([a, b, ...rest]: T[]): T => (undef(b) ? a : max([(a > b ?
  * @param array - The source array
  */
 export const count = (array: any[]): number => (
-  // eslint-disable-next-line no-nested-ternary
   !isArray(array)
-    ? count([array])
-    : (
-      array.filter((x) => def(x)).length > 0
-        ? 1 + count(tail(array))
-        : 0
-    )
+    ? count([array].filter((a) => ![null, undefined].includes(a as any)))
+    : array.length
 );
 /**
  * Returns a new array that is the result of reversing the order of the elements in `array`
