@@ -85,14 +85,16 @@ export const merge = <T>(...a: T[]): T => ({ ...head(a), ...(!arrayEmpty(tail(a)
  * the first objects. Values to the left overwrite values to their right.
  * @param {Hash[]} a - As many hashes as you like to merge together from left to right.
  */
-export const mergeRight = (...a: Hash[]): Hash => merge(...reverse(a));
+export const mergeRight = <T>(...a: T[]): T => merge(...reverse(a));
 
 /**
- * Gets a list of keys that exist in both provided objects and returns them as a new string array.
+ * Gets a list of keys that exist in both `a` and `b` and returns them as a new string array.
  * @param a
  * @param b
  */
-export const getSharedKeys = (a: Hash, b: Hash): Array<string> => intersect(keys(a), keys(b));
+export const getSharedKeys = <T>(a: T, b: T): Array<keyof Partial<T>> => (
+  intersect(keys(a), keys(b)) as Array<string> as Array<keyof Partial<T>>
+);
 
 /**
  * Returns a new object that is the result of merging together two objects ONLY on keys that both share.
@@ -102,7 +104,7 @@ export const getSharedKeys = (a: Hash, b: Hash): Array<string> => intersect(keys
  * @param b
  */
 export const mergeIntersection = (a: Hash, b: Hash): Hash => {
-  const [a2, b2] = [a, b].map((o: Hash) => pick(o, getSharedKeys(a, b)));
+  const [a2, b2] = [a, b].map((o: Hash) => pick(o, getSharedKeys(a, b) as string[]));
   return merge(a2, b2);
 };
 
