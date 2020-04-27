@@ -40,12 +40,12 @@ export const concat = <T>(...args: Array<T>[]): T[] => (([] as T[]).concat(...ar
  * Compares all values in an array returning the lowest element. Elements should be naturally comparable by the `<` operator.
  * @param {Array<T>} array Array to compare values from.
  */
-export const min = <T>([a, b, ...rest]: T[]): T => (undef(b) ? a : min([(a < b ? a : b), ...rest]))
+export const min = <T>([a, b, ...rest]: T[]): T => (undef(b) ? a : min([(a < b ? a : b), ...rest]));
 /**
  * Compares all values in an array returning the highest element. Elements should be naturally comparable by the `>` operator.
  * @param {Array<T>} array Array to compare values from.
  */
-export const max = <T>([a, b, ...rest]: T[]): T => (undef(b) ? a : max([(a > b ? a : b), ...rest]))
+export const max = <T>([a, b, ...rest]: T[]): T => (undef(b) ? a : max([(a > b ? a : b), ...rest]));
 
 /**
  * Returns number of elements in `array`.
@@ -146,7 +146,23 @@ export const slice = <T>(
   end: number = Infinity,
 ): T[] => (
     array.slice(start, end)
-  )
+  );
+
+/**
+ * Returns a section of an array using page size and number.
+ * @param array - The array to source the section from.
+ * @param start — The beginning of the specified portion of the array.
+ * @param end — The end of the specified portion of the array. This is exclusive of the element at the index 'end'.
+ */
+export const slicePage = <T>(
+  array: T[],
+  pageSize: number,
+  pageNumber: number = 1,
+): T[] => {
+  const start = pageSize * (pageNumber - 1);
+  const end = start + pageSize;
+  return slice(array, start, end);
+};
 
 /**
  * Returns an array using the following rules:
@@ -177,7 +193,7 @@ export const map = <T, U>(
  *
  * @returns (array: IMappableObject) => T[]
  */
-export const preparedMap = <T, U>(mapFn: (<T>(el: T, i: number) => U)) => (ary: T[]): U[] => map(ary, mapFn)
+export const preparedMap = <T, U>(mapFn: (<T>(el: T, i: number) => U)) => (ary: T[]): U[] => map(ary, mapFn);
 
 /**
  * Returns a new array of objects containing a subset of fields from an original array of objects.
@@ -240,14 +256,14 @@ export const last = <T>(array: Array<T>) => first(reverse(array));
  * @param array - The source array
  * @param whereFn - Function used to filter the source list.
  */
-export const findLast = <T>(array: Array<T>, whereFn: ((testElement: T) => boolean)) => last(where(array, whereFn))
+export const findLast = <T>(array: Array<T>, whereFn: ((testElement: T) => boolean)) => last(where(array, whereFn));
 
 /**
  * Returns number of elements in `array` matching a given condition.
  * @param array - The source array
  * @param fn - Function used to filter the source list.
  */
-export const countWhere = <T>(array: Array<T>, fn: FilterFn<T>) => where(array, fn).length
+export const countWhere = <T>(array: Array<T>, fn: FilterFn<T>) => where(array, fn).length;
 
 /** Helper method: Determines how many elements in an array are a value other than undefined. */
 export const countDefined = (array: Array<any>) => countWhere(map(array, (i) => def(i)), (defined) => defined === true);
@@ -266,7 +282,7 @@ export const hasNoneDefined = (array: Array<any>) => countDefined(array) === 0;
  * @param field - Which field to sum. If the value of any instance of this property in any element cannot be parsed to an Integer, the result will be NaN
  */
 export const sum = <T>(array: T[], field: string) => reduce(array,
-  (prev, cur) => prev + parseInt((cur as Hash)[field], 10), 0)
+  (prev, cur) => prev + parseInt((cur as Hash)[field], 10), 0);
 /**
  * Returns a sum of a provided field matching a given condition from the elements in `array`.
  * @param array - The source array
@@ -384,7 +400,7 @@ export const table = <T extends Hash>(
       (prev, curr) => addProp(prev, strVal(curr[key]), curr),
       {} as HashOf<T>,
     )
-  )
+  );
 /** Alias for `table()` */
 export const hash = table;
 /** Alias for `table()` */
@@ -407,9 +423,9 @@ export const group = <T extends Hash>(array: Array<T>, key: string) => {
         : { ...prev, [`${curr[key]}`]: [ curr ] }
     ),
     {} as HashOf<Hash[]>,
-  )
+  );
   return grouped;
-}
+};
 
 /**
  * Removes elements which are null or undefined.
@@ -427,7 +443,7 @@ export const compactArray = (array: any[], allowNulls = false) => (
 export const flatten = (arr: any[], d = 1): any[] => (d > 0
   ? reduce(arr, (acc, val) => acc.concat(isArray(val) ? flatten(val, d - 1) : val), [])
   : slice(arr)
-)
+);
 
 /**
  * Tests `array` to determine if it has a zero length.
