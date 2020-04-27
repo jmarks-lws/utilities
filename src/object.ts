@@ -78,7 +78,7 @@ export const compactObject = <T extends Hash>(o: T, allowNulls = false): Partial
  * overwrite values before them.
  * @param {Hash[]} a - As many hashes as you like to merge together from left to right.
  */
-export const merge = (...a: Hash[]): Hash => ({ ...head(a), ...(!arrayEmpty(tail(a)) ? merge(...tail(a)) : null) })
+export const merge = <T>(...a: T[]): T => ({ ...head(a), ...(!arrayEmpty(tail(a)) ? merge(...tail(a)) : null) });
 
 /**
  * Returns a new object that is the result of merging together a series of objects going from the last to
@@ -102,7 +102,7 @@ export const getSharedKeys = (a: Hash, b: Hash): Array<string> => intersect(keys
  * @param b
  */
 export const mergeIntersection = (a: Hash, b: Hash): Hash => {
-  const [a2, b2] = [a, b].map((o: Hash) => pick(o, getSharedKeys(a, b)))
+  const [a2, b2] = [a, b].map((o: Hash) => pick(o, getSharedKeys(a, b)));
   return merge(a2, b2);
 };
 
@@ -125,16 +125,16 @@ export const diff = (a: Hash, b: Hash) => {
         dif[key] = comparison; // diff(a[key], b[key]);
       }
     } else if (typeof a[key] !== typeof b[key] || a[key] !== b[key]) {
-      dif[key] = '~'
+      dif[key] = '~';
     }
   });
   bKeys.forEach((key) => {
     if (!aKeys.includes(key)) {
       dif[key] = '+';
     }
-  })
+  });
   return dif;
-}
+};
 
 /**
  * Provides a list of change descriptions where the "from" object is `a` and the "to" object is `b`.
@@ -162,9 +162,9 @@ export const fullDiff = (a: Hash, b: Hash) => {
     if (!aKeys.includes(key)) {
       dif[key] = { '+': b[key] };
     }
-  })
+  });
   return dif;
-}
+};
 
 /**
  * Returns a boolean indicating whether the two provided objects have different data.
@@ -204,7 +204,7 @@ export const remapKeys = (obj: Hash, remap: Hash, returnAll: boolean = false): H
     { ...acc },
     ((hasKey(remap, k) || returnAll) ? { [(hasKey(remap, k) ? remap[k] : k)]: obj[k] } : {}),
   ), {} as Hash,
-)
+);
 
 /**
  * Returns a new object where the keys and corresponding values of `obj` have been swapped with each other.
@@ -261,7 +261,7 @@ export const iterateWithBreak = ( // TODO: Make so it works with arrays too (lik
  * @param key
  * @param defaultValue
  */
-export const prop = (o: Hash, key: string, defaultValue: any = null): any => (hasKey(o, key) ? o[key] : defaultValue)
+export const prop = (o: Hash, key: string, defaultValue: any = null): any => (hasKey(o, key) ? o[key] : defaultValue);
 
 /**
  * Zips two arrays into an array of tuples. Assumes both arrays are the length of `keysArray`
@@ -273,7 +273,7 @@ export const zip = <T>(
   valuesArray: T[],
 ): Array<[string, T]> => keysArray.reduce(
     (acc: [string, T][], key: string, i) => acc.concat([key, valuesArray[i]]), [] as [string, T][],
-  )
+  );
 
 /**
  * Creates an object having keys from `keysArray` matching values from `valuesArray`. Assumes both arrays are the length of `keysArray`.
@@ -285,7 +285,7 @@ export const arraysToObject = (
   valuesArray: any[],
 ): Hash => keysArray.reduce(
   (acc: Hash, key: string, index: number) => merge(acc, { [key]: valuesArray[index] }), {} as Hash,
-)
+);
 
 /**
  * Works similarly to mapping an array, but maps the values of `o`, returning a new object that has
@@ -295,7 +295,7 @@ export const transformValues = <T, U>(o: HashOf<T>, fn: (value: T) => U) : HashO
   keys(o),
   (acc: HashOf<U>, key) => ({ ...acc, [key]: fn(o[key]) }),
   {} as HashOf<U>,
-)
+);
 
 /**
  * Returns an object that is the result adding a property to `o`.
@@ -305,4 +305,4 @@ export const transformValues = <T, U>(o: HashOf<T>, fn: (value: T) => U) : HashO
  */
 export const addProp = <T>(o: HashOf<T>, key: string, val: T) => merge(o, { [key]: val });
 
-export const objectsHaveSameValues = (a: Hash, b: Hash) => count(keys(diff(a, b))) === 0
+export const objectsHaveSameValues = (a: Hash, b: Hash) => count(keys(diff(a, b))) === 0;

@@ -11,6 +11,7 @@
     "@typescript-eslint"
   ],
   "rules": {
+    "@typescript-eslint/semi": "warn",
     "array-bracket-spacing": "off",
     "comma-dangle": [
       2,
