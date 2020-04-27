@@ -193,11 +193,11 @@ describe('Array utilities tests', () => {
       ];
 
       expect.assertions(6);
-      expect(slicePage(sliceTestList, 10)).toMatchObject([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
-      expect(slicePage(sliceTestList, 10, 2)).toMatchObject([10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
-      expect(slicePage(sliceTestList, 10, 5)).toMatchObject([40, 41, 42, 43, 44, 45, 46, 47, 48, 49]);
-      expect(slicePage(sliceTestList, 10, 7)).toMatchObject([]);
-      expect(slicePage(sliceTestList, 5, 7)).toMatchObject([30, 31, 32, 33, 34]);
+      expect(slicePage(sliceTestList, 1, 10)).toMatchObject([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+      expect(slicePage(sliceTestList, 2, 10)).toMatchObject([10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
+      expect(slicePage(sliceTestList, 5, 10)).toMatchObject([40, 41, 42, 43, 44, 45, 46, 47, 48, 49]);
+      expect(slicePage(sliceTestList, 7, 10)).toMatchObject([]);
+      expect(slicePage(sliceTestList, 7, 5)).toMatchObject([30, 31, 32, 33, 34]);
       expect(slicePage(sliceTestList, 3, 3)).toMatchObject([6, 7, 8]);
     });
     test('reduce', async () => {
