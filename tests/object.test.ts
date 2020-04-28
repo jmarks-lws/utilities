@@ -38,7 +38,7 @@ describe('Object utilities tests', () => {
     dob: '1980-01-07',
     weight: 220,
     height: 6.25,
-  }
+  } as Hash;
 
   test('iterate can be short circiuted', () => {
     let runs = 0;
@@ -60,10 +60,10 @@ describe('Object utilities tests', () => {
   test('iterate can loop over an everyday array', async () => {
     const input: Array<number> = [1, 2, 3, 4, 5];
     const out: Hash = {};
-    iterate(input, (k, v) => { out[k] = v; })
+    iterate(input, (k, v) => { out[k] = v; });
     expect(out).toMatchObject({
       0: 1, 1: 2, 2: 3, 3: 4, 4: 5,
-    })
+    });
     expect(input).toMatchObject(values(out));
   });
 
@@ -88,7 +88,7 @@ describe('Object utilities tests', () => {
     expect(pick(testPerson1, ['id', 'name'])).toMatchObject({
       id: 123,
       name: 'Forest',
-    })
+    });
   });
 
   test('pick doesn\'t care if a field doesn\'t exist', () => {
@@ -113,14 +113,14 @@ describe('Object utilities tests', () => {
     const vs = [1, 2, 3];
     expect(zip(ks, vs)).toMatchObject([
       'a', 1, 'b', 2, 'c', 3,
-    ])
+    ]);
   });
   test('arraysToObject', async () => {
     const ks = ['a', 'b', 'c'];
     const vs = [1, 2, 3];
     expect(arraysToObject(ks, vs)).toMatchObject({
       a: 1, b: 2, c: 3,
-    })
+    });
   });
   test('transformValues', async () => {
     const timesTwo = (v: number) => v * 2;
@@ -128,7 +128,7 @@ describe('Object utilities tests', () => {
       a: 1, b: 2, c: 3,
     }, timesTwo)).toMatchObject({
       a: 2, b: 4, c: 6,
-    })
+    });
   });
 
   test('hasDiff', async () => {
@@ -153,7 +153,7 @@ describe('Object utilities tests', () => {
     expect(diff(a, b)).toMatchObject({
       a: '-',
       b: '+',
-    })
+    });
   });
   test('flat diff', async () => {
     const a = {
@@ -167,8 +167,8 @@ describe('Object utilities tests', () => {
       p: '-',
       r: '+',
       d: '+',
-    })
-  })
+    });
+  });
 
   test('nested object diff', async () => {
     const a = {
@@ -201,9 +201,9 @@ describe('Object utilities tests', () => {
         height: '~',
         languageCount: '~',
       },
-    })
+    });
     expect(diff(a, a)).toMatchObject({});
-  })
+  });
   // TODO: Finish writing tests and adjusting `diff`
   // test('diff with subobject', async () => {
   //   const a = { a: 1, b: { a: 1, b: 2 } };
@@ -222,7 +222,7 @@ describe('Object utilities tests', () => {
     expect(fullDiff(a, b)).toMatchObject({
       a: { '-': 1 },
       b: { '+': 1 },
-    })
+    });
   });
 
   test('flat fullDiff', async () => {
@@ -237,8 +237,8 @@ describe('Object utilities tests', () => {
       p: { '-': 0 },
       r: { '+': 2 },
       d: { '+': 2 },
-    })
-  })
+    });
+  });
 
   test('nested object fullDiff', async () => {
     const a = {
@@ -271,9 +271,9 @@ describe('Object utilities tests', () => {
         height: { '-': 6.5, '+': 1.5 },
         languageCount: { '-': 100, '+': 1 },
       },
-    })
+    });
     expect(fullDiff(a, a)).toMatchObject({});
-  })
+  });
 
   test('compactObject removes null or undefined properties', () => {
     expect(compactObject(testPerson1)).toMatchObject({
@@ -283,12 +283,12 @@ describe('Object utilities tests', () => {
       dob: '1980-01-07',
       weight: 220,
       height: 6.25,
-    })
+    });
   });
 
   test('tail() works as expected', async () => {
     const t = tail([1, 2, 3, 4 ]);
-    expect(t).toMatchObject([2, 3, 4 ])
+    expect(t).toMatchObject([2, 3, 4 ]);
   });
 
   test('merge results in a new combined object', () => {
@@ -300,7 +300,7 @@ describe('Object utilities tests', () => {
       dob: '1980-01-07',
       weight: 220,
       height: 6.25,
-    })
+    });
   });
 
   test('merge() works correctly with several objects', async () => {
@@ -314,11 +314,11 @@ describe('Object utilities tests', () => {
       height: 6.25,
       HP: 100,
       maxHP: 100,
-    })
+    });
   });
 
   test('getSharedKeys returns only keys that both objects have', () => {
-    expect(getSharedKeys(testPerson1, { id: 'id', dob: 'dob', test: 'test' })).toMatchObject([
+    expect(getSharedKeys(testPerson1, { id: 111, dob: 'dob', test: 'test' })).toMatchObject([
       'id', 'dob',
     ]);
   });
@@ -334,7 +334,7 @@ describe('Object utilities tests', () => {
     const remap = {
       a: 'a1',
       b: 'b1',
-    }
+    };
 
     expect(remapKeys(sourceObj, remap)).toMatchObject({
       a1: 123,
@@ -345,7 +345,7 @@ describe('Object utilities tests', () => {
       a1: 123,
       b1: 234,
       c: 345,
-    })
+    });
   });
 
   test('isObject ', async () => {
@@ -402,6 +402,6 @@ describe('Object utilities tests', () => {
   });
 
   test('invert', async () => {
-    expect(invert({ a: 1, b: 2, c: 3 })).toMatchObject({ 1: 'a', 2: 'b', 3: 'c' })
+    expect(invert({ a: 1, b: 2, c: 3 })).toMatchObject({ 1: 'a', 2: 'b', 3: 'c' });
   });
 });

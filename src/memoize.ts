@@ -1,4 +1,4 @@
-import objectHash from 'object-hash';
+import objectHash from './object-hash';
 
 import { Hash, isDefinedObject } from './object';
 import { def, map } from '.';

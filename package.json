@@ -28,7 +28,5 @@
     "ts-node": "^8.6.2",
     "typescript": "^3.8.3"
   },
-  "dependencies": {
-    "object-hash": "^2.0.3"
-  }
+  "dependencies": {}
 }
