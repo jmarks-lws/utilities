@@ -397,7 +397,7 @@ export const table = <T extends Hash>(
 ): HashOf<T> => (
     reduce(
       array as T[],
-      (prev, curr) => addProp(prev, strVal(curr[key]), curr),
+      (prev, curr) => addProp(prev, strVal(curr[key]), curr) as Hash,
       {} as HashOf<T>,
     )
   );
