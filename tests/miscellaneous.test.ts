@@ -1,6 +1,7 @@
 import {
   isNull, notNull, empty, notEmpty, boolVal, floatVal, strVal, isValidNumber,
   isIntegerNumber, isNumeric, isString, isBigInt, isSymbol, isBoolean,
+  isPrimitive, isReference,
 } from '../src/miscellaneous';
 
 describe('Miscellaneous functions', () => {
@@ -31,7 +32,7 @@ describe('Miscellaneous functions', () => {
     expect(empty(undefined)).toBe(true);
     expect(empty(null)).toBe(true);
     expect(empty({})).toBe(true);
-  })
+  });
   test('notEmpty', async () => {
     expect.assertions(12);
     expect(notEmpty([])).toBe(false);
@@ -50,7 +51,7 @@ describe('Miscellaneous functions', () => {
   test('boolVal', async () => {
     expect(boolVal('a')).toBe(true);
     expect(boolVal('')).toBe(false);
-  })
+  });
   test('floatVal', async () => {
     expect(floatVal('123')).toBe(123);
     expect(floatVal(123)).toBe(123);
@@ -80,7 +81,7 @@ describe('Miscellaneous functions', () => {
     expect(isIntegerNumber('123')).toBe(false);
     expect(isIntegerNumber(true)).toBe(false);
     expect(isIntegerNumber(false)).toBe(false);
-  })
+  });
   test('isNumeric returns correctly', async () => {
     expect(isNumeric(12)).toBe(true);
     expect(isNumeric(0.712)).toBe(true);
@@ -89,7 +90,7 @@ describe('Miscellaneous functions', () => {
     expect(isNumeric('123')).toBe(true);
     expect(isNumeric(true)).toBe(false);
     expect(isNumeric(false)).toBe(false);
-  })
+  });
   test('isString returns correctly', async () => {
     expect(isString(12)).toBe(false);
     expect(isString(0.712)).toBe(false);
@@ -98,7 +99,7 @@ describe('Miscellaneous functions', () => {
     expect(isString('123')).toBe(true);
     expect(isString(true)).toBe(false);
     expect(isString(false)).toBe(false);
-  })
+  });
   test('isBigInt returns correctly', async () => {
     expect(isBigInt(12)).toBe(false);
     expect(isBigInt(0.712)).toBe(false);
@@ -108,7 +109,7 @@ describe('Miscellaneous functions', () => {
     expect(isBigInt(BigInt(123))).toBe(true);
     expect(isBigInt(true)).toBe(false);
     expect(isBigInt(false)).toBe(false);
-  })
+  });
   test('isSymbol returns correctly', async () => {
     expect(isSymbol(12)).toBe(false);
     expect(isSymbol(0.712)).toBe(false);
@@ -118,7 +119,7 @@ describe('Miscellaneous functions', () => {
     expect(isSymbol(BigInt(123))).toBe(false);
     expect(isSymbol(true)).toBe(false);
     expect(isSymbol(false)).toBe(false);
-  })
+  });
   test('isBoolean returns correctly', async () => {
     expect(isBoolean(12)).toBe(false);
     expect(isBoolean(0.712)).toBe(false);
@@ -128,5 +129,31 @@ describe('Miscellaneous functions', () => {
     expect(isBoolean(BigInt(123))).toBe(false);
     expect(isBoolean(true)).toBe(true);
     expect(isBoolean(false)).toBe(true);
-  })
+  });
+  test('isPrimitive returns correctly', async () => {
+    expect(isPrimitive(12)).toBe(true);
+    expect(isPrimitive(0.712)).toBe(true);
+    expect(isPrimitive('abc')).toBe(true);
+    expect(isPrimitive(NaN)).toBe(true);
+    expect(isPrimitive('123')).toBe(true);
+    expect(isPrimitive(BigInt(123))).toBe(true);
+    expect(isPrimitive(true)).toBe(true);
+    expect(isPrimitive(false)).toBe(true);
+    expect(isPrimitive({})).toBe(false);
+    expect(isPrimitive([])).toBe(false);
+    expect(isPrimitive(new Date())).toBe(false);
+  });
+  test('isReference returns correctly', async () => {
+    expect(isReference(12)).toBe(false);
+    expect(isReference(0.712)).toBe(false);
+    expect(isReference('abc')).toBe(false);
+    expect(isReference(NaN)).toBe(false);
+    expect(isReference('123')).toBe(false);
+    expect(isReference(BigInt(123))).toBe(false);
+    expect(isReference(true)).toBe(false);
+    expect(isReference(false)).toBe(false);
+    expect(isReference({})).toBe(true);
+    expect(isReference([])).toBe(true);
+    expect(isReference(new Date())).toBe(true);
+  });
 });

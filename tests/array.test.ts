@@ -54,6 +54,8 @@ import {
   hasNoneDefined,
   replaceAt,
   slicePage,
+  cloneArray,
+  deepCloneArray,
 } from '../src/array';
 import { IMappableObject, tryCatch } from '../src/functional';
 
@@ -541,6 +543,34 @@ describe('Array utilities tests', () => {
         { a: 1, b: 'abc', c: 2 },
         { a: 12, b: 'abc', c: 2 },
       ]);
+    });
+
+    test('`cloneArray`', async () => {
+      const a1 = [ 1, 2, 3, 4, 5, 6, 7];
+      expect(cloneArray(a1)).toMatchObject(a1);
+
+      const a2 = [ 1, 2, 3, [4, 5, 6, 7], { b: 'a', c: [ 1, 2, 3] }];
+      const complexClone = cloneArray(a2);
+      expect(complexClone).toMatchObject(a2);
+      expect(Object.is(complexClone[3], a2[3])).toBe(true);
+      expect(Object.is(complexClone[4], a2[4])).not.toBe(true);
+    });
+
+    test('`deepCloneArray`', async () => {
+      const a1 = [ 1, 2, 3, 4, 5, 6, 7];
+      expect(deepCloneArray(a1)).toMatchObject(a1);
+
+      const a2 = [ 1, 2, 3, [4, 5, 6, 7], { b: 'a', c: [ 1, 2, 3] }];
+      const complexClone = deepCloneArray(a2);
+      expect(complexClone).toMatchObject(a2);
+      expect(Object.is(complexClone[3], a2[3])).not.toBe(true);
+      expect(Object.is(complexClone[4], a2[4])).not.toBe(true);
+      expect(
+        Object.is(
+          (complexClone[4] as { b: string, c: number[] }).c,
+          (a2[4] as { b: string, c: number[] }).c,
+        ),
+      ).not.toBe(true);
     });
   });
 });

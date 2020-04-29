@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+// Note: Ignoring because this was copied from an external github source.
 import crypto from 'crypto';
 import { Hash } from '..';
 

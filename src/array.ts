@@ -1,8 +1,8 @@
 import {
-  pick, Hash, HashOf, addProp, hasKey, objectsHaveSameValues,
+  pick, Hash, HashOf, addProp, hasKey, identical, clone, deepClone,
 } from './object';
 import {
-  def, strVal, undef, intVal, Nullable, empty,
+  def, strVal, undef, intVal, Nullable, empty, isPrimitive,
 } from './miscellaneous';
 
 /**
@@ -319,13 +319,14 @@ export const hasNone = <T>(array: Array<T>, fn: FilterFn<T>) => !hasAny(array, f
 export const hasAll = <T>(array: T[], fn: FilterFn<T>) => count(where(array, fn)) === count(array);
 
 /**
- * Helper method: Returns an array consisting only of distinct values.
+ * Helper method: Returns an array consisting only of distinct values. Intended for arrays containing a set of
+ * objects, which may have different reference values, but have the potential to contain repeat data.
  * @param array - array to filter
  */
 export const distinctObjects = <T extends Hash>(
   array: Array<T>,
 ) => reduce(array, (acc, el) => {
-    const alreadyProcessed = hasAny(acc, (curr) => objectsHaveSameValues(curr, el));
+    const alreadyProcessed = hasAny(acc, (curr) => identical(curr, el));
     return alreadyProcessed ? [ ...acc ] : [ ...acc, el ];
   }, [] as T[]);
 
@@ -457,3 +458,33 @@ export const arrayEmpty = (array: any[]) => count(array) === 0;
  * @param startAt - Which number to start at. (default 0)
  */
 export const series = (n: number, startAt: number = 0) => Array.from(Array(n).keys(), (k) => k + startAt);
+
+/**
+ * Clones each of `array`'s individual elements using shallow cloning (`clone` from the object subset
+ * of utilities). Cloned reference values will copy by reference. While this is sometimes useful, you
+ * will usually want `deepCloneArray()`
+ *
+ * @param array Array to clone
+ */
+export const cloneArray = <T>(array: T[]): T[] => array.map(
+  (x) => (
+    isPrimitive(x) // eslint-disable-line no-nested-ternary
+      ? x
+      : (isArray(x) ? x : clone(x))
+  ),
+);
+
+/**
+ * Clones `array` ensuring reference types are copied by value and not by reference.
+ *
+ * ! Warning: This could result in infinite recursion if circular references exist inside the object.
+ *
+ * @param array Array to clone
+ */
+export const deepCloneArray = <T>(array: T[]): T[] => array.map(
+  (x) => (
+    isPrimitive(x) // eslint-disable-line no-nested-ternary
+      ? x
+      : (Array.isArray(x) ? deepCloneArray(x) : deepClone(x)) as any
+  ),
+);

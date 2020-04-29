@@ -26,6 +26,8 @@ import {
   noDiff,
   diff,
   fullDiff,
+  clone,
+  deepClone,
 } from '../src/object';
 import { tail } from '../src/array';
 
@@ -403,5 +405,27 @@ describe('Object utilities tests', () => {
 
   test('invert', async () => {
     expect(invert({ a: 1, b: 2, c: 3 })).toMatchObject({ 1: 'a', 2: 'b', 3: 'c' });
+  });
+
+  test('clone', async () => {
+    const startObj = {
+      a: 1, b: 'abc', c: { d: 'abc123', e: Symbol('whatever') },
+    };
+    const clonedObj = clone(startObj);
+    expect(startObj).not.toBe(clonedObj);
+    expect(clonedObj).not.toBe(startObj);
+    expect(startObj.c).toBe(clonedObj.c);
+    expect(diff(startObj, clonedObj)).toMatchObject({});
+  });
+
+  test('deep', async () => {
+    const startObj = {
+      a: 1, b: 'abc', c: { d: 'abc123', e: Symbol('whatever') },
+    };
+    const deepObj = deepClone(startObj);
+    expect(startObj).not.toBe(deepObj);
+    expect(deepObj).not.toBe(startObj);
+    expect(startObj.c).not.toBe(deepObj.c);
+    expect(diff(startObj, deepObj)).toMatchObject({});
   });
 });

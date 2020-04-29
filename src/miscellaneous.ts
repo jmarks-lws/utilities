@@ -11,13 +11,13 @@ export type Optional<T> = T | null | undefined;
 export type RequireAtLeastOne<T, Keys extends keyof T = keyof T> =
   Pick<T, Exclude<keyof T, Keys>> & {
       [K in Keys]-?: Required<Pick<T, K>> & Partial<Pick<T, Exclude<Keys, K>>>
-  }[Keys]
+  }[Keys];
 
 /** Require EXACTLY ONE of `Keys` in the provided object */
 export type RequireOnlyOne<T, Keys extends keyof T = keyof T> =
   Pick<T, Exclude<keyof T, Keys>> & {
       [K in Keys]-?: Required<Pick<T, K>> & Partial<Record<Exclude<Keys, K>, undefined>>
-  }[Keys]
+  }[Keys];
 
 /** Returns true if `x` is a `number`. NaN is considered a number and so will return `true`. Does not return true for `BigInt`. */
 export const isNumber = (x: any) => (typeof x === 'number');
@@ -41,12 +41,20 @@ export const isBoolean = (x: any) => (typeof x === 'boolean');
 export const def = (x: any) => typeof x !== 'undefined';
 /** Alias for `def` */ export const isDef = def;
 /** Returns true if `x` is undefined. */
-export const undef = (x: any) => !def(x);
+export const undef = (x: any) => typeof x === 'undefined';
 /** Alias for `undef` */ export const notDef = undef;
 /** Returns true if `x` is `null` */
 export const isNull = (x: any) => x === null;
 /** Returns true if `x` is NOT `null` */
 export const notNull = (x: any) => !isNull(x);
+
+/** Convenience function. Returns true if the type of the provided value is a primitive type */
+export const isPrimitive = (x: any) => (
+  isString(x) || isNumber(x) || isBigInt(x) || isBoolean(x) || isNull(x) || isSymbol(x) || undef(x)
+);
+/** Convenience function. Returns true if the type of the provided value is a reference type */
+export const isReference = (x: any) => !isPrimitive(x);
+
 /**
  * Closely equivalent to PHP's rules for empty().
  *  - Note: Treats both `undefined` and `null` as PHP's `null` for this method.

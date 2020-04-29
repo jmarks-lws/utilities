@@ -1,8 +1,10 @@
 import {
   intersect, map, prune, reduce, head, tail,
-  reverse, arrayEmpty, filter, count,
+  reverse, arrayEmpty, filter, count, isArray, deepCloneArray,
 } from './array';
-import { isNull, Nullable } from './miscellaneous';
+import {
+  isNull, Nullable, isPrimitive,
+} from './miscellaneous';
 
 /** Type representing a tabular flat object. Most reference types in javascript can be a Hash. */
 export interface Hash { [index: string]: any }
@@ -42,11 +44,6 @@ export const pick = <T extends Hash>(obj: T, fields: string[]): Partial<T> => (
  * @param o - The source object from which to construct a result with its fields removed.
  */
 export const pickNot = (obj: Hash, fields: string[]): Hash => pick(obj, prune(keys(obj), fields));
-
-/**
- * Returns an object that is the result of removing a field from `o` by name.
- */
-export const removeField = (o: Hash, field: string) => ((f: string, { [f]: _, ...rest }) => ({ ...rest }))(field, o);
 
 /**
  * Returns a boolean indicating whether a given key exists in the provided object.
@@ -309,4 +306,53 @@ export const transformValues = <T, U>(o: HashOf<T>, fn: (value: T) => U) : HashO
  */
 export const addProp = <T>(o: HashOf<T>, key: string, val: T) => merge(o, { [key]: val });
 
-export const objectsHaveSameValues = (a: Hash, b: Hash) => count(keys(diff(a, b))) === 0;
+/**
+ * Compares two objects. If you were to print out the values of both objects on paper and they would
+ * both look identical, this function would return `true` when provided those two objects - regardless
+ * of whether the two items being compared are actually the same object stored in the same part of the
+ * computer's memory.
+ *
+ * @param a First object to compare.
+ * @param b Second object to compare.
+ */
+export const identical = (a: Hash, b: Hash) => count(keys(diff(a, b))) === 0;
+
+/**
+ * Does a shallow copy of an object. Not usually what you want as it maintains references
+ * when values are objects. If you need something more complete, use `deepClone()`.
+ *
+ * Note: this is NOT intended for instances of class objects (those created with the `new` keyword, etc.)
+ *
+ * @param obj Object to copy.
+ */
+export const clone = <T extends Hash>(obj: T): T => ({ ...obj });
+
+/**
+ * Does a deep copy of an object ensuring that reference values are recursively clones such that the resulting
+ * object value does not refer to the same memory location that the source object value does. This is usually
+ * preferred over the `clone()` method.
+ *
+ * Note: this is NOT intended for instances of class objects (those created with the `new` keyword, etc.)
+ *
+ * @param obj Object to copy.
+ */
+export const deepClone = <T extends Hash>(obj: T): T => {
+  const out = reduce(keys(obj), (acc, key) => {
+    const val = obj[key];
+    const copiedValue = (
+      isPrimitive(val) // eslint-disable-line no-nested-ternary
+        ? val
+        : (isArray(val) ? deepCloneArray(val) : deepClone(val))
+    );
+    return {
+      ...acc,
+      [key]: copiedValue,
+    };
+  }, {} as T);
+  return out;
+};
+
+/**
+ * Returns an object that is the result of removing a field from `o` by name.
+ */
+export const removeField = (o: Hash, field: string) => ((f: string, { [f]: _, ...rest }) => (clone(rest)))(field, o);
