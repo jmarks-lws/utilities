@@ -57,6 +57,7 @@ import {
   cloneArray,
   deepCloneArray,
   distinctOn,
+  distinctOnFields,
 } from '../src/array';
 import { IMappableObject, tryCatch } from '../src/functional';
 
@@ -557,6 +558,21 @@ describe('Array utilities tests', () => {
       expect(distinctOn(original, (x, y) => x.b === y.b && x.c === y.c)).toMatchObject([
         { a: 1, b: 'abc', c: 2 },
         { a: 1, b: 'abc', c: 3 },
+      ]);
+    });
+
+    test('`distinctOnFields`', async () => {
+      const original = [
+        { a: 1, b: 'abc', c: 2 },
+        { a: 12, b: 'abc', c: 2 },
+        { a: 1, b: 'abc', c: 2 },
+        { a: 1, b: 'abc', c: 3 },
+        { a: 1, b: 'abc', c: 4 },
+      ];
+      expect(distinctOnFields(original, [ 'b', 'c' ])).toMatchObject([
+        { a: 1, b: 'abc', c: 2 },
+        { a: 1, b: 'abc', c: 3 },
+        { a: 1, b: 'abc', c: 4 },
       ]);
     });
 

@@ -1,5 +1,5 @@
 import {
-  pick, Hash, HashOf, addProp, hasKey, identical, clone, deepClone,
+  pick, Hash, HashOf, addProp, hasKey, identical, clone, deepClone, diff, hasDiff,
 } from './object';
 import {
   def, strVal, undef, intVal, Nullable, empty, isPrimitive,
@@ -8,19 +8,19 @@ import {
 /**
  * Function signature used in `filter()` and other filtering functions.
  */
-interface FilterFn<T> {
+export interface FilterFn<T> {
   (el: T, i?: number, m?: T[]): boolean;
 }
 /**
  * Function signature used in `reduce()` and `reduceRight()`
  */
-interface ReduceFn<TElement, TResult> {
+export interface ReduceFn<TElement, TResult> {
   (previousValue: TResult, currentValue: TElement, currentIndex?: number, array?: TElement[]): TResult;
 }
 
-interface EqualityFn<T> {
-  (a: T, b: T): boolean;
-}
+export interface EqualityFn<T> { (a: T, b: T): boolean; }
+
+export interface ComparerFn<T> { (a: T, b: T): number; }
 
 /** Wrapper for native `Array.isArray()` */
 export const isArray = (x: any): boolean => Array.isArray(x); // NOTE: This is a static function, so not going to attempt to rewrite.
@@ -339,6 +339,15 @@ export const distinctOn = <T>(
   equality: EqualityFn<T>,
 ) => reduce(array, (acc, el) => (
     hasAny(acc, (accEl) => equality(el, accEl)) ? [...acc] : [...acc, el ]
+  ), [] as T[]);
+
+export const distinctOnFields = <T>(
+  array: Array<T>,
+  keys: Array<keyof T>,
+) => reduce(array, (acc, el) => (
+    hasAny(acc, (accEl) => !hasDiff(pick(accEl, keys as string[]), pick(el, keys as string[])))
+      ? [...acc]
+      : [...acc, el ]
   ), [] as T[]);
 
 /**
