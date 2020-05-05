@@ -6,9 +6,9 @@ import {
   isNull, Nullable, isPrimitive,
 } from './miscellaneous';
 
-/** Type representing a tabular flat object. Most reference types in javascript can be a Hash. */
+/** Base type representing a tabular flat object. Most reference types in javascript can be a Hash. */
 export interface Hash { [index: string]: any }
-/** Type representing a tabular flat object. Most reference types in javascript can be a Hash. */
+/** Base type representing a tabular flat object. Most reference types in javascript can be an Object Literal. */
 export interface ObjectLiteral { [index: string]: any }
 
 /** Type representing a tabular flat object, where the values are all of a given type `T`. */
@@ -29,9 +29,9 @@ export const isDefinedObject = (x: any) => (!Array.isArray(x)) && (typeof x === 
  * @param obj - The object to project
  * @param fields - The fields to project from that object
  */
-export const pick = <T extends Hash>(obj: T, fields: string[]): Partial<T> => (
+export const pick = <T extends Hash>(obj: T, fields: Array<keyof T>): Partial<T> => (
   reduce(
-    intersect(keys(obj), fields),
+    intersect(keys(obj), fields as string[]),
     (prev: Hash, f: any) => ({ ...prev, [f]: obj[f] }),
     {} as Partial<T>,
   )
@@ -43,7 +43,9 @@ export const pick = <T extends Hash>(obj: T, fields: string[]): Partial<T> => (
  * @param fields - A string array containing the names of fields to remove
  * @param o - The source object from which to construct a result with its fields removed.
  */
-export const pickNot = (obj: Hash, fields: string[]): Hash => pick(obj, prune(keys(obj), fields));
+export const pickNot = <T extends Hash>(obj: T, fields: Array<keyof T>): Partial<T> => pick(
+  obj, prune(keys(obj), fields as string[]),
+);
 
 /**
  * Returns a boolean indicating whether a given key exists in the provided object.
