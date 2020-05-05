@@ -74,5 +74,9 @@ export const boolVal = (x: any): boolean => !!x;
 export const floatVal = (x: any): number => ((typeof x === 'number') ? x : parseFloat(x));
 /** Returns a non-fractional (integer) numeric representation of an input value. This may return NaN */
 export const intVal = (x: any): number => parseInt(x, 10);
-/** Returns an appropriate string value for `x`. If `x` is an array or object, this will be a JSON representation. Otherwise it will be the result of built in .toString() */
+/**
+ * Returns an appropriate string value for `x`. If `x` is an array or object, this will be a JSON
+ * representation. `null` and `undefined` will be converted to an empty string. Otherwise this will
+ * return the result of built in .toString().
+ */
 export const strVal = (x: any): string => ((isDefinedObject(x) || isArray(x)) ? JSON.stringify(x) : `${x || ''}`);

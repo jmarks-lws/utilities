@@ -56,6 +56,7 @@ import {
   slicePage,
   cloneArray,
   deepCloneArray,
+  distinctOn,
 } from '../src/array';
 import { IMappableObject, tryCatch } from '../src/functional';
 
@@ -277,6 +278,7 @@ describe('Array utilities tests', () => {
     test('replaceAt', async () => {
       const result = replaceAt([1, 2, 3, 4], 1, 1);
       expect(result).toMatchObject([1, 1, 3, 4]);
+      expect(replaceAt([1, 2, 3, 4], 3, 8)).toMatchObject([1, 2, 3, 8]);
     });
   });
 
@@ -542,6 +544,19 @@ describe('Array utilities tests', () => {
       expect(distinctObjects(original)).toMatchObject([
         { a: 1, b: 'abc', c: 2 },
         { a: 12, b: 'abc', c: 2 },
+      ]);
+    });
+
+    test('`distinctOn`', async () => {
+      const original = [
+        { a: 1, b: 'abc', c: 2 },
+        { a: 12, b: 'abc', c: 2 },
+        { a: 1, b: 'abc', c: 2 },
+        { a: 1, b: 'abc', c: 3 },
+      ];
+      expect(distinctOn(original, (x, y) => x.b === y.b && x.c === y.c)).toMatchObject([
+        { a: 1, b: 'abc', c: 2 },
+        { a: 1, b: 'abc', c: 3 },
       ]);
     });
 

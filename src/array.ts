@@ -18,6 +18,10 @@ interface ReduceFn<TElement, TResult> {
   (previousValue: TResult, currentValue: TElement, currentIndex?: number, array?: TElement[]): TResult;
 }
 
+interface EqualityFn<T> {
+  (a: T, b: T): boolean;
+}
+
 /** Wrapper for native `Array.isArray()` */
 export const isArray = (x: any): boolean => Array.isArray(x); // NOTE: This is a static function, so not going to attempt to rewrite.
 
@@ -329,6 +333,13 @@ export const distinctObjects = <T extends Hash>(
     const alreadyProcessed = hasAny(acc, (curr) => identical(curr, el));
     return alreadyProcessed ? [ ...acc ] : [ ...acc, el ];
   }, [] as T[]);
+
+export const distinctOn = <T>(
+  array: Array<T>,
+  equality: EqualityFn<T>,
+) => reduce(array, (acc, el) => (
+    hasAny(acc, (accEl) => equality(el, accEl)) ? [...acc] : [...acc, el ]
+  ), [] as T[]);
 
 /**
  * Returns a new array which is the result of removing elements from `initialList` which are also in `pruneList`

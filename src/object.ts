@@ -1,6 +1,6 @@
 import {
   intersect, map, prune, reduce, head, tail,
-  reverse, arrayEmpty, filter, count, isArray, deepCloneArray,
+  reverse, arrayEmpty, filter, count, isArray, deepCloneArray, distinct, concat,
 } from './array';
 import {
   isNull, Nullable, isPrimitive,
@@ -13,11 +13,11 @@ export interface ObjectLiteral { [index: string]: any }
 
 /** Type representing a tabular flat object, where the values are all of a given type `T`. */
 export interface HashOf<T> { [index: string]: T }
-// export interface KeyValuePair<T, U> {
-//   key: T,
-//   value: U,
+// export interface KeyValuePair<TKey, TVal> {
+//   key: TKey,
+//   value: TVal,
 // }
-// export type Dictionary<T, U> = Array<KeyValuePair<T, U>>;
+// export type Dictionary<TKey, TVal> = Array<KeyValuePair<TKey, TVal>>;
 
 export const { keys, values, freeze } = Object;
 
@@ -78,6 +78,27 @@ export const compactObject = <T extends Hash>(o: T, allowNulls = false): Partial
 export const merge = <T extends Hash>(
   ...a: Partial<T>[]
 ): T => ({ ...head(a), ...(!arrayEmpty(tail(a)) ? merge(...tail(a)) : null) });
+
+// TODO: Finish `deepMerge()`
+// Needs options for merging arrays: 'byIndex' | 'byValue' | 'concatOnly'
+// export const deepMerge = <T extends Hash>(
+//   a: Partial<T>, b: Partial<T>,
+// ): T => {
+//   const allKeys = distinct([ ...keys(a), ...keys(b) ]);
+//   const result = reduce(allKeys, (acc, key) => {
+//     const val = b[key] || a[key];
+//     return {
+//       ...acc,
+//       [key]: isPrimitive(val) // eslint-disable-line no-nested-ternary
+//         ? val : (
+//           isArray(a[key]) && isArray(b[key])
+//             ? deepCloneArray(concat(a[key]!, b[key]!))
+//             : deepMerge(a[key]!, b[key]!)
+//         ),
+//     };
+//   }, {} as T);
+//   return result;
+// };
 
 /**
  * Returns a new object that is the result of merging together a series of objects going from the last to
