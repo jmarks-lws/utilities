@@ -9,7 +9,8 @@
   "scripts": {
     "build": "rm -rf dist && tsc",
     "test": "jest",
-    "coverage": "jest --coverage"
+    "coverage": "jest --coverage",
+    "buildAndPublish": "rm -rf dist && tsc && npm version patch && npm publish"
   },
   "keywords": [],
   "author": "",

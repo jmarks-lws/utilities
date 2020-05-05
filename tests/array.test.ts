@@ -58,11 +58,26 @@ import {
   deepCloneArray,
   distinctOn,
   distinctOnFields,
+  sort,
 } from '../src/array';
 import { IMappableObject, tryCatch } from '../src/functional';
 
 describe('Array utilities tests', () => {
   const testPeopleList1 = [
+    {
+      id: 123, name: 'Forest', age: 40, favColor: '#FF0000',
+    },
+    {
+      id: 125, name: 'Tiffany', age: 53, favColor: '#FFFF00',
+    },
+    {
+      id: 124, name: 'Lump', age: 25, favColor: '#FF00FF',
+    },
+    {
+      id: 128, name: 'Roxanne', age: 18, favColor: '#0000FF',
+    },
+  ];
+  const testPeopleListSameOnPurpose = [
     {
       id: 123, name: 'Forest', age: 40, favColor: '#FF0000',
     },
@@ -229,6 +244,27 @@ describe('Array utilities tests', () => {
       expect(join([1, 2, 3, 4, 5], ', ')).toBe('1, 2, 3, 4, 5');
       expect(join([1, 2, 3, 4, 5], '| ')).toBe('1| 2| 3| 4| 5');
       expect(join([1, 2, 3, 4, 5], ' | ')).toBe('1 | 2 | 3 | 4 | 5');
+    });
+    test('sort', async () => {
+      const newArray = sort(testPeopleList1, (a, b) => a.age - b.age);
+      const expectedSorted = [
+        {
+          id: 128, name: 'Roxanne', age: 18, favColor: '#0000FF',
+        },
+        {
+          id: 124, name: 'Lump', age: 25, favColor: '#FF00FF',
+        },
+        {
+          id: 123, name: 'Forest', age: 40, favColor: '#FF0000',
+        },
+        {
+          id: 125, name: 'Tiffany', age: 53, favColor: '#FFFF00',
+        },
+      ];
+      expect(newArray).not.toBe(testPeopleList1);
+      expect(newArray).toMatchObject(expectedSorted);
+      expect(testPeopleList1).not.toMatchObject(expectedSorted);
+      expect(testPeopleList1).toMatchObject(testPeopleListSameOnPurpose);
     });
   });
 

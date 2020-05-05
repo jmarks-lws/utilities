@@ -1,5 +1,5 @@
 import {
-  pick, Hash, HashOf, addProp, hasKey, identical, clone, deepClone, diff, hasDiff,
+  pick, Hash, HashOf, addProp, hasKey, identical, clone, deepClone, diff, hasDiff, ObjectLiteral,
 } from './object';
 import {
   def, strVal, undef, intVal, Nullable, empty, isPrimitive,
@@ -39,6 +39,14 @@ export const arrayCopy = <T>(arr: T[]): Nullable<Array<T>> => (Array.isArray(arr
  * @param {Array<T>[]} args: Each argument should be an array.
  * */
 export const concat = <T>(...args: Array<T>[]): T[] => (([] as T[]).concat(...args));
+
+/**
+ * Returns a NEW array that has been sorted using `sortFn`. The original array is unaffected.
+ * @param array - The array to sort
+ * @param sortFn - A function used to sort. This function should return a negative value if
+ *                 a < b, zero for the same and a positive value if b > a (Ex: `(a, b) => a - b`)
+ */
+export const sort = <T>(array: Array<T>, sortFn: ComparerFn<T>): T[] => (arrayCopy(array) || []).sort(sortFn);
 
 /**
  * Compares all values in an array returning the lowest element. Elements should be naturally comparable by the `<` operator.
@@ -327,25 +335,37 @@ export const hasAll = <T>(array: T[], fn: FilterFn<T>) => count(where(array, fn)
  * objects, which may have different reference values, but have the potential to contain repeat data.
  * @param array - array to filter
  */
-export const distinctObjects = <T extends Hash>(
+export const distinctObjects = <T extends ObjectLiteral>(
   array: Array<T>,
 ) => reduce(array, (acc, el) => {
     const alreadyProcessed = hasAny(acc, (curr) => identical(curr, el));
     return alreadyProcessed ? [ ...acc ] : [ ...acc, el ];
   }, [] as T[]);
 
-export const distinctOn = <T>(
+/**
+ * Returns a new array where only one of each "same" object is returned. Sameness is determined by `equality`.
+ * @param array - The array to filter.
+ * @param equality - A function used to determine whether any two elements are equal. Return `true` for equal and `false` for not equal.
+ */
+export const distinctOn = <T extends ObjectLiteral>(
   array: Array<T>,
   equality: EqualityFn<T>,
 ) => reduce(array, (acc, el) => (
     hasAny(acc, (accEl) => equality(el, accEl)) ? [...acc] : [...acc, el ]
   ), [] as T[]);
 
-export const distinctOnFields = <T>(
+/**
+ * Returns a new array where only one of each "same" object is returned. Sameness is determined by comparing
+ * the values of all of the field names indicated in `fieldsToCompare`. Note that reference value types will
+ * not be considered equal unless the two values refer to the exact same referenced object in memory.
+ * @param array - The array to filter
+ * @param fieldsToCompare - The field names of objects in the array to compare.
+ */
+export const distinctOnFields = <T extends ObjectLiteral>(
   array: Array<T>,
-  keys: Array<keyof T>,
+  fieldsToCompare: Array<keyof T>,
 ) => reduce(array, (acc, el) => (
-    hasAny(acc, (accEl) => !hasDiff(pick(accEl, keys as string[]), pick(el, keys as string[])))
+    hasAny(acc, (accEl) => !hasDiff(pick(accEl, fieldsToCompare as string[]), pick(el, fieldsToCompare as string[])))
       ? [...acc]
       : [...acc, el ]
   ), [] as T[]);
