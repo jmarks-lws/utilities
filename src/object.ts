@@ -10,6 +10,8 @@ import {
 export interface Hash { [index: string]: any }
 /** Base type representing a tabular flat object. Most reference types in javascript can be an Object Literal. */
 export interface ObjectLiteral { [index: string]: any }
+/** Indicates an object of `T` which may also have additional properties that are not explicitly defined */
+export type Augmented<T> = T & ObjectLiteral;
 
 /** Type representing a tabular flat object, where the values are all of a given type `T`. */
 export interface HashOf<T> { [index: string]: T }
