@@ -16,9 +16,7 @@ export interface IMappableObject {
  * @param x
  * @param key
  */
-export const isFunction = (x: any, key?: string) => (
-  def(key) ? key && hasKey(x, key) && (typeof x[key as string] === 'function') : (typeof x === 'function')
-);
+export const isFunction = (x: any): x is Function => (typeof x === 'function');
 
 /**
  * Returns a curried version of the provided function.

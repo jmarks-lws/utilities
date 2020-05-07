@@ -3,7 +3,7 @@ import {
   reverse, arrayEmpty, filter, count, isArray, deepCloneArray, distinct, concat,
 } from './array';
 import {
-  isNull, Nullable, isPrimitive,
+  isNull, Nullable, isPrimitive, strVal,
 } from './miscellaneous';
 
 /** Base type representing a tabular flat object. Most reference types in javascript can be a Hash. */
@@ -238,7 +238,7 @@ export const remapKeys = (obj: Hash, remap: Hash, returnAll: boolean = false): H
  */
 export const invert = (
   obj: Hash,
-): Hash => reduce(keys(obj), (acc: Hash, key: string) => ({ ...acc, [obj[key]]: key }), {} as Hash);
+): Hash => reduce(keys(obj), (acc: Hash, key: string) => ({ ...acc, [strVal(obj[key])]: key }), {} as Hash);
 
 /**
  * Loop over an Array or over a JS object as if it were an associative array. Inspired by the PHP implementation
@@ -252,11 +252,10 @@ export const iterate = <T, U>(
   hash: HashOf<T> | T[],
   fn: ((key: string, value: T) => U),
 ): U[] => {
-  if (Array.isArray(hash)) {
-    let i = 0;
-    return map(hash, (value) => fn(`${i++}`, value));
+  if (isArray(hash)) {
+    return map(hash, (value, i) => fn(`${i}`, value));
   }
-  return isDefinedObject(hash) ? mapKeys(hash, (key) => fn(key, hash[key])) : [];
+  return isDefinedObject(hash) ? mapKeys(hash, (key) => fn(key, (hash)[key] as T)) : [];
 };
 
 /**

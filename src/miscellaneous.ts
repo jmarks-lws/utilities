@@ -20,53 +20,53 @@ export type RequireOnlyOne<T, Keys extends keyof T = keyof T> =
   }[Keys];
 
 /** Returns true if `x` is a `number`. NaN is considered a number and so will return `true`. Does not return true for `BigInt`. */
-export const isNumber = (x: any) => (typeof x === 'number');
+export const isNumber = (x: any): x is number => (typeof x === 'number');
 /** Returns true if `x` is a `number` that is not NaN. Does not return true for `BigInt`.  */
-export const isValidNumber = (x: any) => isNumber(x) && !Number.isNaN(x);
+export const isValidNumber = <T extends any>(x: T): boolean => isNumber(x) && !Number.isNaN(x);
 /** Returns true if `x` is a `number` with no fractional data. */
-export const isIntegerNumber = (x: any) => (typeof x === 'number') && x === Math.floor(x);
+export const isIntegerNumber = (x: any): boolean => (typeof x === 'number') && x === Math.floor(x);
 /** Returns true if `x` is a `number` or a string that can be successfully parsed to a `number` that is not `NaN` */
-export const isNumeric = (x: any) => isValidNumber(Number.parseFloat(`${x}`));
+export const isNumeric = (x: any): boolean => isValidNumber(Number.parseFloat(`${x}`));
 
 /** Returns true if `x` is a `bigint`. Does not return true for `Number`. */
-export const isBigInt = (x: any) => (typeof x === 'bigint');
+export const isBigInt = (x: any): x is BigInt => (typeof x === 'bigint');
 /** Returns true if `x` is a `string`. */
-export const isString = (x: any) => (typeof x === 'string');
+export const isString = (x: any): x is string => (typeof x === 'string');
 /** Returns true if `x` is a `symbol`. */
-export const isSymbol = (x: any) => (typeof x === 'symbol');
+export const isSymbol = (x: any): x is Symbol => (typeof x === 'symbol');
 /** Returns true if `x` is a `boolean`. */
-export const isBoolean = (x: any) => (typeof x === 'boolean');
+export const isBoolean = (x: any): x is boolean => (typeof x === 'boolean');
 
-/** Returns true if `x` is not undefined. This will return true for `null`. */
-export const def = (x: any) => typeof x !== 'undefined';
-/** Alias for `def` */ export const isDef = def;
 /** Returns true if `x` is undefined. */
-export const undef = (x: any) => typeof x === 'undefined';
+export const undef = (x: any): x is undefined => typeof x === 'undefined';
 /** Alias for `undef` */ export const notDef = undef;
+/** Returns true if `x` is not undefined. This will return true for `null`. */
+export const def = (x: any) => !undef(x);
+/** Alias for `def` */ export const isDef = def;
 /** Returns true if `x` is `null` */
-export const isNull = (x: any) => x === null;
+export const isNull = (x: any): x is null => x === null;
 /** Returns true if `x` is NOT `null` */
 export const notNull = (x: any) => !isNull(x);
 
 /** Convenience function. Returns true if the type of the provided value is a primitive type */
-export const isPrimitive = (x: any) => (
+export const isPrimitive = (x: any): x is string | number | bigint | boolean | null | symbol | undefined => (
   isString(x) || isNumber(x) || isBigInt(x) || isBoolean(x) || isNull(x) || isSymbol(x) || undef(x)
 );
 /** Convenience function. Returns true if the type of the provided value is a reference type */
-export const isReference = (x: any) => !isPrimitive(x);
+export const isReference = (x: any): x is object => !isPrimitive(x);
 
 /**
  * Closely equivalent to PHP's rules for empty().
  *  - Note: Treats both `undefined` and `null` as PHP's `null` for this method.
  * */
-export const empty = (x: any) => (
+export const empty = (x: any): boolean => (
   undef(x) || isNull(x) || x === 0 || x === '' || x === '0' || x === false
   || (isArray(x) && count(x) === 0) || (isDefinedObject(x) && count(keys(x)) === 0)
 );
 /**
  * Opposite of `empty()`.
  */
-export const notEmpty = (x: any) => !empty(x);
+export const notEmpty = (x: any): boolean => !empty(x);
 
 /** Returns `true` if `x` is "truthy" and `false` if `x` is "falsey". */
 export const boolVal = (x: any): boolean => !!x;
@@ -85,13 +85,13 @@ export const strVal = (x: any): string => ((isDefinedObject(x) || isArray(x)) ? 
  * Determines whether the given string is either 'true' or 'false' (case insensitive).
  * @param s - String to test
  */
-export const isBoolString = (s: string) => ['true', 'false'].includes(s.toLowerCase());
+export const isBoolString = (s: string): s is 'true' | 'false' => ['true', 'false'].includes(s.toLowerCase());
 
 /**
  * Returns `true` if the provided string is the string 'true' (case insensitive), otherwise returns `false`.
  * @param s - String to convert to boolean.
  */
-export const stringToBool = (s: string) => (s.toLowerCase() === 'true');
+export const stringToBool = (s: string): boolean => (s.toLowerCase() === 'true');
 
 /**
  * Attempts to convert a string environment variable to its appropriate JS data type. If it appears numeric, it will return a Number.

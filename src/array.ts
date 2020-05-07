@@ -23,7 +23,7 @@ export interface EqualityFn<T> { (a: T, b: T): boolean; }
 export interface ComparerFn<T> { (a: T, b: T): number; }
 
 /** Wrapper for native `Array.isArray()` */
-export const isArray = (x: any): boolean => Array.isArray(x); // NOTE: This is a static function, so not going to attempt to rewrite.
+export const isArray = (x: any): x is any[] => Array.isArray(x); // NOTE: This is a static function, so not going to attempt to rewrite.
 
 /**
  * A set of simple functional array utilities
