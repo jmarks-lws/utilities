@@ -80,3 +80,27 @@ export const intVal = (x: any): number => parseInt(x, 10);
  * return the result of built in .toString().
  */
 export const strVal = (x: any): string => ((isDefinedObject(x) || isArray(x)) ? JSON.stringify(x) : `${x || ''}`);
+
+/**
+ * Determines whether the given string is either 'true' or 'false' (case insensitive).
+ * @param s - String to test
+ */
+export const isBoolString = (s: string) => ['true', 'false'].includes(s.toLowerCase());
+
+/**
+ * Returns `true` if the provided string is the string 'true' (case insensitive), otherwise returns `false`.
+ * @param s - String to convert to boolean.
+ */
+export const stringToBool = (s: string) => (s.toLowerCase() === 'true');
+
+/**
+ * Attempts to convert a string environment variable to its appropriate JS data type. If it appears numeric, it will return a Number.
+ * If it appears to be a boolean string, it will return a boolean value. Otherwise it will return the provided string.
+ * @param env - The environment variable value to convert to its appropriate type. Use 'as <Type>' to provide relevant data type for application.
+ */
+export const envToType = (env: string): any => (
+  // eslint-disable-next-line no-nested-ternary
+  isNumeric(env)
+    ? floatVal(env)
+    : (isBoolString(env) ? stringToBool(env) : env as string)
+);
