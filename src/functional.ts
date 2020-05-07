@@ -39,7 +39,7 @@ export const curry = (fn: Function) => {
 
     return fn.call(null, ...args);
   };
-}
+};
 
 /**
  * Like `map()`, but awaitable. This way you can ensure mapped async functions have resolved, if desired.
@@ -49,7 +49,7 @@ export const curry = (fn: Function) => {
 export const mapAsync = async <T, U>(
   list: T[],
   fn: ((x: T) => Promise<U>),
-) => Promise.all(list.map(async (id) => fn(id)))
+) => Promise.all(list.map(async (id) => fn(id)));
 
 /**
  * (Don't use this - deprecation incoming quickly) Provides an English-esque interface for getting a key from an object with a default value.
@@ -78,13 +78,19 @@ export const partial = (fn: CallableFunction, ...args: any[]) => (...newArgs: an
 
 /**
  * Wraps a function that normally accepts a single array as an argument so that elements can be provided as individual parameters
- * @param fn
+ * @param fn The function to wrap
  */
-export const spreadArgs = (fn: (arg: any[]) => any) => (...args: any[]) => fn(args);
+export const spreadArgs = <T>(fn: (arg: T[]) => T) => (...args: T[]) => fn(args);
+
+/**
+ * Wraps a function that normally accepts multiple parameters such that the elements can be provided as an array.
+ * @param fn The function to wrap.
+ */
+export const argsAsArray = <T>(fn: (...args: T[]) => T) => (arg: T[]) => fn(...arg);
 
 /**
  * Reverses the order of arguments in a function call. Helpful for many 'functional programming' tasks.
- * @param fn
+ * @param fn The function to reverse arguments for.
  */
 export const reverseArgs = (fn: CallableFunction) => (...args: any[]) => fn(...reverse(args));
 
@@ -97,8 +103,11 @@ export const reverseArgs = (fn: CallableFunction) => (...args: any[]) => fn(...r
 export const branch = <T>(
   condition: boolean,
   truePath: ((x: T) => any),
-  falsePath: ((x: T) => any),
-) => (x: T) => (condition ? truePath(x) : falsePath(x));
+  falsePath?: ((x: T) => any),
+) => (x: T) => (
+  // eslint-disable-next-line no-nested-ternary
+    condition ? truePath(x) : (falsePath ? falsePath(x) : identity(x))
+  );
 
 /**
  * Functional style try catch expression
@@ -120,7 +129,7 @@ export const tryCatch = <T>(
     } finally {
       finallyPath(x, { tryResult, catchResult });
     }
-  }
+  };
 
 /**
  * Wrap a function so that it will only run at most `times` times when called from the resulting wrapper.
@@ -144,7 +153,7 @@ export const maxTimes = <T extends (...args: any[]) => any>(times: number, fn: T
     ranTimes += 1;
     return fn.apply(context || this, args);
   } as T;
-}
+};
 
 /**
  * Convenience method providing a wrapper that can only run an enclosed function once. Delegates to `maxTimes`
@@ -153,15 +162,15 @@ export const maxTimes = <T extends (...args: any[]) => any>(times: number, fn: T
  * @param fn - Function to wrap
  * @param context - An optional context to provide `this` for the enclosed function.
  */
-export const maxOnce = <T extends (...args: any[]) => any>(fn: T, context?: any): T => maxTimes(1, fn, context)
+export const maxOnce = <T extends (...args: any[]) => any>(fn: T, context?: any): T => maxTimes(1, fn, context);
 
 export const repeat = (repeatTimes: number, fn: (index: number, ...fnArgs: any[]) => void, ...args: any[]) => {
   for (let i = 0; i < repeatTimes; i++) { fn(i, ...args); }
-}
+};
 
 export const repeatWhile = (repeatCondition: () => boolean, fn: (...fnArgs: any[]) => void, ...args: any[]) => {
   while (repeatCondition()) { fn(...args); }
-}
+};
 
 export const repeatAsync = async (
   repeatTimes: number,
@@ -170,7 +179,7 @@ export const repeatAsync = async (
 ) => {
   // eslint-disable-next-line no-await-in-loop
   for (let i = 0; i < repeatTimes; i++) { await fn(i, ...args); }
-}
+};
 
 export const repeatWhileAsync = async (
   repeatCondition: () => boolean,
@@ -179,7 +188,7 @@ export const repeatWhileAsync = async (
 ) => {
   // eslint-disable-next-line no-await-in-loop
   while (repeatCondition()) { await fn(...args); }
-}
+};
 
 export const repeatWithBreak = (
   repeatTimes: number,
@@ -189,10 +198,10 @@ export const repeatWithBreak = (
   let isDone = false;
   for (let i = 0; i < repeatTimes; i++) {
     // eslint-disable-next-line no-loop-func
-    fn(i, () => { isDone = true }, ...args);
+    fn(i, () => { isDone = true; }, ...args);
     if (isDone) break;
   }
-}
+};
 
 export const repeatAsyncWithBreak = async (
   repeatTimes: number,
@@ -200,10 +209,10 @@ export const repeatAsyncWithBreak = async (
   ...args: any[]
 ) => {
   let isDone = false;
-  const setDone = () => { isDone = true };
+  const setDone = () => { isDone = true; };
   for (let i = 0; i < repeatTimes; i++) {
     // eslint-disable-next-line no-await-in-loop
     await fn(i, setDone, ...args);
     if (isDone) break;
   }
-}
+};

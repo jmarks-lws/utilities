@@ -330,6 +330,8 @@ export const transformValues = <T, U>(o: HashOf<T>, fn: (value: T) => U) : HashO
  * @param val
  */
 export const addProp = <T>(o: HashOf<T>, key: string, val: T) => merge(o, { [key]: val });
+/** alias for `addProp()` */
+export const addField = addProp;
 
 /**
  * Compares two objects. If you were to print out the values of both objects on paper and they would
@@ -380,4 +382,6 @@ export const deepClone = <T extends Hash>(obj: T): T => {
 /**
  * Returns an object that is the result of removing a field from `o` by name.
  */
-export const removeField = (o: Hash, field: string) => ((f: string, { [f]: _, ...rest }) => (clone(rest)))(field, o);
+export const removeProp = (o: Hash, field: string) => ((f: string, { [f]: _, ...rest }) => (clone(rest)))(field, o);
+/** alias for `removeProp` */
+export const removeField = removeProp;
