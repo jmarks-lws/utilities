@@ -10,7 +10,7 @@
     "build": "rm -rf dist && tsc",
     "test": "jest",
     "coverage": "jest --coverage",
-    "buildAndPublish": "rm -rf dist && tsc && npm version patch && npm publish"
+    "buildAndPublish": "rm -rf dist && tsc && npm version patch && git push && npm publish"
   },
   "keywords": [],
   "author": "",

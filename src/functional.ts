@@ -18,6 +18,14 @@ export interface IMappableObject {
  */
 export const isFunction = (x: any): x is Function => (typeof x === 'function');
 
+// TODO: evaluate `either()`, `maybe()` etc
+// export function either<T1 extends undefined, T2>(a: T1, b: T2): T2;
+// export function either<T1 extends any, T2>(a: T1, b: T2): T1;
+// export function either <T1 extends any, T2>(a: T1, b: T2): T1 | T2 {
+//   return (a || b);
+// }
+// export const maybe = <T>(a: T): T | null => either(a, null);
+
 /**
  * Returns a curried version of the provided function.
  * (Note: This will probably mess with your IDE's ability to provide intellisense)
