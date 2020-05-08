@@ -1,22 +1,22 @@
-export interface IPipeCaller<T> {
-  (initialValue: T): T
+export interface IPipeCaller<TIn, TOut> {
+  (initialValue: TIn): TOut
 }
 
 export interface IPipe {
-  <T>(...func: CallableFunction[]): IPipeCaller<T>;
+  <T, U>(...func: CallableFunction[]): IPipeCaller<T, U>;
 }
-interface IPipeAsync<T> {
-  (...func: ((...input: T[]) => Promise<T>)[]): IPipeCaller<T>;
+interface IPipeAsync<T, U> {
+  (...func: ((...input: T[]) => Promise<T>)[]): IPipeCaller<T, U>;
 }
 
-export const pipe: IPipe = <T>(
+export const pipe: IPipe = <T, U>(
   ...func: CallableFunction[]
-): IPipeCaller<T> => (
+): IPipeCaller<T, U> => (
     initialValue: T,
   ) => func.reduce((acc: any, currentFunc: CallableFunction) => (currentFunc ? currentFunc(acc) : acc), initialValue);
 
 // TODO: This probaby does not work as expected, try setting it up as <T>( ... func (...)) => {...}
-export const pipeAsync: IPipeAsync<any> = (
+export const pipeAsync: IPipeAsync<any, any> = (
   ...func: ((input: any) => Promise<any>)[]
 ) => (
   initialValue: any,

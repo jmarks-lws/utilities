@@ -1,4 +1,6 @@
-import { pipe, asyncPipe, stringToBool } from '../src';
+import {
+  pipe, asyncPipe, stringToBool, Hash,
+} from '../src';
 
 describe('Pipe tests', () => {
   test('pipe does things in order a', () => {
@@ -17,7 +19,7 @@ describe('Pipe tests', () => {
     expect(v).toBe('James');
   });
   test('pipe ignores empty values', () => {
-    const p = pipe(
+    const p = pipe<Hash, string>(
       (person: any) => person.name,
       null as unknown as CallableFunction,
       (name: any) => name.first,
