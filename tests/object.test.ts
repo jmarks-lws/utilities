@@ -28,6 +28,7 @@ import {
   fullDiff,
   clone,
   deepClone,
+  keyList,
 } from '../src/object';
 import { tail } from '../src/array';
 
@@ -80,6 +81,14 @@ describe('Object utilities tests', () => {
     expect(outKeys).toMatchObject(['a', 'b', 'c', 'd', 'e']);
   });
 
+  test('keyList gets all keys', async () => {
+    const o = {
+      a: 1, c: 2, d: 3, b: 2,
+    };
+    const k = keyList(o);
+    expect(k).toMatchObject(['a', 'c', 'd', 'b' ]);
+    expect(k.sort()).toMatchObject(['a', 'b', 'c', 'd'].sort());
+  });
 
   test('iterate doesn\'t cause errors for empty input: ', async () => {
     const out = iterate(null as any, (k: string, v: number) => v);

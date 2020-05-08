@@ -1,7 +1,7 @@
 import {
   isNull, notNull, empty, notEmpty, boolVal, floatVal, strVal, isValidNumber,
   isIntegerNumber, isNumeric, isString, isBigInt, isSymbol, isBoolean,
-  isPrimitive, isReference,
+  isPrimitive, isReference, envToType,
 } from '../src/miscellaneous';
 
 describe('Miscellaneous functions', () => {
@@ -155,5 +155,15 @@ describe('Miscellaneous functions', () => {
     expect(isReference({})).toBe(true);
     expect(isReference([])).toBe(true);
     expect(isReference(new Date())).toBe(true);
+  });
+
+  test('envToType returns correctly', async () => {
+    expect(envToType('ABC')).toBe('ABC');
+    expect(envToType('123')).toBe(123);
+    expect(envToType('123.321')).toBe(123.321);
+    expect(envToType('false')).toBe(false);
+    expect(envToType('FALSE')).toBe(false);
+    expect(envToType('true')).toBe(true);
+    expect(envToType('TRUE')).toBe(true);
   });
 });

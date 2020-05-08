@@ -23,6 +23,13 @@ export interface HashOf<T> { [index: string]: T }
 
 export const { keys, values, freeze } = Object;
 
+/**
+ * Exactly like `Object.keys`, but different. Return type ensures keys of the provided object, which helps immensely
+ * with typescript (and usuallay javascript) intellisense software that can read typescript definition files.
+ * @param o Object to get keys from
+ */
+export const keyList = <T>(o: T) => keys(o) as (keyof T)[];
+
 /** Returns a boolean indicating whether `x` is a non null object. Does not return true for an array or a null value. */
 export const isDefinedObject = (x: any) => (!Array.isArray(x)) && (typeof x === 'object') && !isNull(x);
 
@@ -381,6 +388,7 @@ export const deepClone = <T extends Hash>(obj: T): T => {
 /**
  * Returns an object that is the result of removing a field from `o` by name.
  */
-export const removeProp = (o: Hash, field: string) => ((f: string, { [f]: _, ...rest }) => (clone(rest)))(field, o);
+export const removeProp = <T extends Hash>(o: T, field: (keyof T)): Partial<T> => (clone(pickNot(o, [ field ])));
+
 /** alias for `removeProp` */
 export const removeField = removeProp;

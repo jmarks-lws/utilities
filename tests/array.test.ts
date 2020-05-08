@@ -265,6 +265,7 @@ describe('Array utilities tests', () => {
       expect(newArray).toMatchObject(expectedSorted);
       expect(testPeopleList1).not.toMatchObject(expectedSorted);
       expect(testPeopleList1).toMatchObject(testPeopleListSameOnPurpose);
+      expect(sort(null as unknown as any[], (a: any, b: any) => (a - b))).toMatchObject([]);
     });
   });
 

@@ -1,7 +1,8 @@
 
 import {
   repeat, repeatWithBreak, repeatAsync, repeatAsyncWithBreak, repeatWhile, repeatWhileAsync,
-  isFunction, curry, mapAsync, identity, partial, spreadArgs, reverseArgs, maxTimes, maxOnce, take, branch, tryCatch,
+  isFunction, curry, mapAsync, identity, partial, spreadArgs, reverseArgs, maxTimes, maxOnce,
+  take, branch, tryCatch, argsAsArray,
 } from '../src/functional';
 import { reduce } from '../src/array';
 
@@ -26,7 +27,7 @@ describe('functional methods', () => {
     });
     expect(c).toBe(10);
     expect(l).toMatchObject([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
-  })
+  });
 
   test('repeatAsync runs 10 times', async () => {
     let c = 0;
@@ -48,7 +49,7 @@ describe('functional methods', () => {
     });
     expect(c).toBe(10);
     expect(l).toMatchObject([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
-  })
+  });
 
   test('repeatWithBreak runs 10 times', async () => {
     let c = 0;
@@ -104,16 +105,16 @@ describe('functional methods', () => {
   test('isFunction with key', async () => {
     const obj = {
       fn: () => {},
-    }
-    expect(isFunction(1, 'fn')).toBe(false);
-    expect(isFunction('a', 'fn')).toBe(false);
-    expect(isFunction(obj, 'fn')).toBe(true);
-    expect(isFunction(new Promise(() => {}), 'fn')).toBe(false);
-    expect(isFunction(new Promise(obj.fn), 'fn')).toBe(false);
+    };
+    expect(isFunction(1)).toBe(false);
+    expect(isFunction('a')).toBe(false);
+    expect(isFunction(obj.fn)).toBe(true);
+    expect(isFunction(new Promise(() => {}))).toBe(false);
+    expect(isFunction(new Promise(obj.fn))).toBe(false);
   });
 
   test('curry', async () => {
-    const add = (a: number, b: number) => a + b
+    const add = (a: number, b: number) => a + b;
     const curried = curry(add);
     const step2 = curried(5);
     expect(step2).toBeInstanceOf(Function);
@@ -134,14 +135,14 @@ describe('functional methods', () => {
     const a = { hello: 'world' };
     expect(identity(5)).toBe(5);
     expect(identity(a)).toBe(a);
-  })
+  });
 
   test('partial', async () => {
     const partway = partial((a: number, b: number, c: number) => a + b + c, 1, 2);
     expect(partway).toBeInstanceOf(Function);
     expect(isFunction(partway)).toBe(true);
     expect(partway(3)).toBe(6);
-  })
+  });
 
   test('spreadArgs', async () => {
     const sumFunction = (sumValues: number[]) => reduce(sumValues, (a, b) => a + b, 0);
@@ -152,38 +153,47 @@ describe('functional methods', () => {
     expect(resultSum).toBe(resultSpread);
   });
 
+  test('argsAsArray', async () => {
+    const sumFunction = (...sumValues: number[]) => reduce(sumValues, (a, b) => a + b, 0);
+    const arrayFunction = argsAsArray(sumFunction);
+    expect(sumFunction).toBeInstanceOf(Function);
+    const resultSum = sumFunction(1, 2, 3, 4);
+    const resultSpread = arrayFunction([1, 2, 3, 4]);
+    expect(resultSum).toBe(resultSpread);
+  });
+
   test('reverseArgs', async () => {
     const forwards = (dividend: number, divisor: number) => divisor / dividend;
     const backwards = reverseArgs(forwards);
     expect(forwards(1, 2)).toBe(backwards(2, 1));
-  })
+  });
 
   test('maxTimes', async () => {
     let start = 1; // 1
-    const addOne = () => { start += 1 };
+    const addOne = () => { start += 1; };
     const addOneLimited = maxTimes(2, addOne);
     addOneLimited(); // 2
     addOneLimited(); // 3
     addOneLimited(); // 3
     expect(start).toBe(3);
-  })
+  });
 
   test('maxOnce', async () => {
     let start = 1; // 1
-    const addOne = () => { start += 1 };
+    const addOne = () => { start += 1; };
     const addOneLimited = maxOnce(addOne);
     addOneLimited(); // 2
     addOneLimited(); // 2
     addOneLimited(); // 2
     expect(start).toBe(2);
-  })
+  });
 
   test('take().from()', async () => {
     const obj = {
       name: 'James',
       value: 'abc',
       date: '2020-04-24',
-    }
+    };
     expect(take('value', 'cba').from(obj)).toBe('abc');
     expect(take('firstName', 'Friend').from(obj)).toBe('Friend');
   });
@@ -193,7 +203,10 @@ describe('functional methods', () => {
     const falsePath = () => 'falsehood';
     expect(branch(1 > 2, truePath, falsePath)(null)).toBe('falsehood');
     expect(branch(1 < 2, truePath, falsePath)(null)).toBe('truth');
-  })
+    // No false param provided, so just identity of input.
+    expect(branch(1 > 2, truePath)(null)).toBe(null);
+    expect(branch(1 < 2, truePath)(null)).toBe('truth');
+  });
 
   test('tryCatch', async () => {
     let a = 0;
@@ -214,5 +227,5 @@ describe('functional methods', () => {
     )(1);
     expect(a).toBe(0);
     expect(b).toBe(2);
-  })
-})
+  });
+});
