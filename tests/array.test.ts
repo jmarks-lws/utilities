@@ -60,36 +60,19 @@ import {
   distinctOnFields,
   sort,
 } from '../src/array';
-import { IMappableObject, tryCatch } from '../src/functional';
 
 describe('Array utilities tests', () => {
   const testPeopleList1 = [
-    {
-      id: 123, name: 'Forest', age: 40, favColor: '#FF0000',
-    },
-    {
-      id: 125, name: 'Tiffany', age: 53, favColor: '#FFFF00',
-    },
-    {
-      id: 124, name: 'Lump', age: 25, favColor: '#FF00FF',
-    },
-    {
-      id: 128, name: 'Roxanne', age: 18, favColor: '#0000FF',
-    },
+    { id: 123, name: 'Forest', age: 40, favColor: '#FF0000' },
+    { id: 125, name: 'Tiffany', age: 53, favColor: '#FFFF00' },
+    { id: 124, name: 'Lump', age: 25, favColor: '#FF00FF' },
+    { id: 128, name: 'Roxanne', age: 18, favColor: '#0000FF' },
   ];
   const testPeopleListSameOnPurpose = [
-    {
-      id: 123, name: 'Forest', age: 40, favColor: '#FF0000',
-    },
-    {
-      id: 125, name: 'Tiffany', age: 53, favColor: '#FFFF00',
-    },
-    {
-      id: 124, name: 'Lump', age: 25, favColor: '#FF00FF',
-    },
-    {
-      id: 128, name: 'Roxanne', age: 18, favColor: '#0000FF',
-    },
+    { id: 123, name: 'Forest', age: 40, favColor: '#FF0000' },
+    { id: 125, name: 'Tiffany', age: 53, favColor: '#FFFF00' },
+    { id: 124, name: 'Lump', age: 25, favColor: '#FF00FF' },
+    { id: 128, name: 'Roxanne', age: 18, favColor: '#0000FF' },
   ];
 
   describe('Functional utility methods', () => {
@@ -248,24 +231,24 @@ describe('Array utilities tests', () => {
     test('sort', async () => {
       const newArray = sort(testPeopleList1, (a, b) => a.age - b.age);
       const expectedSorted = [
-        {
-          id: 128, name: 'Roxanne', age: 18, favColor: '#0000FF',
-        },
-        {
-          id: 124, name: 'Lump', age: 25, favColor: '#FF00FF',
-        },
-        {
-          id: 123, name: 'Forest', age: 40, favColor: '#FF0000',
-        },
-        {
-          id: 125, name: 'Tiffany', age: 53, favColor: '#FFFF00',
-        },
+        { id: 128, name: 'Roxanne', age: 18, favColor: '#0000FF' },
+        { id: 124, name: 'Lump', age: 25, favColor: '#FF00FF' },
+        { id: 123, name: 'Forest', age: 40, favColor: '#FF0000' },
+        { id: 125, name: 'Tiffany', age: 53, favColor: '#FFFF00' },
       ];
       expect(newArray).not.toBe(testPeopleList1);
       expect(newArray).toMatchObject(expectedSorted);
       expect(testPeopleList1).not.toMatchObject(expectedSorted);
       expect(testPeopleList1).toMatchObject(testPeopleListSameOnPurpose);
       expect(sort(null as unknown as any[], (a: any, b: any) => (a - b))).toMatchObject([]);
+    });
+    test('includes', async () => {
+      expect(includes(['a', 'b', 3, 5], 'a')).toBe(true);
+      expect(includes(['a', 'b', 3, 5], 'c')).toBe(false);
+      expect(includes(['a', 'b', 3, 5], 'A')).toBe(false);
+      expect(includes(['a', 'b', 3, 5], 'D')).toBe(false);
+      expect(includes(['a', 'b', 3, 5], '3')).toBe(false);
+      expect(includes(['a', 'b', 3, 5], 3)).toBe(true);
     });
   });
 

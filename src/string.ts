@@ -13,3 +13,10 @@ export const padRight = (subject: string, desiredLength: number, prefixCharacter
 );
 /** alias for `padRight` */
 export const padEnd = padRight;
+
+/**
+ * Compares two strings for case insensitive equality.
+ * @param a first string to compare
+ * @param b second string to compare
+ */
+export const iEqual = (a: string, b: string): boolean => a.toLowerCase() === b.toLowerCase();
