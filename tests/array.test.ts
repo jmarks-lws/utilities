@@ -59,6 +59,8 @@ import {
   distinctOn,
   distinctOnFields,
   sort,
+  prepend,
+  append,
 } from '../src/array';
 
 describe('Array utilities tests', () => {
@@ -264,6 +266,18 @@ describe('Array utilities tests', () => {
       const indexes: number[] = [];
       const added3 = map(array, (item: number, index: number) => { indexes.push(index); });
       expect(indexes).toMatchObject([ 0, 1, 2 ]);
+    });
+
+    test('prepend', async () => {
+      const a = [ 1, 2, 3 ];
+      const b = prepend(a, 2);
+      expect(b).toMatchObject([ 2, 1, 2, 3 ]);
+    });
+
+    test('append', async () => {
+      const a = [ 1, 2, 3 ];
+      const b = append(a, 2);
+      expect(b).toMatchObject([ 1, 2, 3, 2 ]);
     });
 
     test('preparedMap :: Returns mapping function', async () => {

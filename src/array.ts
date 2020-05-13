@@ -197,6 +197,7 @@ export const map = <T, U>(
   array: T[],
   mapFn: ((el: T, i: number) => U),
 ): U[] => reduce(array, (acc: U[], el, i) => concat(arrayCopy(acc) as any[], [ mapFn(el, intVal(i)) ]), []);
+
 /**
  * Prepares a reusable mapper which can run the same function on different sets of arrays using common arguments.
  *
@@ -206,6 +207,24 @@ export const map = <T, U>(
  * @returns (array: IMappableObject) => T[]
  */
 export const preparedMap = <T, U>(mapFn: (<T>(el: T, i: number) => U)) => (ary: T[]): U[] => map(ary, mapFn);
+
+/**
+ * Concatenates an element on to the end of an array.
+ * Can be used as an immutable alternative to Array.prototype.push();
+ *
+ * @param array - The original array
+ * @param element - The element to append to the new array
+ */
+export const append = <T>(array: T[], element: T) => concat(array, [ element ]);
+
+/**
+ * Concatenates an element on to the beginning of an array.
+ * Can be used as an immutable alternative to Array.prototype.unshift();
+ *
+ * @param array - The original array
+ * @param element - The element to append to the new array
+ */
+export const prepend = <T>(array: T[], element: T) => concat([ element ], array);
 
 /**
  * Returns a new array of objects containing a subset of fields from an original array of objects.
