@@ -1,6 +1,6 @@
 import { isDefinedObject } from './object';
 import { isArray, count } from './array';
-import { keys } from '.';
+import { keys, Hash } from '.';
 
 /** Helper type: T | null */
 export type Nullable<T> = T | null;
@@ -18,6 +18,8 @@ export type RequireOnlyOne<T, Keys extends keyof T = keyof T> =
   Pick<T, Exclude<keyof T, Keys>> & {
       [K in Keys]-?: Required<Pick<T, K>> & Partial<Record<Exclude<Keys, K>, undefined>>
   }[Keys];
+
+export type NotUndefined = string | number | bigint | boolean | null | symbol | object | Array<any> | Hash;
 
 /** Returns true if `x` is a `number`. NaN is considered a number and so will return `true`. Does not return true for `BigInt`. */
 export const isNumber = (x: any): x is number => (typeof x === 'number');
@@ -41,12 +43,16 @@ export const isBoolean = (x: any): x is boolean => (typeof x === 'boolean');
 export const undef = (x: any): x is undefined => typeof x === 'undefined';
 /** Alias for `undef` */ export const notDef = undef;
 /** Returns true if `x` is not undefined. This will return true for `null`. */
-export const def = (x: any) => !undef(x);
+export const def = (x: any): x is NotUndefined => !undef(x);
 /** Alias for `def` */ export const isDef = def;
 /** Returns true if `x` is `null` */
 export const isNull = (x: any): x is null => x === null;
 /** Returns true if `x` is NOT `null` */
 export const notNull = (x: any) => !isNull(x);
+
+const a: string | undefined = 'abc';
+const b: string | undefined = undefined;
+const d: string = def(b) ? b : 'not defined';
 
 /** Convenience function. Returns true if the type of the provided value is a primitive type */
 export const isPrimitive = (x: any): x is string | number | bigint | boolean | null | symbol | undefined => (
