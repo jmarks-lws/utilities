@@ -1,549 +1,67 @@
-import {
-  pick, Hash, HashOf, addProp, hasKey, identical, clone, deepClone, diff, hasDiff, ObjectLiteral,
-} from './object';
-import {
-  def, strVal, undef, intVal, Nullable, empty, isPrimitive,
-} from './miscellaneous';
+export { ArrayMergeMethod } from './arrays/types/ArrayMergeMethod';
+export { ComparerFn } from './arrays/types/ComparerFn';
+export { EqualityFn } from './arrays/types/EqualityFn';
+export { FilterFn } from './arrays/types/FilterFn';
+export { ReduceFn } from './arrays/types/ReduceFn';
 
-/**
- * Function signature used in `filter()` and other filtering functions.
- */
-export interface FilterFn<T> {
-  (el: T, i?: number, m?: T[]): boolean;
-}
-/**
- * Function signature used in `reduce()` and `reduceRight()`
- */
-export interface ReduceFn<TElement, TResult> {
-  (previousValue: TResult, currentValue: TElement, currentIndex?: number, array?: TElement[]): TResult;
-}
-
-export interface EqualityFn<T> { (a: T, b: T): boolean; }
-
-export interface ComparerFn<T> { (a: T, b: T): number; }
-
-/** Wrapper for native `Array.isArray()` */
-export const isArray = (x: any): x is any[] => Array.isArray(x); // NOTE: This is a static function, so not going to attempt to rewrite.
-
-/**
- * A set of simple functional array utilities
- */
-/** Returns the first element of an array */
-export const head = ([x]: any[]) => x;
-/** Returns all elements other than the first element of an array */
-export const tail = ([, ...xs]: any[]) => xs;
-/** Shallow copy of an array. References remain intact. If a non-array is supplied, null is returned. */
-export const arrayCopy = <T>(arr: T[]): Nullable<Array<T>> => (Array.isArray(arr) ? [...arr] : null);
-/**
- * Returns an array that is the result of appending each array to the end of the one before it in sequence
- * @param {Array<T>[]} args: Each argument should be an array.
- * */
-export const concat = <T>(...args: Array<T>[]): T[] => (([] as T[]).concat(...args));
-
-/**
- * Returns a NEW array that has been sorted using `sortFn`. The original array is unaffected.
- * @param array - The array to sort
- * @param sortFn - A function used to sort. This function should return a negative value if
- *                 a < b, zero for the same and a positive value if b > a (Ex: `(a, b) => a - b`)
- */
-export const sort = <T>(array: Array<T>, sortFn: ComparerFn<T>): T[] => (arrayCopy(array) || []).sort(sortFn);
-
-/**
- * Compares all values in an array returning the lowest element. Elements should be naturally comparable by the `<` operator.
- * @param {Array<T>} array Array to compare values from.
- */
-export const min = <T>([a, b, ...rest]: T[]): T => (undef(b) ? a : min([(a < b ? a : b), ...rest]));
-/**
- * Compares all values in an array returning the highest element. Elements should be naturally comparable by the `>` operator.
- * @param {Array<T>} array Array to compare values from.
- */
-export const max = <T>([a, b, ...rest]: T[]): T => (undef(b) ? a : max([(a > b ? a : b), ...rest]));
-
-/**
- * Returns number of elements in `array`.
- * @param array - The source array
- */
-export const count = (array: any[]): number => (
-  !isArray(array)
-    ? count([array].filter((a) => ![null, undefined].includes(a as any)))
-    : array.length
-);
-/**
- * Returns a new array that is the result of reversing the order of the elements in `array`
- */
-export const reverse = (array: any[]): any[] => (def(head(array)) ? [...reverse(tail(array)), head(array)] : []);
-/**
- * Retreives the first `n` elements from `array` and returns as a new Array.
- */
-export const chopFirst = (array: any[], n: number = 1): any => (
-  def(head(array)) && n ? [head(array), ...chopFirst(tail(array), n - 1)] : []
-);
-/**
- * Retreives the last `n` elements from `array` and returns as a new Array.
- */
-export const chopLast = (xs: any[], n: number = 1): any => reverse(chopFirst(reverse(xs), n));
-/**
- * Returns a new Array consisting of the elements of `array` that would remain after dropping the first `n` elements.
- */
-export const dropFirst = <T>(array: T[], n: number = 0): T[] => chopLast(array, count(array) - min([n, count(array)]));
-/**
- * Returns a new Array consisting of the elements of `array` that would remain after dropping the last `n` elements.
- */
-export const dropLast = <T>(array: T[], n: number = 0): T[] => chopFirst(array, count(array) - min([n, count(array)]));
-
-/**
- * Abstractions of Array dot methods, with some additional typescript annotation.
- */
-
-/**
- * Step over each element in `array`, building a new output object which is initialized as `init`.
- * `fn` should return a new representation of the aggregate object after applying changes based
- * on an array element.
- *
- * @param array - An array to step over for source information
- * @param fn - A function to process each element in the array. It should return a new object that is the result of adding changes based on an array element.
- * @param init - The initial value for the object being built by `fn`. Represents the initial state of the object.
- */
-export const reduce = <TElement, TResult>(
-  array: TElement[],
-  fn: ReduceFn<TElement, TResult>,
-  init: TResult,
-): TResult => array.reduce(fn, init);
-/** Alias for `reduce()` */
-export const aggregate = reduce;
-
-/**
- * Similar to `reduce()` but array elements are processed from last to first. (See `reduce()`)
- */
-export const reduceRight = <TElement, TResult>(
-  array: TElement[],
-  fn: ReduceFn<TElement, TResult>,
-  init: TResult,
-) => array.reduceRight(fn, init);
-/** Alias for `reduceRight()` */
-export const aggregateRight = reduceRight;
-
-/**
- * Create a string which is the result of concatenating the string values of each `array` element, using `delimiter` as a separator.
- * @param array
- * @param delimiter
- */
-export const join = (
-  array: any[],
-  delimiter: string = ',',
-): string => array.join(delimiter);
-
-/**
- * Determines whether an array includes a certain element, returning true or false as appropriate.
- * Wrapper around `<array>.includes()`.
- * @param array - The array to search through.
- * @param needle - The element to search for
- * @param fromIndex - The position in this array at which to begin searching for searchElement
- */
-export const includes = <T>(
-  array: T[],
-  needle: T,
-  fromIndex: number = 0,
-): boolean => array.includes(needle, fromIndex);
-
-/**
- * Returns a section of an array.
- * @param array - The array to source the section from.
- * @param start — The beginning of the specified portion of the array.
- * @param end — The end of the specified portion of the array. This is exclusive of the element at the index 'end'.
- */
-export const slice = <T>(
-  array: T[],
-  start: number = 0,
-  end: number = Infinity,
-): T[] => (
-    array.slice(start, end)
-  );
-
-/**
- * Returns a section of an array using page size and number.
- * @param array - The array to source the section from.
- * @param pageNumber — The page to slice out.
- * @param pageSize — How many elements should represent a single page.
- */
-export const slicePage = <T>(
-  array: T[],
-  pageNumber: number,
-  pageSize: number,
-): T[] => {
-  const start = pageSize * (pageNumber - 1);
-  const end = start + pageSize;
-  return slice(array, start, end);
-};
-
-/**
- * Returns an array using the following rules:
- *  - If an array is provided, the return array will be a copy of the input array
- *  - If a null or undefined value is provided, a new empty array will be returned.
- *  - If any other value is provided, the return value will be a new array with the
- *    original provided value as its only element.
- * @param input - The value to transform
- */
-export const arrayWrap = (input: any): any[] => (
-  arrayCopy(input) ?? ((input === null || input === undefined) ? [] : [input])
-);
-
-/**
- * Utility mapping function for functional style programming.
- * @param array - The source array
- * @param mapFn - A function which returns a new value for each element of `array`.
- */
-export const map = <T, U>(
-  array: T[],
-  mapFn: ((el: T, i: number) => U),
-): U[] => reduce(array, (acc: U[], el, i) => concat(arrayCopy(acc) as any[], [ mapFn(el, intVal(i)) ]), []);
-
-/**
- * Prepares a reusable mapper which can run the same function on different sets of arrays using common arguments.
- *
- * @param mapFn - A function which is ready to return a new value for each element of `array`.
- *               The processing from this function is deferred until the returned function is called.
- *
- * @returns (array: IMappableObject) => T[]
- */
-export const preparedMap = <T, U>(mapFn: (<T>(el: T, i: number) => U)) => (ary: T[]): U[] => map(ary, mapFn);
-
-/**
- * Concatenates an element on to the end of an array.
- * Can be used as an immutable alternative to Array.prototype.push();
- *
- * @param array - The original array
- * @param element - The element to append to the new array
- */
-export const append = <T>(array: T[], element: T) => concat(array, [ element ]);
-
-/**
- * Concatenates an element on to the beginning of an array.
- * Can be used as an immutable alternative to Array.prototype.unshift();
- *
- * @param array - The original array
- * @param element - The element to append to the new array
- */
-export const prepend = <T>(array: T[], element: T) => concat([ element ], array);
-
-/**
- * Returns a new array of objects containing a subset of fields from an original array of objects.
- * @param array - The source array
- * @param fields - A list of property names to keep from each object in `array`. If the array does not contain any of
- *                 the expected elements, they will not exist in the resulting output array
- */
-export const pickEach = <T>(array: Array<T>, fields: string[]) => map(array, (e: Hash) => pick(e, fields));
-/**
- * Returns a new array of objects containing filtered from an original array of objects.
- * @param array - The source array
- * @param filterFn - Function used to filter the source list.
- */
-export const filter = <T>(
-  array: Array<T>,
-  filterFn: FilterFn<T>,
-) => array.filter(filterFn);
-
-/**
- * Alias for `filter()`
- */
-export const where = filter;
-export const whereNot = <T>(array: Array<T>, whereFn: FilterFn<T>) => where(array, (x, i, m) => !whereFn(x, i, m));
-
-/**
- * Returns a two element array. The first element is an array of items that match the provided query function, the second
- * is the items from the original array that do not match the function query.
- * @param array - The source array to query against.
- * @param filterFn - A lambda that describes elements to match.
- */
-export const partition = <T>(array: T[], filterFn: FilterFn<T>) => [where(array, filterFn), whereNot(array, filterFn)];
-
-/**
- * Returns the first T from an Array<T>
- * @param array - The source array
- */
-export const first = <T>([x]: Array<T>) : T | undefined => x;
-/**
- * Returns the first T that matches a provided condition from an Array<T>
- * @param array - The source array
- * @param whereFn - Function used to filter the source list.
- */
-export const findFirst = <T>(array: Array<T>, whereFn: ((testElement: T) => boolean)) => first(where(array, whereFn));
-/**
- * Returns the index of the first element in the array where predicate is true, and -1 otherwise.
- * @param array - Array to search.
- * @param filterFn — find calls predicate once for each element of the array, in ascending order, until it finds
- *    one where predicate returns true. If such an element is found, findIndex immediately returns that element index.
- *    Otherwise, findIndex returns -1.
- */
-export const findIndex = <T>(array: T[], filterFn: FilterFn<T>) => array.findIndex(filterFn);
-
-/**
- * Returns the last T from an Array<T>
- * @param array - The source array
- */
-export const last = <T>(array: Array<T>) => first(reverse(array));
-/**
- * Returns the last T that matches a provided condition from an Array<T>
- * @param array - The source array
- * @param whereFn - Function used to filter the source list.
- */
-export const findLast = <T>(array: Array<T>, whereFn: ((testElement: T) => boolean)) => last(where(array, whereFn));
-
-/**
- * Returns number of elements in `array` matching a given condition.
- * @param array - The source array
- * @param fn - Function used to filter the source list.
- */
-export const countWhere = <T>(array: Array<T>, fn: FilterFn<T>) => where(array, fn).length;
-
-/** Helper method: Determines how many elements in an array are a value other than undefined. */
-export const countDefined = (array: Array<any>) => countWhere(map(array, (i) => def(i)), (defined) => defined === true);
-/** Helper method: Determines if an array contains exactly one defined value */
-export const hasOneDefined = (array: Array<any>) => countDefined(array) === 1;
-/** Helper method: Determines if an array contains one or more defined values */
-export const hasSomeDefined = (array: Array<any>) => countDefined(array) > 0;
-/** Helper method: Determines if an array contains no undefined values */
-export const hasAllDefined = (array: Array<any>) => countDefined(array) === count(array);
-/** Helper method: Determines if an array contains only undefined values */
-export const hasNoneDefined = (array: Array<any>) => countDefined(array) === 0;
-
-/**
- * Returns a sum of a provided field from the elements in `array`.
- * @param array - The source array
- * @param field - Which field to sum. If the value of any instance of this property in any element cannot be parsed to an Integer, the result will be NaN
- */
-export const sum = <T>(array: T[], field: string) => reduce(array,
-  (prev, cur) => prev + parseInt((cur as Hash)[field], 10), 0);
-/**
- * Returns a sum of a provided field matching a given condition from the elements in `array`.
- * @param array - The source array
- * @param fn - Function used to filter the source list.
- * @param field - Which field to sum. If the value of any instance of this property in any element cannot be parsed to an Integer, the result will be NaN
- */
-export const sumWhere = <T>(array: Array<T>, fn: FilterFn<T>, field: string) => sum(where(array, fn), field);
-
-/**
- * Helper method: Returns an array consisting only of distinct values.
- * @param array - array to filter
- */
-export const distinct = <T>(
-  array: Array<T>,
-) => reduce(array, (acc, el) => (includes(acc, el) ? [...acc] : [ ...acc, el ]), [] as T[]);
-
-/**
- * Asserts that an array has any elements matching a condition
- * @param array - The source array
- * @param fn - Function used to filter the source list.
- */
-export const hasAny = <T>(array: Array<T>, fn: FilterFn<T>) => where(array, fn).length > 0;
-/**
- * Asserts that an array does not have any elements matching a condition
- * @param array - The source array
- * @param fn - Function used to filter the source list.
- */
-export const hasNone = <T>(array: Array<T>, fn: FilterFn<T>) => !hasAny(array, fn);
-/**
- * Asserts that all elements match a given condition
- * @param array - The source array
- * @param fn - Function used to filter the source list.
- */
-export const hasAll = <T>(array: T[], fn: FilterFn<T>) => count(where(array, fn)) === count(array);
-
-/**
- * Helper method: Returns an array consisting only of distinct values. Intended for arrays containing a set of
- * objects, which may have different reference values, but have the potential to contain repeat data.
- * @param array - array to filter
- */
-export const distinctObjects = <T extends ObjectLiteral>(
-  array: Array<T>,
-) => reduce(array, (acc, el) => {
-    const alreadyProcessed = hasAny(acc, (curr) => identical(curr, el));
-    return alreadyProcessed ? [ ...acc ] : [ ...acc, el ];
-  }, [] as T[]);
-
-/**
- * Returns a new array where only one of each "same" object is returned. Sameness is determined by `equality`.
- * @param array - The array to filter.
- * @param equality - A function used to determine whether any two elements are equal. Return `true` for equal and `false` for not equal.
- */
-export const distinctOn = <T extends ObjectLiteral>(
-  array: Array<T>,
-  equality: EqualityFn<T>,
-) => reduce(array, (acc, el) => (
-    hasAny(acc, (accEl) => equality(el, accEl)) ? [...acc] : [...acc, el ]
-  ), [] as T[]);
-
-/**
- * Returns a new array where only one of each "same" object is returned. Sameness is determined by comparing
- * the values of all of the field names indicated in `fieldsToCompare`. Note that reference value types will
- * not be considered equal unless the two values refer to the exact same referenced object in memory.
- * @param array - The array to filter
- * @param fieldsToCompare - The field names of objects in the array to compare.
- */
-export const distinctOnFields = <T extends ObjectLiteral>(
-  array: Array<T>,
-  fieldsToCompare: Array<keyof T>,
-) => reduce(array, (acc, el) => (
-    hasAny(acc, (accEl) => !hasDiff(pick(accEl, fieldsToCompare as string[]), pick(el, fieldsToCompare as string[])))
-      ? [...acc]
-      : [...acc, el ]
-  ), [] as T[]);
-
-/**
- * Returns a new array which is the result of removing elements from `initialList` which are also in `pruneList`
- * @param initialList - List to prune from. The source list is not affected. A new array will be returned.
- * @param pruneList - List of elements to remove.
- */
-export const prune = <T>(initialList: T[], pruneList: T[]) => where(initialList, (el: T) => !includes(pruneList, el));
-
-/**
- * Returns a new array consisting of elements that exist in both `a` and `b`
- * @param a
- * @param b
- */
-export const intersect = <T>(a: T[], b: T[]) => where(a, (el: T) => includes(b, el));
-
-/**
- * Returns a new array consisting of elements that exist only in `a` and only in `b`, but not in both `a` and `b`
- * @param a
- * @param b
- */
-export const notIntersect = <T>(a: T[], b: T[]) => concat(prune(a, intersect(a, b)), prune(b, intersect(a, b)));
-
-/**
- * Returns a new array that is the result of removing `element` from `array`
- * @param array - The source array
- * @param element - The element to omit from the resulting array
- */
-export const omit = <T>(array: Array<T>, element: T) => where(array, (e) => e !== element);
-
-/**
- * Returns a new array that is the result of inserting `element` to `array` at position `index`
- * @param array - The source array
- * @param element - The element to add to the resulting array
- * @param index - Where to place the element
- */
-export const insertAt = <T>(array: Array<T>, index: number, element: T) => [
-  ...slice(array, 0, index), element, ...slice(array, index),
-];
-
-/**
- * Returns a new array that is the result of replacing the element at `index` in `array` with the new `element`
- * @param array - The source array
- * @param element - The element to add to the resulting array
- * @param index - Where to place the element
- */
-export const replaceAt = <T>(array: Array<T>, index: number, element: T) => [
-  ...slice(array, 0, index), element, ...slice(array, index + 1),
-];
-
-/**
- * Returns a new array that is the result of removing the element at position `index` from `array`
- * @param array - The source array
- * @param index - The index of the element to remove
- */
-export const removeAt = <T>(array: Array<T>, index: number) => [
-  ...slice(array, 0, index), ...slice(array, index + 1),
-];
-
-/**
- * Returns a hash from an array of objects where the key is the value of the provided field name.
- * @param array - The source array
- * @param key - Which field to use as the ObjectHash key
- */
-export const table = <T extends Hash>(
-  array: Array<T>,
-  key: string,
-): HashOf<T> => (
-    reduce(
-      array as T[],
-      (prev, curr) => addProp(prev, strVal(curr[key]), curr) as Hash,
-      {} as HashOf<T>,
-    )
-  );
-/** Alias for `table()` */
-export const hash = table;
-/** Alias for `table()` */
-export const hashTable = table;
-/** Alias for `table()` */
-export const associative = table;
-
-/**
- * Group array items by a specific key which should exist on all elements of the array.
- *
- * @param array An ideally flat array of objects
- * @param key The name of the key which should be used as the key for each item group.
- */
-export const group = <T extends Hash>(array: Array<T>, key: string) => {
-  const grouped = reduce(
-    array,
-    (prev, curr) => (
-      hasKey(prev, `${curr[key]}`)
-        ? { ...prev, [`${curr[key]}`]: concat(prev[`${curr[key]}`], [ curr ]) }
-        : { ...prev, [`${curr[key]}`]: [ curr ] }
-    ),
-    {} as HashOf<Hash[]>,
-  );
-  return grouped;
-};
-
-/**
- * Removes elements which are null or undefined.
- * @param array - The source array
- */
-export const compactArray = (array: any[], allowNulls = false) => (
-  where(array, (x) => x !== undefined && (allowNulls || x !== null))
-);
-
-/**
- * Returns a new array with all sub-array elements concatenated into it recursively up to the specified depth.
- * @param arr
- * @param d
- */
-export const flatten = (arr: any[], d = 1): any[] => (d > 0
-  ? reduce(arr, (acc, val) => acc.concat(isArray(val) ? flatten(val, d - 1) : val), [])
-  : slice(arr)
-);
-
-/**
- * Tests `array` to determine if it has a zero length.
- * @param array - array to test
- */
-export const arrayEmpty = (array: any[]) => count(array) === 0;
-
-/**
- * Creates an array consisting of a series of sequential numbers.
- * @param n - How many elements to generate
- * @param startAt - Which number to start at. (default 0)
- */
-export const series = (n: number, startAt: number = 0) => Array.from(Array(n).keys(), (k) => k + startAt);
-
-/**
- * Clones each of `array`'s individual elements using shallow cloning (`clone` from the object subset
- * of utilities). Cloned reference values will copy by reference. While this is sometimes useful, you
- * will usually want `deepCloneArray()`
- *
- * @param array Array to clone
- */
-export const cloneArray = <T>(array: T[]): T[] => array.map(
-  (x) => (
-    isPrimitive(x) // eslint-disable-line no-nested-ternary
-      ? x
-      : (isArray(x) ? x : clone(x))
-  ),
-);
-
-/**
- * Clones `array` ensuring reference types are copied by value and not by reference.
- *
- * ! Warning: This could result in infinite recursion if circular references exist inside the object.
- *
- * @param array Array to clone
- */
-export const deepCloneArray = <T>(array: T[]): T[] => array.map(
-  (x) => (
-    isPrimitive(x) // eslint-disable-line no-nested-ternary
-      ? x
-      : (Array.isArray(x) ? deepCloneArray(x) : deepClone(x)) as any
-  ),
-);
+export { countDefined, hasOneDefined, hasSomeDefined, hasNoneDefined, hasAllDefined } from './arrays/aggregateDefined';
+export { append } from './arrays/append';
+export { arrayCopy } from './arrays/arrayCopy';
+export { arrayEmpty } from './arrays/arrayEmpty';
+export { arrayWrap } from './arrays/arrayWrap';
+export { chopFirst } from './arrays/chopFirst';
+export { chopLast } from './arrays/chopLast';
+export { cloneArray } from './arrays/cloneArray';
+export { compactArray } from './arrays/compactArray';
+export { concat } from './arrays/concat';
+export { count } from './arrays/count';
+export { countWhere } from './arrays/countWhere';
+export { deepCloneArray } from './arrays/deepCloneArray';
+export { deepMergeArrays } from './arrays/deepMergeArrays';
+export { distinct } from './arrays/distinct';
+export { distinctObjects } from './arrays/distinctObjects';
+export { distinctOn } from './arrays/distinctOn';
+export { distinctOnFields } from './arrays/distinctOnFields';
+export { dropFirst } from './arrays/dropFirst';
+export { dropLast } from './arrays/dropLast';
+export { findFirst } from './arrays/findFirst';
+export { findIndex } from './arrays/findIndex';
+export { findLast } from './arrays/findLast';
+export { first } from './arrays/first';
+export { flatten } from './arrays/flatten';
+export { group } from './arrays/group';
+export { hasAll } from './arrays/hasAll';
+export { hasAny } from './arrays/hasAny';
+export { hasNone } from './arrays/hasNone';
+export { head } from './arrays/head';
+export { includes } from './arrays/includes';
+export { insertAt } from './arrays/insertAt';
+export { intersect } from './arrays/intersect';
+export { isArray } from './arrays/isArray';
+export { join } from './arrays/join';
+export { last } from './arrays/last';
+export { map } from './arrays/map';
+export { max } from './arrays/max';
+export { min } from './arrays/min';
+export { notIntersect } from './arrays/notIntersect';
+export { omit } from './arrays/omit';
+export { partition } from './arrays/partition';
+export { pickEach } from './arrays/pickEach';
+export { preparedMap } from './arrays/preparedMap';
+export { prepend } from './arrays/prepend';
+export { prune } from './arrays/prune';
+export { reduce } from './arrays/reduce';
+export { reduceRight } from './arrays/reduceRight';
+export { removeAt } from './arrays/removeAt';
+export { replaceAt } from './arrays/replaceAt';
+export { reverse } from './arrays/reverse';
+export { series } from './arrays/series';
+export { slice } from './arrays/slice';
+export { slicePage } from './arrays/slicePage';
+export { sort } from './arrays/sort';
+export { sum } from './arrays/sum';
+export { sumWhere } from './arrays/sumWhere';
+export { table } from './arrays/table';
+export { tail } from './arrays/tail';
+export { where } from './arrays/where';
+export { whereNot } from './arrays/whereNot';
