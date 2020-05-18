@@ -19,7 +19,7 @@ import {
   hasAny,
   hasNone,
   hasAll,
-  hash,
+  table,
   compactArray,
   slice,
   includes,
@@ -319,7 +319,7 @@ describe('Array utilities tests', () => {
 
   describe('Advanced Transformations', () => {
     test('hash', async () => {
-      const result = hash(testPeopleList1, 'id');
+      const result = table(testPeopleList1, 'id');
       expect(result).toMatchObject({
         123: {
           id: 123, name: 'Forest', age: 40, favColor: '#FF0000',
