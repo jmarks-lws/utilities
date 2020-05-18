@@ -11,7 +11,7 @@ import {
   values,
   isDefinedObject,
   pickNot,
-  removeField,
+  removeProp,
   mapKeys,
   mergeRight,
   mergeIntersection,
@@ -381,7 +381,7 @@ describe('Object utilities tests', () => {
   });
 
   test('removeField', async () => {
-    expect(removeField({ a: 1, b: 2 }, 'a')).toMatchObject({ b: 2 });
+    expect(removeProp({ a: 1, b: 2 }, 'a')).toMatchObject({ b: 2 });
   });
 
   test('mapKeys', async () => {
