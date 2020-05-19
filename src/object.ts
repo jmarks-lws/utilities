@@ -2,7 +2,7 @@ export { Augmented } from './objects/types/Augmented';
 export { Hash } from './objects/types/Hash';
 export { HashOf } from './objects/types/HashOf';
 
-export { addProp } from './objects/addProp';
+export { addProp, addField } from './objects/addProp';
 export { arraysToObject } from './objects/arraysToObject';
 export { clone } from './objects/clone';
 export { compactObject } from './objects/compactObject';
@@ -31,7 +31,7 @@ export { pickNot } from './objects/pickNot';
 export { pluck } from './objects/pluck';
 export { prop } from './objects/prop';
 export { remapKeys } from './objects/remapKeys';
-export { removeProp } from './objects/removeProp';
+export { removeProp, removeField } from './objects/removeProp';
 export { transformValues } from './objects/transformValues';
 export { values } from './objects/values';
 export { zip } from './objects/zip';

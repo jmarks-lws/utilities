@@ -61,7 +61,7 @@ export { slicePage } from './arrays/slicePage';
 export { sort } from './arrays/sort';
 export { sum } from './arrays/sum';
 export { sumWhere } from './arrays/sumWhere';
-export { table } from './arrays/table';
+export { table, hash, hashTable, associative } from './arrays/table';
 export { tail } from './arrays/tail';
 export { where } from './arrays/where';
 export { whereNot } from './arrays/whereNot';

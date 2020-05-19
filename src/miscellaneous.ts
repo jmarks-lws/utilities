@@ -6,7 +6,7 @@ export { RequireAtLeastOne } from './misc/types/RequireAtLeastOne';
 export { RequireOnlyOne } from './misc/types/RequireOnlyOne';
 
 export { boolVal } from './misc/boolVal';
-export { def } from './misc/def';
+export { def, isDefined, isDef } from './misc/def';
 export { empty } from './misc/empty';
 export { envToType } from './misc/envToType';
 export { floatVal } from './misc/floatVal';
@@ -28,4 +28,4 @@ export { notNull } from './misc/notNull';
 export { sameType } from './misc/sameType';
 export { stringToBool } from './misc/stringToBool';
 export { strVal } from './misc/strVal';
-export { undef } from './misc/undef';
+export { undef, notDef, isUndefined } from './misc/undef';

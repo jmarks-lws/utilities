@@ -61,7 +61,10 @@ import {
   sort,
   prepend,
   append,
+  deepMergeArrays,
+  ArrayMergeMethod,
 } from '../src/array';
+import { strVal } from '../src/misc/strVal';
 
 describe('Array utilities tests', () => {
   const testPeopleList1 = [
@@ -636,6 +639,91 @@ describe('Array utilities tests', () => {
           (a2[4] as { b: string, c: number[] }).c,
         ),
       ).not.toBe(true);
+    });
+
+    test('`deepMergeArrays` 1', async () => {
+      const a = [ 1, 2, 3 ];
+      const b = [ 1, 2, 3, 4 ];
+      const c = deepMergeArrays(a, b);
+      expect(c).toMatchObject([1, 2, 3, 1, 2, 3, 4]);
+      const d = deepMergeArrays(a, b, 'value');
+      expect(d).toMatchObject([1, 2, 3, 4]);
+      const e = deepMergeArrays(a, b, 'index');
+      expect(e).toMatchObject([1, 2, 3, 4]);
+    });
+
+    test('`deepMergeArrays` 2', async () => {
+      const sameObj = { a: 1, b: 2 };
+      const a = [ sameObj, { a: 1, b: 2 } ];
+      const b = [ sameObj, { a: 1, b: 2 } ];
+      const c = deepMergeArrays(a, b);
+      expect(c).toMatchObject([{ a: 1, b: 2 }, { a: 1, b: 2 }, { a: 1, b: 2 }, { a: 1, b: 2 }]);
+      const d = deepMergeArrays(a, b, 'value');
+      expect(d).toMatchObject([{ a: 1, b: 2 }, { a: 1, b: 2 }, { a: 1, b: 2 }]);
+      const e = deepMergeArrays(a, b, 'index');
+      expect(e).toMatchObject([{ a: 1, b: 2 }, { a: 1, b: 2 }]);
+    });
+
+    test('`deepMergeArrays` 3', async () => {
+      const el1 = [ 'a', 1, 'b', 2 ];
+      const el2 = [ 'c', 3, 'd', 4 ];
+      const el3 = [ 'c', 3, 'd', 4 ];
+
+      const a = [ el1, el2 ];
+      const b = [ el1, el3, el2 ];
+      const c = deepMergeArrays(a, b);
+      expect(c).toMatchObject([ el1, el2, el1, el3, el2 ]);
+      const d = deepMergeArrays(a, b, 'value');
+      expect(d).toMatchObject([ el1, el3, el2 ]);
+      const e = deepMergeArrays(a, b, 'index');
+      expect(e).toMatchObject([ el1, el3, el2 ]);
+    });
+
+    test('`deepMergeArrays` 4', async () => {
+      const el1 = [ 'a', 1, 'b', 2 ];
+      const el2 = [ 'c', 3, 'd', 4 ];
+      const el3 = [ 'c', 3, 'd', 4 ];
+
+      const a = [ el1, el3, el2 ];
+      const b = [ el1, el2 ];
+      const c = deepMergeArrays(a, b);
+      expect(c).toMatchObject([ el1, el3, el2, el1, el2 ]);
+      const d = deepMergeArrays(a, b, 'value');
+      expect(d).toMatchObject([ el1, el2, el3 ]);
+      const e = deepMergeArrays(a, b, 'index');
+      expect(e).toMatchObject([ el1, el2, el2 ]);
+    });
+
+    test('`deepMergeArrays` 5', async () => {
+      const el1 = [ 'a', 1, 'b', 2 ];
+      const el2 = [ 'c', 3, 'd', 4 ];
+      const el3 = [ 'c', 3, 'd', 4 ];
+
+      const a = [ 'a', el3, el2 ];
+      const b = [ el1, el2 ];
+      const c = deepMergeArrays(a, b);
+      expect(c).toMatchObject([ 'a', el3, el2, el1, el2 ]);
+      const d = deepMergeArrays(a, b, 'value');
+      expect(d).toMatchObject([ 'a', el2, el3, el1 ]);
+      const e = deepMergeArrays(a, b, 'index');
+      expect(e[0]).toBe(el1);
+      expect(e[1]).toMatchObject(el2);
+      expect(e[2]).toMatchObject(el2);
+    });
+
+    test('`deepMergeArrays` 5', async () => {
+      expect(() => {
+        deepMergeArrays(['a'], ['b'], 'wahtever' as ArrayMergeMethod);
+      }).toThrow();
+    });
+
+    test('`deepMergeArrays` 6', async () => {
+      const c = deepMergeArrays(
+        null as any as any[],
+        [ undefined ],
+        'index',
+      );
+      expect(c).toMatchObject([ undefined ]);
     });
   });
 });

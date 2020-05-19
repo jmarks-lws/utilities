@@ -1,3 +1,4 @@
+// eslint-disable-next-line max-classes-per-file
 import {
   pick,
   compactObject,
@@ -29,6 +30,7 @@ import {
   clone,
   deepClone,
   keyList,
+  deepMerge,
 } from '../src/object';
 import { tail } from '../src/array';
 
@@ -427,7 +429,7 @@ describe('Object utilities tests', () => {
     expect(diff(startObj, clonedObj)).toMatchObject({});
   });
 
-  test('deep', async () => {
+  test('deepClone', async () => {
     const startObj = {
       a: 1, b: 'abc', c: { d: 'abc123', e: Symbol('whatever') },
     };
@@ -436,5 +438,58 @@ describe('Object utilities tests', () => {
     expect(deepObj).not.toBe(startObj);
     expect(startObj.c).not.toBe(deepObj.c);
     expect(diff(startObj, deepObj)).toMatchObject({});
+  });
+
+  test('deepMerge 1', async () => {
+    const sym = Symbol('whatever');
+    const obj1 = {
+      a: 1,
+      b: 'abc',
+      c: { d: 'abc123', e: sym },
+      d: 'b',
+      e: 'de',
+    };
+    const obj2 = {
+      a: 1,
+      b: 123,
+      c: { d: 'abc123', e: sym },
+      f: 123,
+      e: { more: 'data' },
+    };
+    const obj3 = deepMerge<Hash>(obj1, obj2);
+    expect(obj3).toMatchObject({
+      a: 1,
+      b: 123,
+      c: { d: 'abc123', e: sym },
+      d: 'b',
+      e: { more: 'data' },
+      f: 123,
+    });
+  });
+  test('deepMerge 2', async () => {
+    const srcObj = { a: 1, b: 2 };
+    const obj1 = {
+      a: [ 1, 2, 3 ],
+      b: srcObj,
+    };
+    const obj2 = {
+      a: [ 1, 2, 4 ],
+      b: srcObj,
+    };
+    const obj3 = deepMerge<Hash>(obj1, obj2);
+    expect(obj3).toMatchObject({
+      a: [ 1, 2, 3, 1, 2, 4 ],
+      b: srcObj,
+    });
+    const obj4 = deepMerge<Hash>(obj1, obj2, 'index');
+    expect(obj4).toMatchObject({
+      a: [ 1, 2, 4 ],
+      b: srcObj,
+    });
+    const obj5 = deepMerge<Hash>(obj1, obj2, 'value');
+    expect(obj5).toMatchObject({
+      a: [ 1, 2, 3, 4 ],
+      b: srcObj,
+    });
   });
 });

@@ -1,7 +1,7 @@
 import {
   isNull, notNull, empty, notEmpty, boolVal, floatVal, strVal, isValidNumber,
   isIntegerNumber, isNumeric, isString, isBigInt, isSymbol, isBoolean,
-  isPrimitive, isReference, envToType,
+  isPrimitive, isReference, envToType, intVal, sameType,
 } from '../src/miscellaneous';
 
 describe('Miscellaneous functions', () => {
@@ -62,6 +62,15 @@ describe('Miscellaneous functions', () => {
     expect(strVal({ a: 1, b: 2, c: 3 })).toBe(JSON.stringify({ a: 1, b: 2, c: 3 }));
     expect(strVal(undefined)).toBe('');
     expect(strVal(null)).toBe('');
+  });
+  test('intVal', async () => {
+    expect(intVal([1, 2, 3])).toBe(1);
+    expect(intVal({ a: 1, b: 2, c: 3 })).toBe(NaN);
+    expect(intVal(undefined)).toBe(NaN);
+    expect(intVal(null)).toBe(NaN);
+    expect(intVal(1.3)).toBe(1);
+    expect(intVal(25)).toBe(25);
+    expect(intVal('153')).toBe(153);
   });
   test('isValidNumber returns correctly', async () => {
     expect(isValidNumber(12)).toBe(true);
@@ -155,6 +164,15 @@ describe('Miscellaneous functions', () => {
     expect(isReference({})).toBe(true);
     expect(isReference([])).toBe(true);
     expect(isReference(new Date())).toBe(true);
+  });
+
+  test('sameType', async () => {
+    expect(sameType(1, 1)).toBe(true);
+    expect(sameType(1, '1')).toBe(false);
+    expect(sameType('1', '1')).toBe(true);
+    expect(sameType(true, true)).toBe(true);
+    expect(sameType(false, false)).toBe(true);
+    expect(sameType(true, false)).toBe(true);
   });
 
   test('envToType returns correctly', async () => {
