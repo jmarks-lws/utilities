@@ -222,3 +222,11 @@ export const repeatAsyncWithBreak = async (
     if (isDone) break;
   }
 };
+
+export const selectBranch = async <T extends CallableFunction>(
+  key: string,
+  callMap: HashOf<T>,
+  ...args: any[]
+) => {
+  (callMap[key] ? callMap[key] : identity as CallableFunction)(key, ...args);
+};

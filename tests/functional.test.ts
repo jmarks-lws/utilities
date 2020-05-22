@@ -2,7 +2,7 @@
 import {
   repeat, repeatWithBreak, repeatAsync, repeatAsyncWithBreak, repeatWhile, repeatWhileAsync,
   isFunction, curry, mapAsync, identity, partial, spreadArgs, reverseArgs, maxTimes, maxOnce,
-  take, branch, tryCatch, argsAsArray,
+  take, branch, tryCatch, argsAsArray, selectBranch,
 } from '../src/functional';
 import { reduce } from '../src/array';
 
@@ -227,5 +227,19 @@ describe('functional methods', () => {
     )(1);
     expect(a).toBe(0);
     expect(b).toBe(2);
+  });
+
+  test('selectBranch', async () => {
+    let result = -1;
+    const callMap = {
+      1: (val: any) => { result = 1; },
+      2: (val: any) => { result = 2; },
+      5: (val: any) => { result = 5; },
+    };
+    selectBranch('8', callMap);
+    expect(result).toBe(-1);
+
+    selectBranch('1', callMap);
+    expect(result).toBe(1);
   });
 });

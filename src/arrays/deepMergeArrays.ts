@@ -1,7 +1,6 @@
-import { isNull } from 'util';
+import { isNull } from '../misc/isNull';
 import { undef } from '../misc/undef';
 import { isPrimitive } from '../misc/isPrimitive';
-import { isDefinedObject } from '../objects/isDefinedObject';
 import { ArrayMergeMethod } from './types/ArrayMergeMethod';
 import { reduce } from './reduce';
 import { replaceAt } from './replaceAt';
@@ -13,6 +12,12 @@ import { deepMerge } from '../objects/deepMerge';
 import { InvalidParameterError } from '../misc/types/InvalidParameterError';
 import { sameType } from '../misc/sameType';
 
+/**
+ *
+ * @param a
+ * @param b
+ * @param arrayMergeMethod
+ */
 export const deepMergeArrays = <T>(
   a: T[],
   b: T[],

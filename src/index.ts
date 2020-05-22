@@ -1,4 +1,5 @@
 export * from './array';
+export * from './date';
 export * from './functional';
 export * from './logical';
 export * from './memoize';
