@@ -22,6 +22,7 @@ export { isPrimitive } from './misc/isPrimitive';
 export { isReference } from './misc/isReference';
 export { isString } from './misc/isString';
 export { isSymbol } from './misc/isSymbol';
+export { isValidJSON } from './misc/isValidJSON';
 export { isValidNumber } from './misc/isValidNumber';
 export { notEmpty } from './misc/notEmpty';
 export { notNull } from './misc/notNull';
