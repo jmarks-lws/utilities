@@ -1,4 +1,4 @@
-import { Optional } from 'src/misc/types/Optional';
+import { Optional } from '../misc/types/Optional';
 import { where } from './where';
 
 /**
