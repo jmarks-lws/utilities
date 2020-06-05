@@ -63,6 +63,7 @@ import {
   append,
   deepMergeArrays,
   ArrayMergeMethod,
+  fieldSort,
 } from '../src/array';
 import { strVal } from '../src/misc/strVal';
 
@@ -246,6 +247,20 @@ describe('Array utilities tests', () => {
       expect(testPeopleList1).not.toMatchObject(expectedSorted);
       expect(testPeopleList1).toMatchObject(testPeopleListSameOnPurpose);
       expect(sort(null as unknown as any[], (a: any, b: any) => (a - b))).toMatchObject([]);
+    });
+    test('fieldSort', async () => {
+      const newArray = fieldSort(testPeopleList1, 'age');
+      const expectedSorted = [
+        { id: 128, name: 'Roxanne', age: 18, favColor: '#0000FF' },
+        { id: 124, name: 'Lump', age: 25, favColor: '#FF00FF' },
+        { id: 123, name: 'Forest', age: 40, favColor: '#FF0000' },
+        { id: 125, name: 'Tiffany', age: 53, favColor: '#FFFF00' },
+      ];
+      expect(newArray).not.toBe(testPeopleList1);
+      expect(newArray).toMatchObject(expectedSorted);
+      expect(testPeopleList1).not.toMatchObject(expectedSorted);
+      expect(testPeopleList1).toMatchObject(testPeopleListSameOnPurpose);
+      expect(fieldSort(null as unknown as any[], '')).toMatchObject([]);
     });
     test('includes', async () => {
       expect(includes(['a', 'b', 3, 5], 'a')).toBe(true);
