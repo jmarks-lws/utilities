@@ -24,6 +24,7 @@ export { distinctOn } from './arrays/distinctOn';
 export { distinctOnFields } from './arrays/distinctOnFields';
 export { dropFirst } from './arrays/dropFirst';
 export { dropLast } from './arrays/dropLast';
+export { fieldSort } from './arrays/fieldSort';
 export { findFirst } from './arrays/findFirst';
 export { findIndex } from './arrays/findIndex';
 export { findLast } from './arrays/findLast';

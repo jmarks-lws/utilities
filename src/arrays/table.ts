@@ -11,7 +11,7 @@ import { strVal } from '../misc/strVal';
  */
 export const table = <T extends Hash>(
   array: Array<T>,
-  key: string,
+  key: keyof T,
 ): HashOf<T> => (
     reduce(
       array as T[],

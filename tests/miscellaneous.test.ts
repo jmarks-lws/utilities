@@ -1,7 +1,7 @@
 import {
   isNull, notNull, empty, notEmpty, boolVal, floatVal, strVal, isValidNumber,
   isIntegerNumber, isNumeric, isString, isBigInt, isSymbol, isBoolean,
-  isPrimitive, isReference, envToType, intVal, sameType,
+  isPrimitive, isReference, envToType, intVal, sameType, isValidJSON,
 } from '../src/miscellaneous';
 
 describe('Miscellaneous functions', () => {
@@ -81,6 +81,10 @@ describe('Miscellaneous functions', () => {
     expect(isValidNumber(BigInt(123))).toBe(false);
     expect(isValidNumber(true)).toBe(false);
     expect(isValidNumber(false)).toBe(false);
+  });
+  test('isValidJSON returns correctly', async () => {
+    expect(isValidJSON(JSON.stringify({}))).toBe(true);
+    expect(isValidJSON('asdfasdf null fun')).toBe(false);
   });
   test('isIntegerNumber returns correctly', async () => {
     expect(isIntegerNumber(12)).toBe(true);
