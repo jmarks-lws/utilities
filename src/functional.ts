@@ -54,8 +54,8 @@ export const curry = (fn: Function) => {
  */
 export const mapAsync = async <T, U>(
   list: T[],
-  fn: ((x: T) => Promise<U>),
-) => Promise.all(list.map(async (id) => fn(id)));
+  fn: ((value: T, index: number, array: T[]) => Promise<U>),
+) => Promise.all(list.map(async (id, ix, ar) => fn(id, ix, ar)));
 
 /**
  * (Don't use this - deprecation incoming quickly) Provides an English-esque interface for getting a key from an object with a default value.
