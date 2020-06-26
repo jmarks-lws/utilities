@@ -13,7 +13,7 @@ import { keys } from './keys';
  *                  `remap` being changed. All other keys and values will remain as they were in the source object.
  */
 export const remapKeys = (obj: Hash, remap: Hash, returnAll: boolean = false): Hash => reduce(
-  keys(obj),
+  keys(obj) as string[],
   (acc: Hash, k: string) => merge(
     { ...acc },
     ((hasKey(remap, k) || returnAll) ? { [(hasKey(remap, k) ? remap[k] : k)]: obj[k] } : {}),

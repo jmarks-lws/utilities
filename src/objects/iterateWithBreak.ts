@@ -16,7 +16,7 @@ export const iterateWithBreak = ( // TODO: Make so it works with arrays too (lik
   reduce(keys(hash), (acc: Hash, key) => {
     let done: boolean = false || acc.done;
     if (!acc.done) {
-      fn(key, hash[key], () => {
+      fn(key as any, hash[key], () => {
         done = true;
       });
     }

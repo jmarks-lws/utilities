@@ -11,7 +11,7 @@ export const diff = (a: Hash, b: Hash) => {
   const dif: Hash = {};
   const aKeys = keys(a);
   const bKeys = keys(b);
-  aKeys.forEach((key: string) => {
+  aKeys.forEach((key) => {
     if (!bKeys.includes(key)) {
       dif[key] = '-';
     } else if (typeof a[key] === 'object' && a[key] !== null) {
