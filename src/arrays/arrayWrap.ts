@@ -1,4 +1,5 @@
 import { arrayCopy } from './arrayCopy';
+import { isArray } from './isArray';
 
 /**
  * Returns an array using the following rules:
@@ -8,6 +9,7 @@ import { arrayCopy } from './arrayCopy';
  *    original provided value as its only element.
  * @param input - The value to transform
  */
-export const arrayWrap = (input: any): any[] => (
-  arrayCopy(input) ?? ((input === null || input === undefined) ? [] : [input])
-);
+export const arrayWrap = <T>(input: T | T[]): T[] => {
+  if (isArray(input)) return arrayCopy(input)!;
+  return ((input === null || input === undefined) ? [] : [input]);
+};
