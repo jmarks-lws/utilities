@@ -32,6 +32,7 @@ export { pluck } from './objects/pluck';
 export { prop } from './objects/prop';
 export { remapKeys } from './objects/remapKeys';
 export { removeProp, removeField } from './objects/removeProp';
+export { transformKeys } from './objects/transformKeys';
 export { transformValues } from './objects/transformValues';
 export { values } from './objects/values';
 export { zip } from './objects/zip';

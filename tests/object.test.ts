@@ -22,6 +22,7 @@ import {
   prop,
   zip,
   arraysToObject,
+  transformKeys,
   transformValues,
   hasDiff,
   noDiff,
@@ -141,6 +142,14 @@ describe('Object utilities tests', () => {
       a: 1, b: 2, c: 3,
     }, timesTwo)).toMatchObject({
       a: 2, b: 4, c: 6,
+    });
+  });
+  test('transformKeys', async () => {
+    const addPrefix = (k: string) => `_${k}`;
+    expect(transformKeys({
+      a: 1, b: 2, c: 3,
+    }, addPrefix)).toMatchObject({
+      _a: 1, _b: 2, _c: 3,
     });
   });
 
