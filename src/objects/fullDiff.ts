@@ -12,7 +12,7 @@ export const fullDiff = (a: Hash, b: Hash) => {
   const dif: Hash = {};
   const aKeys = keys(a);
   const bKeys = keys(b);
-  aKeys.forEach((key: string) => {
+  aKeys.forEach((key) => {
     if (!bKeys.includes(key)) {
       dif[key] = { '-': a[key] };
     } else if (typeof a[key] === 'object') {

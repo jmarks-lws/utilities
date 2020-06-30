@@ -7,4 +7,4 @@ import { map } from '../arrays/map';
  * @param o
  * @param fn
  */
-export const mapKeys = <T, U>(o: HashOf<T>, fn: ((k: string, i: number) => U)): U[] => map(keys(o), fn);
+export const mapKeys = <T, U>(o: HashOf<T>, fn: ((k: string, i: number) => U)): U[] => map(keys(o) as string[], fn);

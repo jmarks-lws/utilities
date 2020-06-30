@@ -9,4 +9,4 @@ import { reduce } from '../arrays/reduce';
  */
 export const invert = (
   obj: Hash,
-): Hash => reduce(keys(obj), (acc: Hash, key: string) => ({ ...acc, [strVal(obj[key])]: key }), {} as Hash);
+): Hash => reduce(keys(obj), (acc: Hash, key) => ({ ...acc, [strVal(obj[key])]: key }), {} as Hash);
