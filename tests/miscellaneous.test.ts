@@ -2,6 +2,7 @@ import {
   isNull, notNull, empty, notEmpty, boolVal, floatVal, strVal, isValidNumber,
   isIntegerNumber, isNumeric, isString, isBigInt, isSymbol, isBoolean,
   isPrimitive, isReference, envToType, intVal, sameType, isValidJSON,
+  typeCast,
 } from '../src/miscellaneous';
 
 describe('Miscellaneous functions', () => {
@@ -187,5 +188,9 @@ describe('Miscellaneous functions', () => {
     expect(envToType('FALSE')).toBe(false);
     expect(envToType('true')).toBe(true);
     expect(envToType('TRUE')).toBe(true);
+  });
+  test('typeCast input is still output value', async () => {
+    const a: any = 'a';
+    expect(a).toBe(typeCast<string>(a));
   });
 });
