@@ -9,6 +9,7 @@ export { compactObject } from './objects/compactObject';
 export { deepClone } from './objects/deepClone';
 export { deepMerge } from './objects/deepMerge';
 export { diff } from './objects/diff';
+export { filterKeys } from './objects/filterKeys';
 export { freeze } from './objects/freeze';
 export { fullDiff } from './objects/fullDiff';
 export { getSharedKeys } from './objects/getSharedKeys';

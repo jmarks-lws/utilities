@@ -32,6 +32,7 @@ import {
   deepClone,
   keyList,
   deepMerge,
+  filterKeys,
 } from '../src/object';
 import { tail } from '../src/array';
 
@@ -305,6 +306,12 @@ describe('Object utilities tests', () => {
       dob: '1980-01-07',
       weight: 220,
       height: 6.25,
+    });
+  });
+
+  test('filterKeys does what it is intended to do', () => {
+    expect(filterKeys(testPerson1, (key) => key === 'name')).toMatchObject({
+      name: 'Forest',
     });
   });
 

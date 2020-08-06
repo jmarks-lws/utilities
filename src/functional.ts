@@ -230,3 +230,6 @@ export const selectBranch = async <T extends CallableFunction>(
 ) => {
   (callMap[key] ? callMap[key] : identity as CallableFunction)(key, ...args);
 };
+
+// const iif = <T>(condition: boolean, value: T, falseValue: T) => (condition ? value : falseValue);
+// const select = <T extends string | number, U>(value: T, resultList: HashOf<U>) => (resultList[value]);
