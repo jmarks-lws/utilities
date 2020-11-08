@@ -1,5 +1,5 @@
-import { hasKey, HashOf } from './object';
-import { reverse, head, tail } from './array';
+import { hasKey, HashOf, isDefinedObject, keys } from './object';
+import { reverse, head, tail, isArray } from './array';
 import { undef, def } from './miscellaneous';
 
 /**
@@ -233,3 +233,27 @@ export const selectBranch = async <T extends CallableFunction>(
 
 // const iif = <T>(condition: boolean, value: T, falseValue: T) => (condition ? value : falseValue);
 // const select = <T extends string | number, U>(value: T, resultList: HashOf<U>) => (resultList[value]);
+
+/**
+ * Asynchronously loop over an Array or over a JS object as if it were an associative array. Inspired by the PHP implementation
+ * of `foreach`, returning an array result similar to what you might get from `Array.prototype.map()`
+ *
+ * The differences between this and the synchronous `iterate` are:
+ *  - Most importantly, the body of the provided function may `await` other asynchronous functions
+ *  - This function itself is asynchronous and therefore can - and usually should - be awaited.
+ *  - You must provide an async function (which therefore returns a Promise) as the second parameter
+ *
+ * @param hash
+ * @param fn
+ *
+ * @returns {Promise<Array<U>>}
+ */
+export const iterateAsync = async <T, U>(
+  hash: HashOf<T> | T[],
+  fn: ((key: string, value: T) => Promise<U>),
+): Promise<U[]> => {
+  if (isArray(hash)) {
+    return mapAsync(hash, (value, i) => fn(`${i}`, value));
+  }
+  return isDefinedObject(hash) ? mapAsync(keys(hash), (key) => fn(`${key}`, (hash)[key] as T)) : [];
+};
