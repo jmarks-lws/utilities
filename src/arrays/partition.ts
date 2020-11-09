@@ -11,4 +11,4 @@ import { whereNot } from './whereNot';
 export const partition = <T>(
   array: T[],
   filterFn: FilterFn<T>,
-) => [where(array, filterFn), whereNot(array, filterFn)];
+): [ T[], T[] ] => [where(array, filterFn), whereNot(array, filterFn)];
