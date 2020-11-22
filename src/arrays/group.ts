@@ -10,7 +10,7 @@ import { reduce } from './reduce';
  * @param array An ideally flat array of objects
  * @param key The name of the key which should be used as the key for each item group.
  */
-export const group = <T extends Hash>(array: Array<T>, key: string) => {
+export const group = <T extends Hash>(array: Array<T>, key: string): HashOf<T[]> => {
   const grouped = reduce(
     array,
     (prev, curr) => (
@@ -18,7 +18,7 @@ export const group = <T extends Hash>(array: Array<T>, key: string) => {
         ? { ...prev, [`${curr[key]}`]: concat(prev[`${curr[key]}`], [ curr ]) }
         : { ...prev, [`${curr[key]}`]: [ curr ] }
     ),
-    {} as HashOf<Hash[]>,
+    {} as HashOf<T[]>,
   );
   return grouped;
 };
