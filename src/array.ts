@@ -4,7 +4,13 @@ export { EqualityFn } from './arrays/types/EqualityFn';
 export { FilterFn } from './arrays/types/FilterFn';
 export { ReduceFn } from './arrays/types/ReduceFn';
 
-export { countDefined, hasOneDefined, hasSomeDefined, hasNoneDefined, hasAllDefined } from './arrays/aggregateDefined';
+export {
+  countDefined,
+  hasAllDefined,
+  hasNoneDefined,
+  hasOneDefined,
+  hasSomeDefined,
+} from './arrays/aggregateDefined';
 export { append } from './arrays/append';
 export { arrayCopy } from './arrays/arrayCopy';
 export { arrayEmpty } from './arrays/arrayEmpty';
