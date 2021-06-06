@@ -1,6 +1,7 @@
 import { hasKey, HashOf, isDefinedObject, keys } from './object';
 import { reverse, head, tail, isArray } from './array';
 import { undef, def } from './miscellaneous';
+import { reduce } from './arrays/reduce';
 
 /**
  * Interface used to identify a mappable object. According to most sources, this qualifies as
@@ -56,6 +57,39 @@ export const mapAsync = async <T, U>(
   list: T[],
   fn: ((value: T, index: number, array: T[]) => Promise<U>),
 ) => Promise.all(list.map(async (id, ix, ar) => fn(id, ix, ar)));
+
+/**
+ * Provides reduce()-like wrapper functionality for times when the reducer would use `await`. By nature,
+ * waits for each step to complete sequentially before moving on to the next, in opposition to standard
+ * asynchronous patterns.
+ *
+ * Useful when you need to throttle third party service requests.
+ *
+ * @param list
+ * @param fn
+ * @param init
+ */
+export const reduceAsyncSequential = async<TElement, TResult>(
+  list: TElement[],
+  fn: (previousValue: TResult, currentValue: TElement, currentIndex: number, array: TElement[]) => Promise<TResult>,
+  init: TResult,
+) => list.reduce(async (acc, el, index) => fn(await acc, el, index, list), Promise.resolve(init));
+
+/**
+ * Provides map()-like wrapper functionality for times when the map operation would use `await`. Waits
+ * for each step to complete sequentially before moving on to the next, in opposition to standard
+ * asynchronous patterns.
+ *
+ * Useful when you need to throttle third party service requests.
+ *
+ * @param list
+ * @param fn
+ * @param init
+ */
+export const mapAsyncSequential = async <T, U>(
+  list: T[],
+  fn: ((value: T, index: number, array: T[]) => Promise<U>),
+) => reduceAsyncSequential(list, async (prev, curr, i, l) => [ ...prev, await fn(curr, i, l) ], [] as U[]);
 
 /**
  * (Don't use this - deprecation incoming quickly) Provides an English-esque interface for getting a key from an object with a default value.
@@ -170,14 +204,34 @@ export const maxTimes = <T extends (...args: any[]) => any>(times: number, fn: T
  */
 export const maxOnce = <T extends (...args: any[]) => any>(fn: T, context?: any): T => maxTimes(1, fn, context);
 
+/**
+ * Functional alternative to the standard for loop.
+ *
+ * @param repeatTimes
+ * @param fn
+ * @param args
+ */
 export const repeat = (repeatTimes: number, fn: (index: number, ...fnArgs: any[]) => void, ...args: any[]) => {
   for (let i = 0; i < repeatTimes; i++) { fn(i, ...args); }
 };
 
+/**
+ * Functional alternative to the standard while loop.
+ * @param repeatCondition
+ * @param fn
+ * @param args
+ */
 export const repeatWhile = (repeatCondition: () => boolean, fn: (...fnArgs: any[]) => void, ...args: any[]) => {
   while (repeatCondition()) { fn(...args); }
 };
 
+/**
+ * Functional alternative to the standard for loop. Allows `await` usage inside loop code.
+ *
+ * @param repeatTimes
+ * @param fn
+ * @param args
+ */
 export const repeatAsync = async (
   repeatTimes: number,
   fn: (...args: any[]) => Promise<any>,
@@ -187,6 +241,12 @@ export const repeatAsync = async (
   for (let i = 0; i < repeatTimes; i++) { await fn(i, ...args); }
 };
 
+/**
+ * Functional alternative to the standard while loop. Allows `await` usage inside loop code.
+ * @param repeatCondition
+ * @param fn
+ * @param args
+ */
 export const repeatWhileAsync = async (
   repeatCondition: () => boolean,
   fn: (...args: any[]) => Promise<any>,
@@ -196,6 +256,12 @@ export const repeatWhileAsync = async (
   while (repeatCondition()) { await fn(...args); }
 };
 
+/**
+ * Like `repeat`, but provides a callable `done` function which can be used like a `break`
+ * @param repeatTimes
+ * @param fn
+ * @param args
+ */
 export const repeatWithBreak = (
   repeatTimes: number,
   fn: ((i: number, done: CallableFunction, ...fnargs: any[]) => any),
@@ -209,6 +275,12 @@ export const repeatWithBreak = (
   }
 };
 
+/**
+ * Like `repeatAsync`, but provides a callable `done` function which can be used like a `break`
+ * @param repeatTimes
+ * @param fn
+ * @param args
+ */
 export const repeatAsyncWithBreak = async (
   repeatTimes: number,
   fn: ((i: number, done: CallableFunction, ...fnargs: any[]) => Promise<any>),
@@ -223,6 +295,14 @@ export const repeatAsyncWithBreak = async (
   }
 };
 
+/**
+ * Call the function in `callMap`, indicated by the key in `callMap` matching the input `key`.
+ * Optionally provide parameters using `args`
+ *
+ * @param key
+ * @param callMap
+ * @param args
+ */
 export const selectBranch = async <T extends CallableFunction>(
   key: string,
   callMap: HashOf<T>,

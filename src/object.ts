@@ -4,6 +4,7 @@ export { Hash } from './objects/types/Hash';
 export { HashOf } from './objects/types/HashOf';
 
 export { addProp, addField } from './objects/addProp';
+export { alterProp } from './objects/alterProp';
 export { arraysToObject } from './objects/arraysToObject';
 export { clone } from './objects/clone';
 export { compactObject } from './objects/compactObject';

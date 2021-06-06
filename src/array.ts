@@ -11,6 +11,7 @@ export { arrayEmpty } from './arrays/arrayEmpty';
 export { arrayWrap } from './arrays/arrayWrap';
 export { chopFirst } from './arrays/chopFirst';
 export { chopLast } from './arrays/chopLast';
+export { chunkArray, slicesOf } from './arrays/chunkArray';
 export { cloneArray } from './arrays/cloneArray';
 export { compactArray } from './arrays/compactArray';
 export { concat } from './arrays/concat';

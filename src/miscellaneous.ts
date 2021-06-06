@@ -7,6 +7,7 @@ export { RequireAtLeastOne } from './misc/types/RequireAtLeastOne';
 export { RequireOnlyOne } from './misc/types/RequireOnlyOne';
 
 export { boolVal } from './misc/boolVal';
+export { clamp } from './misc/clamp';
 export { def, isDefined, isDef } from './misc/def';
 export { empty } from './misc/empty';
 export { envToType } from './misc/envToType';
