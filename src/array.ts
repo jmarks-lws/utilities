@@ -37,6 +37,7 @@ export { findIndex } from './arrays/findIndex';
 export { findLast } from './arrays/findLast';
 export { first } from './arrays/first';
 export { flatten } from './arrays/flatten';
+export { flattenOnce } from './arrays/flattenOnce';
 export { group } from './arrays/group';
 export { hasAll } from './arrays/hasAll';
 export { hasAny } from './arrays/hasAny';
