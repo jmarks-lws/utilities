@@ -2,6 +2,7 @@ export { Augmented } from './objects/types/Augmented';
 export { Constructor } from './objects/types/Constructor';
 export { Hash } from './objects/types/Hash';
 export { HashOf } from './objects/types/HashOf';
+export { PartialOn } from './objects/types/PartialOn';
 
 export { addProp, addField } from './objects/addProp';
 export { alterProp } from './objects/alterProp';
