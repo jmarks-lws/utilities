@@ -335,5 +335,5 @@ export const iterateAsync = async <T, U>(
   if (isArray(hash)) {
     return mapAsync(hash, (value, i) => fn(`${i}`, value));
   }
-  return isDefinedObject(hash) ? mapAsync(keys(hash), (key) => fn(`${key}`, (hash)[key] as T)) : [];
+  return mapAsync(keys(hash), (key) => fn(`${key}`, (hash)[key] as T));
 };
