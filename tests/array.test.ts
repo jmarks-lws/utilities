@@ -64,6 +64,8 @@ import {
   deepMergeArrays,
   ArrayMergeMethod,
   fieldSort,
+  chunkArray,
+  flattenOnce,
 } from '../src/array';
 import { strVal } from '../src/misc/strVal';
 
@@ -374,6 +376,21 @@ describe('Array utilities tests', () => {
       ]);
       expect(flatten([1, 2, 3])).toMatchObject([1, 2, 3]);
       expect(flatten([1, 2, 3, 4], 0)).toMatchObject([1, 2, 3, 4]);
+    });
+    test('flattenOnce', async () => {
+      expect(
+        flattenOnce([[1, 2], [3, 4], [5, 5, 7, 7, 8]] as any[]),
+      ).toMatchObject(
+        [1, 2, 3, 4, 5, 5, 7, 7, 8],
+      );
+      expect(
+        flattenOnce([[1, [2, [3, 4]], 5], [5, [7, 7, [8]]]] as any[]),
+      ).toMatchObject(
+        [1, [2, [3, 4]], 5, 5, [7, 7, [8]]],
+      );
+    });
+    test('chunkArray', async () => {
+      expect(chunkArray([1, 2, 3, 4, 5, 6], 2)).toMatchObject([[1, 2], [3, 4], [5, 6]]);
     });
   });
 

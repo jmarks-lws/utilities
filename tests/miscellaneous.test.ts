@@ -2,7 +2,7 @@ import {
   isNull, notNull, empty, notEmpty, boolVal, floatVal, strVal, isValidNumber,
   isIntegerNumber, isNumeric, isString, isBigInt, isSymbol, isBoolean,
   isPrimitive, isReference, envToType, intVal, sameType, isValidJSON,
-  typeCast,
+  typeCast, clamp,
 } from '../src/miscellaneous';
 
 describe('Miscellaneous functions', () => {
@@ -192,5 +192,13 @@ describe('Miscellaneous functions', () => {
   test('typeCast input is still output value', async () => {
     const a: any = 'a';
     expect(a).toBe(typeCast<string>(a));
+  });
+  test('clamp', async () => {
+    const a = 12;
+    expect(clamp(a, 1, 10)).toBe(10);
+    expect(clamp(a, 15, 25)).toBe(15);
+    expect(clamp(a, 1, 20)).toBe(12);
+    expect(clamp(a, 10, 12)).toBe(12);
+    expect(clamp(a, 12, 20)).toBe(12);
   });
 });

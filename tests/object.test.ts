@@ -33,6 +33,9 @@ import {
   keyList,
   deepMerge,
   filterKeys,
+  alterProp,
+  flattenObject,
+  reduceObject,
 } from '../src/object';
 import { tail } from '../src/array';
 
@@ -46,6 +49,33 @@ describe('Object utilities tests', () => {
     weight: 220,
     height: 6.25,
   } as Hash;
+
+  test('alterProp', () => {
+    const result = alterProp(testPerson1, 'name', (name) => name.toUpperCase());
+    expect(result.name).toBe('FOREST');
+    expect(result).toMatchObject({
+      ...testPerson1,
+      name: 'FOREST',
+    });
+  });
+
+  test('flattenObject', async () => {
+    const obj = {
+      a: 1, b: 2, c: { d: 3, e: 4, f: 5, g: { h: 6 } },
+    };
+    const result = flattenObject(obj);
+    expect(result).toMatchObject({
+      a: 1, b: 2, d: 3, e: 4, f: 5, h: 6,
+    });
+  });
+
+  test('reduceObject', async () => {
+    const obj = {
+      a: 1, b: 2, c: 3,
+    };
+    const result = reduceObject(obj, (acc, key, entry) => entry + acc, 0);
+    expect(result).toBe(6);
+  });
 
   test('iterate can be short circiuted', () => {
     let runs = 0;

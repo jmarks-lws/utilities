@@ -2,9 +2,18 @@
 import {
   repeat, repeatWithBreak, repeatAsync, repeatAsyncWithBreak, repeatWhile, repeatWhileAsync,
   isFunction, curry, mapAsync, identity, partial, spreadArgs, reverseArgs, maxTimes, maxOnce,
-  take, branch, tryCatch, argsAsArray, selectBranch,
+  take, branch, tryCatch, argsAsArray, selectBranch, reduceAsyncSequential, mapAsyncSequential, iterateAsync,
 } from '../src/functional';
 import { reduce } from '../src/array';
+
+const sleep = (timeout: number) => new Promise<void>((resolve, reject) => {
+  setTimeout(() => {
+    resolve();
+  }, timeout);
+});
+const sleepRandom = async () => {
+  await sleep(Math.random() * 100);
+};
 
 describe('functional methods', () => {
   test('repeat runs 10 times', async () => {
@@ -209,13 +218,11 @@ describe('functional methods', () => {
   });
 
   test('tryCatch', async () => {
-    let a = 0;
+    const a = 0;
     let b = 1;
     tryCatch(
       (x: any) => {
         throw new Error('artificial error');
-        // eslint-disable-next-line no-unreachable
-        a += x;
       },
       (x: any, error: any) => {
         b += x;
@@ -241,5 +248,65 @@ describe('functional methods', () => {
 
     selectBranch('1', callMap);
     expect(result).toBe(1);
+  });
+
+  test('reduceAsyncSequential', async () => {
+    const items = [
+      { order: 1 },
+      { order: 2 },
+      { order: 3 },
+    ];
+
+    const result = await reduceAsyncSequential(items, async (acc, item) => {
+      await sleepRandom();
+      return [ ...acc, item ];
+    }, [] as any[]);
+
+    expect(result).toMatchObject(items);
+  });
+
+  test('mapAsyncSequential', async () => {
+    const items = [
+      { order: 1 },
+      { order: 3 },
+      { order: 2 },
+    ];
+
+    const result = await mapAsyncSequential(items, async (item) => {
+      await sleepRandom();
+      return item.order;
+    });
+
+    expect(result).toMatchObject([ 1, 3, 2 ]);
+  });
+
+  test('iterateAsync 1', async () => {
+    const items = [
+      { order: 1 },
+      { order: 3 },
+      { order: 2 },
+    ];
+
+    const result = await iterateAsync(items, async (key, item) => {
+      await sleepRandom();
+      return item.order;
+    });
+
+    expect(result).toMatchObject([ 1, 3, 2 ]);
+  });
+
+  test('iterateAsync 2', async () => {
+    const items = {
+      a: { order: 1 },
+      b: { order: 3 },
+      c: { order: 2 },
+    };
+
+    const result = await iterateAsync(items, async (key, item) => {
+      await sleepRandom();
+      return `${key}${item.order}`;
+    });
+
+    expect(result).toMatchObject([ 'a1', 'b3', 'c2' ]);
   });
 });
