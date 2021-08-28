@@ -13,5 +13,5 @@ import { Hash } from './types/Hash';
 export const flattenObject = (object: Hash): Hash => keys(object).reduce((acc, key) => {
   // TODO: Test this
   const value = object[key];
-  return merge(acc, isDefinedObject(value) ? flattenObject(value) : { key: value });
+  return merge(acc, isDefinedObject(value) ? flattenObject(value) : { [key]: value });
 }, {});
