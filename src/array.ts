@@ -72,5 +72,5 @@ export { sum } from './arrays/sum';
 export { sumWhere } from './arrays/sumWhere';
 export { table, hash, hashTable, associative } from './arrays/table';
 export { tail } from './arrays/tail';
-export { where } from './arrays/where';
-export { whereNot } from './arrays/whereNot';
+export { where, filter } from './arrays/where';
+export { whereNot, reject } from './arrays/whereNot';
