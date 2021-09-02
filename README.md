@@ -1,6 +1,8 @@
 # Utilities
 A series of useful functions, heavily tested and strongly typed via Typescript declarations. Inspired by functional philosophies, but not claiming to be a functional library (yet, anyhow).
 
+Each function in this library adheres to the rule that it will never change the data provided to it as input. It will always return a new value.
+
 These functions are intended to simplify code in consuming applications by abstracting common code tasks and control structures into composable, mockable, "unit testable", declarative functions.
 
 Some of these merely wrap common tasks with a declarative word or two to better describe what they do, others abstract more complex functionality. A few - like `branch` - wrap code structures in functions, which allows for some fun functional funny-business, like partial application and currying.
@@ -12,9 +14,12 @@ Some of these merely wrap common tasks with a declarative word or two to better 
   - Functional Tools
   - Pipes
 
+### Memoization
+  - memoize
+
 ### Miscellaneous
-  - def
-  - undef
+  - def / isDef / isDefined
+  - undef / notDef / isUndefined
   - isNull
   - notNull
   - empty
@@ -22,6 +27,32 @@ Some of these merely wrap common tasks with a declarative word or two to better 
   - boolVal
   - floatVal
   - intVal
+  - clamp
+  - envToType
+  - isBigInt
+  - isBoolean
+  - isBoolString
+  - isIntegerNumber
+  - isNumber
+  - isNumeric
+  - isPrimitive
+  - isReference
+  - isString
+  - isSymbol
+  - isValidJSON
+  - isValidNumber
+  - sameType
+  - stringToBool
+  - typeCast
+
+*types:*
+  - InvalidParameterError
+  - NotUndefined
+  - Nullable<T>
+  - OneOrMany<T>
+  - Optional<T>
+  - RequireAtLeastOne<T, Keys extends keyof T = keyof T>
+  - RequireOnlyOne<T, Keys extends keyof T = keyof T>
 
 ### Arrays
 
@@ -40,6 +71,10 @@ Some of these merely wrap common tasks with a declarative word or two to better 
   - hasAll
   - hasAny
   - hasNone
+  - hasAllDefined
+  - hasNoneDefined
+  - hasOneDefined
+  - hasSomeDefined
   - includes
   - last
   - length
@@ -75,8 +110,8 @@ Some of these merely wrap common tasks with a declarative word or two to better 
   - dropLast
   - fieldSort
   - flatten - Takes multidimensional arrays and flattens them out into fewer dimensions. By default will flatten to one dimension completely.
+  - flattenOnce - Takes multidimensional arrays and flattens them out by one dimension only.
   - group
-  - hash - Creates a new Hash by taking the same key from each array element and using it as the hash key.
   - head
   - insertAt
   - intersect
@@ -92,7 +127,7 @@ Some of these merely wrap common tasks with a declarative word or two to better 
   - replaceAt
   - reverse
   - sort
-  - table / hash / hashTable / associative
+  - table / hash / hashTable / associative - Creates a new Hash by taking the same key from each array element and using it as the hash key.
   - tail
 
 *Filtering methods:*
@@ -101,11 +136,12 @@ Some of these merely wrap common tasks with a declarative word or two to better 
   - findLast - get the last element from an array that matches a condition
   - last - get the last element from an array
   - partition
-  - where
-  - whereNot
+  - where / filter
+  - whereNot / reject
 
 *Aggregation functions:*
   - count
+  - countDefined
   - countWhere
   - sum
   - sumWhere
@@ -121,6 +157,9 @@ Some of these merely wrap common tasks with a declarative word or two to better 
   - EqualityFn<T>
   - FilterFn<T>
   - ReduceFn<T>
+
+### Dates
+  - utcYmdToDate
 
 ### Objects
   - addProp / addField
@@ -167,6 +206,7 @@ Some of these merely wrap common tasks with a declarative word or two to better 
   - Constructor<T>
   - Hash
   - HashOf<T>
+  - PartialOn<T, [...keys]>
 
 ### Functional Tools
   - argsAsArray
@@ -197,6 +237,24 @@ Some of these merely wrap common tasks with a declarative word or two to better 
 *types:*
   - IMappableObject - ???? keep ????
 
+### Logical
+*operators:*
+  - and
+  - not
+  - nand
+  - or
+  - nor
+  - xor
+*strict operators:*
+  - strictNot
+  - strictAnd
+  - strictNand
+  - strictOr
+  - strictNor
+  - scrictXor
+*utilities:*
+  - boolOrThrow
+
 ### Pipes
   - pipe
   - asyncPipe
@@ -205,3 +263,8 @@ Some of these merely wrap common tasks with a declarative word or two to better 
   - IPipe
   - IPipeCaller<T>
   - IPipeAsync<T>
+
+### Strings
+  - padLeft / padStart
+  - padRight / padEnd
+  - iEqual - case insensitive equality.
