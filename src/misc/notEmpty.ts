@@ -3,4 +3,4 @@ import { empty } from './empty';
 /**
  * Opposite of `empty()`.
  */
-export const notEmpty = (x: any): boolean => !empty(x);
+export const notEmpty = (x: unknown): boolean => !empty(x);

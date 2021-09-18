@@ -1,2 +1,2 @@
 /** Returns true if `x` is a `symbol`. */
-export const isSymbol = (x: any): x is Symbol => (typeof x === 'symbol');
+export const isSymbol = (x: unknown): x is Symbol => (typeof x === 'symbol');

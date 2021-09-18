@@ -7,5 +7,5 @@ import { isDefinedObject } from '../objects/isDefinedObject';
  * return the result of built in .toString().
  */
 export const strVal = (
-  x: any,
+  x: unknown,
 ): string => ((isDefinedObject(x) || isArray(x)) ? JSON.stringify(x) : `${x || ''}`);

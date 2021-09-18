@@ -11,6 +11,6 @@ import { isSymbol } from './isSymbol';
  *
  * NOTE: `undefined` is a primitive value and will cause this function to return `true`
  */
-export const isPrimitive = (x: any): x is string | number | bigint | boolean | null | symbol | undefined => (
+export const isPrimitive = (x: unknown): x is string | number | bigint | boolean | null | symbol | undefined => (
   isString(x) || isNumber(x) || isBigInt(x) || isBoolean(x) || isNull(x) || isSymbol(x) || undef(x)
 );
