@@ -6,6 +6,6 @@ import { slice } from './slice';
  * @param element - The element to add to the resulting array
  * @param index - Where to place the element
  */
-export const replaceAt = <T>(array: Array<T>, index: number, element: T) => [
+export const replaceAt = <T extends unknown>(array: T[], index: number, element: T) => [
   ...slice(array, 0, index), element, ...slice(array, index + 1),
 ];

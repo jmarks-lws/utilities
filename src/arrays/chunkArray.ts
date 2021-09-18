@@ -4,7 +4,7 @@
  * @param array {Array} Array to split
  * @param sliceSize {Integer} Size of every group
  */
-export const chunkArray = <T>(array: T[], sliceSize: number): Array<T[]> => ([
+export const chunkArray = <T>(array: T[], sliceSize: number): T[][] => ([
   array.slice(0, sliceSize),
   ...(array.length <= sliceSize ? [] : chunkArray(array.slice(sliceSize), sliceSize)),
 ]);

@@ -4,6 +4,6 @@
  * @param delimiter
  */
 export const join = (
-  array: any[],
+  array: unknown[],
   delimiter: string = ',',
 ): string => array.join(delimiter);

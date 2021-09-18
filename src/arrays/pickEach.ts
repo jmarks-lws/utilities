@@ -8,7 +8,7 @@ import { pick } from '../objects/pick';
  * @param fields - A list of property names to keep from each object in `array`. If the array does not contain any of
  *                 the expected elements, they will not exist in the resulting output array
  */
-export const pickEach = <T>(
+export const pickEach = <T extends Hash>(
   array: Array<T>,
   fields: string[],
-) => map(array, (e: Hash) => pick(e, fields));
+) => map(array, (e: T) => pick(e, fields));

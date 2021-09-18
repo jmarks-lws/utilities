@@ -18,7 +18,7 @@ import { sameType } from '../misc/sameType';
  * @param b
  * @param arrayMergeMethod
  */
-export const deepMergeArrays = <T>(
+export const deepMergeArrays = <T extends unknown>(
   a: T[],
   b: T[],
   arrayMergeMethod: ArrayMergeMethod = 'concatOnly',
@@ -38,9 +38,9 @@ export const deepMergeArrays = <T>(
           return replaceAt(acc, index, curr);
         }
         if (isArray(curr) && isArray(aValue)) {
-          return replaceAt(acc, index, deepMergeArrays(aValue, curr, arrayMergeMethod) as any);
+          return replaceAt(acc, index, deepMergeArrays(aValue, curr, arrayMergeMethod) as T);
         }
-        return replaceAt(acc, index, deepMerge(aValue, curr, arrayMergeMethod) as any);
+        return replaceAt(acc, index, deepMerge(aValue as Partial<T>, curr as Partial<T>, arrayMergeMethod) as T);
       }, arrayCopy(a) || []);
     case 'value':
       return distinct(concat(a, b));

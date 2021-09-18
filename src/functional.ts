@@ -27,6 +27,14 @@ export const isFunction = (x: any): x is Function => (typeof x === 'function');
 // }
 // export const maybe = <T>(a: T): T | null => either(a, null);
 
+type CurryFirst<T> = T extends (x: infer U, ...rest: any[]) => any ? U : never;
+type CurryRest<T> =
+    T extends (x: infer U) => infer V ? U :
+    T extends (x: infer U, ...rest: infer V) => infer W ? Curried<(...args: V) => W> :
+    never;
+
+type Curried<T extends (...args: any[]) => any> = (x: CurryFirst<T>) => CurryRest<T>;
+
 /**
  * Returns a curried version of the provided function.
  * (Note: This will probably mess with your IDE's ability to provide intellisense)
@@ -36,15 +44,15 @@ export const isFunction = (x: any): x is Function => (typeof x === 'function');
  * Signature: curry :: ((a, b, ...) => c) => a => b => ... => c
  * @param fn - Function to curry
  */
-export const curry = (fn: Function) => {
+export const curry = <T extends (...args: any[]) => any>(fn: T): (...args: any[]) => Curried<T> => {
   const arity = fn.length;
 
-  return function $curry(...args: any[]): any {
+  return function $curry(...args: any[]): Curried<T> {
     if (args.length < arity) {
-      return $curry.bind(null, ...args);
+      return $curry.bind(null, ...args) as CurryRest<T>;
     }
 
-    return fn.call(null, ...args);
+    return fn.call(null, ...args) as ReturnType<T>;
   };
 };
 

@@ -12,6 +12,6 @@ export const deepCloneArray = <T>(array: T[]): T[] => array.map(
   (x) => (
     isPrimitive(x) // eslint-disable-line no-nested-ternary
       ? x
-      : (Array.isArray(x) ? deepCloneArray(x) : deepClone(x)) as any
+      : (Array.isArray(x) ? deepCloneArray(x) : deepClone(x)) as T
   ),
 );
