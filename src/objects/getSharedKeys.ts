@@ -6,6 +6,6 @@ import { intersect } from '../arrays/intersect';
  * @param a
  * @param b
  */
-export const getSharedKeys = <T>(a: T, b: T): Array<keyof Partial<T>> => (
-  intersect(keys(a), keys(b)) as Array<string> as Array<keyof Partial<T>>
+export const getSharedKeys = <T, U>(a: T, b: U): Array<keyof Partial<T> | keyof Partial<U>> => (
+  intersect<keyof T | keyof U>(keys(a), keys(b)) as Array<string> as Array<keyof Partial<T> | keyof Partial<U>>
 );

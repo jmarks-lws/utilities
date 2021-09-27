@@ -1,14 +1,14 @@
 import { merge } from './merge';
-import { Hash } from './types/Hash';
+import { HashOf } from './types/HashOf';
 
 /**
  * Creates an object having keys from `keysArray` matching values from `valuesArray`. Assumes both arrays are the length of `keysArray`.
  * @param keysArray
  * @param valuesArray
  */
-export const arraysToObject = (
+export const arraysToObject = <T>(
   keysArray: string[],
-  valuesArray: any[],
-): Hash => keysArray.reduce(
-  (acc: Hash, key: string, index: number) => merge(acc, { [key]: valuesArray[index] }), {} as Hash,
-);
+  valuesArray: T[],
+): HashOf<T> => keysArray.reduce(
+    (acc: HashOf<T>, key: string, index: number) => merge(acc, { [key]: valuesArray[index] }), {} as HashOf<T>,
+  );

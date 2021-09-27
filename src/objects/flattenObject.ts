@@ -10,7 +10,7 @@ import { Hash } from './types/Hash';
  * You will also lose the original keys corresponding to the nested objects.
  * @param object - The object to flatten
  */
-export const flattenObject = (object: Hash): Hash => keys(object).reduce((acc, key) => {
+export const flattenObject = <T extends Hash>(object: T): Hash => keys(object).reduce((acc, key) => {
   // TODO: Test this
   const value = object[key];
   return merge(acc, isDefinedObject(value) ? flattenObject(value) : { [key]: value });

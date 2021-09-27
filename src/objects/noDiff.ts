@@ -6,4 +6,4 @@ import { Hash } from './types/Hash';
  * @param a
  * @param b
  */
-export const noDiff = (a: Hash, b: Hash) => !hasDiff(a, b);
+export const noDiff = <T1 extends Hash, T2 extends Hash>(a: T1, b: T2): boolean => !hasDiff(a, b);

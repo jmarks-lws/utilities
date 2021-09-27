@@ -10,7 +10,7 @@ import { merge } from './merge';
  * @param a
  * @param b
  */
-export const mergeIntersection = (a: Hash, b: Hash): Hash => {
-  const [a2, b2] = [a, b].map((o: Hash) => pick(o, getSharedKeys(a, b) as string[]));
+export const mergeIntersection = <T extends Hash, U extends Partial<T>>(a: T, b: U): Partial<T> => {
+  const [a2, b2] = [a, b].map((o) => pick(o, getSharedKeys(a, b) as string[]));
   return merge(a2, b2);
 };

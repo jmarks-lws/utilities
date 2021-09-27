@@ -7,7 +7,11 @@ import { Hash } from './types/Hash';
  * @param obj
  * @param field
  */
-export const pluck = <T extends any>(
-  obj: Hash,
-  field: string,
-): Nullable<T> => (hasKey(obj, field) ? obj[field] : null);
+export const pluck = <
+  TInput extends Hash,
+  TField extends keyof TInput,
+  TReturn = TInput[TField],
+>(
+    obj: TInput,
+    field: TField,
+  ): TReturn => obj[field];

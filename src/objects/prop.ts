@@ -1,5 +1,6 @@
 import { hasKey } from './hasKey';
 import { Hash } from './types/Hash';
+import { Nullable } from '../misc/types/Nullable';
 
 /**
  * Gets a value from an object property with an optional default value.
@@ -7,4 +8,10 @@ import { Hash } from './types/Hash';
  * @param key
  * @param defaultValue
  */
-export const prop = (o: Hash, key: string, defaultValue: any = null): any => (hasKey(o, key) ? o[key] : defaultValue);
+export const prop = <
+  TInput extends Hash,
+  TField extends keyof TInput,
+  TReturn = TInput[TField],
+>(o: TInput, key: TField, defaultValue: Nullable<TReturn> = null): Nullable<TReturn> => (
+    hasKey(o, key) ? o[key] : defaultValue
+  );
