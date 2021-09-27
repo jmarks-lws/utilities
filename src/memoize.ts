@@ -6,10 +6,10 @@ import { def, map } from '.';
 const memoizeWithProxy = <T extends CallableFunction>(
   f: T,
   cacheProxy: {
-    get: (name: string) => any,
-    set: (name: string, value: any) => any,
+    get: (name: string) => unknown,
+    set: (name: string, value: unknown) => unknown,
   },
-): T => ((...args: any[]) => {
+): T => ((...args: unknown[]) => {
   const argStr = JSON.stringify(args);
 
   return cacheProxy.set(

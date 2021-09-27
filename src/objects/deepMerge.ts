@@ -22,18 +22,6 @@ export const deepMerge = <T extends Hash>(
     const bValue = b[key];
     const val = bValue || aValue;
 
-    // let keyVal: any;
-    // if (undef(bValue)) {
-    //   keyVal = aValue;
-    // }
-    // if (isReference(aValue) && isReference(bValue)) {
-    //   if (isArray(aValue) && isArray(bValue)) {
-    //     keyVal = deepMergeArrays(aValue, bValue, arrayMergeMethod);
-    //   } else if (isDefinedObject(aValue) && isDefinedObject(bValue)) {
-    //     keyVal = deepMerge(aValue, bValue, arrayMergeMethod);
-    //   }
-    // }
-
     return {
       ...acc,
       [key]: isPrimitive(val) // eslint-disable-line no-nested-ternary

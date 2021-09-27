@@ -15,7 +15,7 @@ export const reduceObject = <TInput, TReturn>(
   callbackfn: (
     previousValue: TReturn,
     currentKey: string,
-    currentValue: any,
+    currentValue: TInput,
     currentIndex: number,
     object: Hash,
   ) => TReturn,

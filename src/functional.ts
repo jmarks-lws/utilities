@@ -8,7 +8,7 @@ import { reduce } from './arrays/reduce';
  * a "functor", but want to verify.
  */
 export interface IMappableObject {
-  map: (fn: (value: any, index: number, array: any[]) => any, thisArg?: any) => any[]
+  map: <T extends unknown, U extends unknown>(fn: (value: T, index: number, array: T[]) => U, thisArg?: unknown) => U[]
 }
 
 /**
@@ -17,7 +17,7 @@ export interface IMappableObject {
  * @param x
  * @param key
  */
-export const isFunction = (x: any): x is Function => (typeof x === 'function');
+export const isFunction = (x: unknown): x is Function => (typeof x === 'function');
 
 // TODO: evaluate `either()`, `maybe()` etc
 // export function either<T1 extends undefined, T2>(a: T1, b: T2): T2;
@@ -27,7 +27,7 @@ export const isFunction = (x: any): x is Function => (typeof x === 'function');
 // }
 // export const maybe = <T>(a: T): T | null => either(a, null);
 
-type CurryFirst<T> = T extends (x: infer U, ...rest: any[]) => any ? U : never;
+type CurryFirst<T> = T extends (x: infer U, ...rest: unknown[]) => any ? U : never;
 type CurryRest<T> =
     T extends (x: infer U) => infer V ? U :
     T extends (x: infer U, ...rest: infer V) => infer W ? Curried<(...args: V) => W> :

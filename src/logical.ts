@@ -39,12 +39,12 @@ export const xor = (a: boolean, b: boolean) => or(a, b) && or(not(a), not(b)); /
 
 /**
  * Utility function internal to module.
- * @param {any} x
+ * @param {unknown} x
  */
-const boolOrThrow = (x: any) => {
+const boolOrThrow = (x: unknown) => {
   if (!isBoolean(x)) throw new Error('Invalid operand. Must be boolean.');
   return x;
-}
+};
 
 /**
  * Strict logical NOT operation If all operands are not boolean type an error will be thrown.
