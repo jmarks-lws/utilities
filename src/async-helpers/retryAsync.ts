@@ -13,7 +13,6 @@ const retryAsyncDefaultOptions = {
   timeout: 60000,
   attempts: 5,
   delayFirstAttempt: false,
-  echo: 'Retrying connection',
 } as IRetryAsyncOptions;
 
 /**

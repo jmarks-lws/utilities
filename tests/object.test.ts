@@ -146,8 +146,8 @@ describe('Object utilities tests', () => {
 
   test('prop', async () => {
     const p = prop({ a: 1, p: 23 }, 'p');
-    const ba = prop({ a: 1, p: 23, c: 34 }, 'b');
-    const bb = prop({ a: 1, p: 23, c: 34 }, 'b', 'test');
+    const ba = prop({ a: 1, p: 23, c: 34 } as Hash, 'b');
+    const bb = prop({ a: 1, p: 23, c: 34 } as Hash, 'b', 'test');
     expect(p).toBe(23);
     expect(ba).toBe(null);
     expect(bb).toBe('test');
@@ -457,7 +457,7 @@ describe('Object utilities tests', () => {
 
   test('pluck', async () => {
     expect(pluck({ a: 2, b: 3 }, 'a')).toBe(2);
-    expect(pluck({ a: 2, b: 3 }, 'c')).toBeNull();
+    expect(pluck({ a: 2, b: 3 } as Hash, 'c')).toBeNull();
   });
 
   test('invert', async () => {

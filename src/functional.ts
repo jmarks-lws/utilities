@@ -27,7 +27,7 @@ export const isFunction = (x: unknown): x is Function => (typeof x === 'function
 // }
 // export const maybe = <T>(a: T): T | null => either(a, null);
 
-type CurryFirst<T> = T extends (x: infer U, ...rest: unknown[]) => any ? U : never;
+type CurryFirst<T> = T extends (x: infer U, ...rest: any[]) => any ? U : never;
 type CurryRest<T> =
     T extends (x: infer U) => infer V ? U :
     T extends (x: infer U, ...rest: infer V) => infer W ? Curried<(...args: V) => W> :

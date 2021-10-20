@@ -16,8 +16,8 @@ import { HashOf } from './types/HashOf';
 export const remapKeys = <
   TVal extends unknown,
   TIn extends HashOf<TVal>,
-  TMap extends { [key in keyof TIn]: string },
-  TReturn extends { [key in keyof TMap]: TVal }
+  TMap extends { [key in keyof Partial<TIn>]: string },
+  TReturn extends { [key in keyof Partial<TIn>]: TVal }
 >(
     obj: TIn,
     remap: TMap,
@@ -27,7 +27,7 @@ export const remapKeys = <
       keys(obj) as string[],
       (acc: Partial<TReturn>, k: keyof TIn) => merge(
         { ...acc },
-        ((hasKey(remap, k) || returnAll) ? { [(hasKey(remap, k) ? remap[k] : k)]: obj[k] } : {}),
+        ((hasKey(remap, k) || returnAll) ? { [(hasKey(remap, k) ? remap[k] : k)]: obj[k] } : {}) as Partial<TReturn>,
       ), {} as Partial<TReturn>,
     ) as TReturn
   );

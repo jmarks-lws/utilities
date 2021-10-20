@@ -4,7 +4,7 @@ import { Hash } from './types/Hash';
 export const alterProp = <TIn extends Hash, TOut extends any>(
   obj: TIn,
   fieldName: keyof TIn,
-  alteration: (val: unknown) => TOut,
+  alteration: (val: TIn[keyof TIn]) => TOut,
 ) => ({
     ...obj,
     [fieldName]: alteration(obj[fieldName]),

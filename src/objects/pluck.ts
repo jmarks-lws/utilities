@@ -14,4 +14,4 @@ export const pluck = <
 >(
     obj: TInput,
     field: TField,
-  ): TReturn => obj[field];
+  ): Nullable<TReturn> => obj[field] ?? null;
