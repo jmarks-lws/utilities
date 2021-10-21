@@ -7,8 +7,7 @@ import { slice } from './slice';
  * @param arr
  * @param d
  */
-export const flatten = <T extends unknown>(arr: T[], d = 1): T[] => (
-  d > 0
-    ? reduce(arr, (acc, val) => acc.concat(isArray(val) ? flatten(val, d - 1) : val), [] as T[])
-    : slice(arr)
+export const flatten = (arr: any[], d = 1): any[] => (d > 0
+  ? reduce(arr, (acc, val) => acc.concat(isArray(val) ? flatten(val, d - 1) : val), [])
+  : slice(arr)
 );
