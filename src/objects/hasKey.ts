@@ -6,4 +6,4 @@ import { keys } from './keys';
  * @param o
  * @param k
  */
-export const hasKey = <T extends Hash, K extends keyof T>(o: T, k: K): boolean => keys(o).includes(k);
+export const hasKey = <T extends Hash, K extends keyof T>(o: T, k: K | string): boolean => keys(o).includes(k);
