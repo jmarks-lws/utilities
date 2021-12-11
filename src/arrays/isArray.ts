@@ -1,3 +1,3 @@
 
 /** Wrapper for native `Array.isArray()` */
-export const isArray = (x: unknown): x is any[] => Array.isArray(x);
+export const isArray = <T>(x: T | T[]): x is T[] => Array.isArray(x);
