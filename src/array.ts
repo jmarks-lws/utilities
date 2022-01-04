@@ -51,6 +51,7 @@ export { last } from './arrays/last';
 export { map } from './arrays/map';
 export { max } from './arrays/max';
 export { min } from './arrays/min';
+export { multiPartition } from './arrays/multiPartition';
 export { notIntersect } from './arrays/notIntersect';
 export { omit } from './arrays/omit';
 export { partition } from './arrays/partition';
