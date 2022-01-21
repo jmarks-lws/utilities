@@ -57,6 +57,7 @@ describe('Miscellaneous functions', () => {
     expect(floatVal('123')).toBe(123);
     expect(floatVal(123)).toBe(123);
     expect(floatVal('aaa')).toBeNaN();
+    expect(floatVal(undefined)).toBeNaN();
   });
   test('strVal', async () => {
     expect(strVal([1, 2, 3])).toBe(JSON.stringify([1, 2, 3]));

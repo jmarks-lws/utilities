@@ -36,6 +36,7 @@ import {
   alterProp,
   flattenObject,
   reduceObject,
+  immutable,
 } from '../src/object';
 import { tail } from '../src/array';
 
@@ -537,5 +538,14 @@ describe('Object utilities tests', () => {
       a: [ 1, 2, 3, 4 ],
       b: srcObj,
     });
+  });
+
+  test('immutable', async () => {
+    const a = { a: 1, b: 2 };
+    const b = immutable(a);
+    expect.assertions(3);
+    expect(b).not.toBe(a);
+    expect(b).toMatchObject(a);
+    expect(() => { (b as any).a = 3; }).toThrow();
   });
 });

@@ -42,6 +42,7 @@ export { group } from './arrays/group';
 export { hasAll } from './arrays/hasAll';
 export { hasAny } from './arrays/hasAny';
 export { hasNone } from './arrays/hasNone';
+export { immutableArray } from './arrays/immutableArray';
 export { includes } from './arrays/includes';
 export { insertAt } from './arrays/insertAt';
 export { intersect } from './arrays/intersect';

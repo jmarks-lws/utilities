@@ -12,7 +12,7 @@ import { flattenOnce } from './flattenOnce';
  */
 export const multiPartition = <T>(items: T[], filterFns: FilterFn<T>[]): T[][] => {
   const filteredResults = filterFns.reduce((acc, filterFn) => [
-    ...acc ?? [],
+    ...acc,
     items.filter((item, i) => filterFn(item, i, items)),
   ], [] as T[][]);
 

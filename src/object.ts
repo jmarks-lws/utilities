@@ -21,6 +21,7 @@ export { getSharedKeys } from './objects/getSharedKeys';
 export { hasDiff } from './objects/hasDiff';
 export { hasKey } from './objects/hasKey';
 export { identical } from './objects/identical';
+export { immutable } from './objects/immutable';
 export { invert } from './objects/invert';
 export { isDefinedObject } from './objects/isDefinedObject';
 export { iterate } from './objects/iterate';

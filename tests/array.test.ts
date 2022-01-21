@@ -66,8 +66,9 @@ import {
   fieldSort,
   chunkArray,
   flattenOnce,
+  immutableArray,
+  multiPartition,
 } from '../src/array';
-import { strVal } from '../src/misc/strVal';
 
 describe('Array utilities tests', () => {
   const testPeopleList1 = [
@@ -103,6 +104,14 @@ describe('Array utilities tests', () => {
       expect.assertions(2);
       expect(copy).not.toBe(original);
       expect(copy).toBeNull();
+    });
+    test('immutableArray', async () => {
+      const a = [1, 2, 3, 4];
+      const b = immutableArray(a);
+      expect.assertions(3);
+      expect(b).not.toBe(a);
+      expect(b).toMatchObject(a);
+      expect(() => { (b as any).push(5); }).toThrow();
     });
     test('count', async () => {
       expect.assertions(5);
@@ -439,6 +448,31 @@ describe('Array utilities tests', () => {
           },
           {
             id: 128, name: 'Roxanne', age: 18, favColor: '#0000FF',
+          },
+        ],
+      ];
+      expect(partitioned).toMatchObject(expectedOutput);
+    });
+    test('multiPartition', async () => {
+      const partitioned = multiPartition(testPeopleList1, [
+        (el) => el.age > 40,
+        (el) => el.age < 25,
+      ]);
+      const expectedOutput = [
+        [
+          {
+            id: 125, name: 'Tiffany', age: 53, favColor: '#FFFF00',
+          },
+        ], [
+          {
+            id: 128, name: 'Roxanne', age: 18, favColor: '#0000FF',
+          },
+        ], [
+          {
+            id: 123, name: 'Forest', age: 40, favColor: '#FF0000',
+          },
+          {
+            id: 124, name: 'Lump', age: 25, favColor: '#FF00FF',
           },
         ],
       ];
