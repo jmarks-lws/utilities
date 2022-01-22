@@ -1,7 +1,14 @@
 import { where } from './where';
 import { FilterFn } from './types/FilterFn';
 
-export const reject = <T>(
+/**
+ * Returns a new array of objects containing elements filtered from an original array of objects
+ * where the filter function returns `false`.
+ *
+ * @param array - The source array
+ * @param filterFn - Function used to filter the source list.
+ */
+export const whereNot = <T>(
   array: Array<T>,
   whereFn: FilterFn<T>,
 ) => where(array, (x, i, m) => !whereFn(x, i, m));
@@ -9,4 +16,4 @@ export const reject = <T>(
 /**
  * Alias for `whereNot()`
  */
-export const whereNot = reject;
+export const reject = whereNot;
