@@ -68,6 +68,7 @@ import {
   flattenOnce,
   immutableArray,
   multiPartition,
+  moveElement,
 } from '../src/array';
 
 describe('Array utilities tests', () => {
@@ -338,6 +339,20 @@ describe('Array utilities tests', () => {
     test('removeAt', async () => {
       const result = removeAt([1, 2, 3, 4], 1);
       expect(result).toMatchObject([1, 3, 4]);
+    });
+    test('move', async () => {
+      const result1 = moveElement([1, 2, 3, 4, 5], 2, 4);
+      expect(result1).toMatchObject([1, 2, 4, 5, 3]);
+      const result2 = moveElement([1, 2, 3, 4, 5], 0, 4);
+      expect(result2).toMatchObject([2, 3, 4, 5, 1]);
+      const result3 = moveElement([1, 2, 3, 4, 5], 1, 3);
+      expect(result3).toMatchObject([1, 3, 4, 2, 5]);
+      const result4 = moveElement([1, 2, 3, 4, 5], 3, 1);
+      expect(result4).toMatchObject([1, 4, 2, 3, 5]);
+      const result5 = moveElement([1, 2, 3, 4, 5], 3, 0);
+      expect(result5).toMatchObject([4, 1, 2, 3, 5]);
+      const result6 = moveElement([1, 2, 3, 4, 5], 4, 0);
+      expect(result6).toMatchObject([5, 1, 2, 3, 4]);
     });
     test('replaceAt', async () => {
       const result = replaceAt([1, 2, 3, 4], 1, 1);

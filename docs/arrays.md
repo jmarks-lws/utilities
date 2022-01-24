@@ -712,6 +712,23 @@ min(array)
 | ----- | --------------- | -------- | ----------------------------- |
 | array | [object Object] | yes      | Array to compare values from. |
 
+## moveElement
+
+> Returns a new array that is the result of removing the element at position `fromIndex` from `array`and placing it back into the copied array at position `toIndex`.
+```js
+moveElement(array, fromIndex, toIndex)
+```
+
+
+
+### Parameters
+
+| Name      | Type | Required | Description                                      |
+| --------- | ---- | -------- | ------------------------------------------------ |
+| array     |      | yes      | The source array                                 |
+| fromIndex |      | yes      | The index of the element to remove               |
+| toIndex   |      | yes      | The index at which to insert the removed element |
+
 ## multiPartition
 
 > Returns a multiple element array. Each array other than the last is the result of applying the filterFns, in order.The last returned array is any items that were not included in the other arrays.
