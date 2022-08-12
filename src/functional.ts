@@ -166,7 +166,7 @@ export const branch = <T>(
 export const tryCatch = <T>(
   tryPath: ((x: T) => any),
   catchPath: ((x: T, error?: any) => any),
-  finallyPath: ((x: T, results: ({ tryResult: any, catchResult: any; })) => any),
+  finallyPath: ((x: T, results: ({ tryResult: any, catchResult: any, })) => any),
 ) => (x: T) => {
   let tryResult: any = null;
   let catchResult: any = null;
