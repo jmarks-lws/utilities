@@ -2,7 +2,7 @@ import {
   isNull, notNull, empty, notEmpty, boolVal, floatVal, strVal, isValidNumber,
   isIntegerNumber, isNumeric, isString, isBigInt, isSymbol, isBoolean,
   isPrimitive, isReference, envToType, intVal, sameType, isValidJSON,
-  typeCast, clamp,
+  typeCast, clamp, stringToNumber,
 } from '../src/miscellaneous';
 
 describe('Miscellaneous functions', () => {
@@ -58,6 +58,28 @@ describe('Miscellaneous functions', () => {
     expect(floatVal(123)).toBe(123);
     expect(floatVal('aaa')).toBeNaN();
     expect(floatVal(undefined)).toBeNaN();
+  });
+  test('stringToNumber', async () => {
+    expect(stringToNumber('123')).toBe(123);
+    expect(stringToNumber('0')).toBe(0);
+    expect(stringToNumber('0.0')).toBe(0);
+    expect(stringToNumber('.123')).toBe(0.123);
+    expect(stringToNumber('123.')).toBe(123);
+    expect(stringToNumber('12.3')).toBe(12.3);
+    expect(stringToNumber('00001')).toBe(1);
+    expect(stringToNumber('000.1')).toBe(0.1);
+    expect(stringToNumber('123 ')).toBeNaN();
+    expect(stringToNumber(' 123')).toBeNaN();
+    expect(stringToNumber('12 3')).toBeNaN();
+    expect(stringToNumber('10e3')).toBeNaN();
+    expect(stringToNumber('a123')).toBeNaN();
+    expect(stringToNumber('123z')).toBeNaN();
+    expect(stringToNumber('1.23.')).toBeNaN();
+    expect(stringToNumber('..123')).toBeNaN();
+    expect(stringToNumber('123..')).toBeNaN();
+    expect(stringToNumber('$123')).toBeNaN();
+    expect(stringToNumber('0x101')).toBeNaN();
+    expect(stringToNumber('0b101')).toBeNaN();
   });
   test('strVal', async () => {
     expect(strVal([1, 2, 3])).toBe(JSON.stringify([1, 2, 3]));

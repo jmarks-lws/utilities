@@ -14,6 +14,7 @@
   "scripts": {
     "build": "rm -rf dist && tsc",
     "test": "jest",
+    "test-watch": "jest --watch",
     "coverage": "jest --coverage",
     "build:doc": "npm run build & ts-node src/dev/jsdoc.ts",
     "buildAndPublish": "rm -rf dist && npm run build:doc && npm version patch && git push && npm publish"
