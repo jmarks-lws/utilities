@@ -12,7 +12,7 @@ export const diff = (a: Hash, b: Hash) => {
   const aKeys = keys(a);
   const bKeys = keys(b);
   aKeys.forEach((key) => {
-    if (!bKeys.includes(key)) {
+    if (b[key] === undefined) {
       dif[key] = '-';
     } else if (typeof a[key] === 'object' && a[key] !== null) {
       const comparison = diff(a[key], b[key]);
@@ -24,7 +24,7 @@ export const diff = (a: Hash, b: Hash) => {
     }
   });
   bKeys.forEach((key) => {
-    if (!aKeys.includes(key)) {
+    if (a[key] === undefined) {
       dif[key] = '+';
     }
   });
