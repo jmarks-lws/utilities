@@ -30,6 +30,7 @@ export { notEmpty } from './misc/notEmpty';
 export { notNull } from './misc/notNull';
 export { sameType } from './misc/sameType';
 export { stringToBool } from './misc/stringToBool';
+export { stringToNumber } from './misc/stringToNumber';
 export { strVal } from './misc/strVal';
 export { undef, notDef, isUndefined } from './misc/undef';
 export { typeCast } from './misc/typeCast';
