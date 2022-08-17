@@ -63,8 +63,8 @@ export const curry = <T extends (...args: any[]) => any>(fn: T): (...args: any[]
  */
 export const mapAsync = async <T, U>(
   list: T[],
-  fn: ((value: T, index: number, array: T[]) => Promise<U>),
-) => Promise.all(list.map(async (id, ix, ar) => fn(id, ix, ar)));
+  fn: (value: T, index: number, array: T[]) => Promise<U>,
+): Promise<U[]> => Promise.all(list.map(fn));
 
 /**
  * Provides reduce()-like wrapper functionality for times when the reducer would use `await`. By nature,
@@ -114,7 +114,7 @@ export const take = <T>(key: string, defaultValue?: T) => ({
  * we always return a function value to reduce complexity otherwise introduced with null checking, etc.
  * @param id
  */
-export const identity = <T>(id: T) : T => id;
+export const identity = <T>(id: T): T => id;
 
 /**
  * Partially apply a function by filling in any number of its arguments.
