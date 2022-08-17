@@ -8,7 +8,7 @@ import { reduce } from './arrays/reduce';
  * a "functor", but want to verify.
  */
 export interface IMappableObject {
-  map: <T extends unknown, U extends unknown>(fn: (value: T, index: number, array: T[]) => U, thisArg?: unknown) => U[];
+  map: <T extends unknown, U extends unknown>(fn: (value: T, index: number, array: T[]) => U, thisArg?: unknown) => U[]
 }
 
 /**
@@ -29,9 +29,9 @@ export const isFunction = (x: unknown): x is Function => (typeof x === 'function
 
 type CurryFirst<T> = T extends (x: infer U, ...rest: any[]) => any ? U : never;
 type CurryRest<T> =
-  T extends (x: infer U) => infer V ? U :
-  T extends (x: infer U, ...rest: infer V) => infer W ? Curried<(...args: V) => W> :
-  never;
+    T extends (x: infer U) => infer V ? U :
+    T extends (x: infer U, ...rest: infer V) => infer W ? Curried<(...args: V) => W> :
+    never;
 
 type Curried<T extends (...args: any[]) => any> = (x: CurryFirst<T>) => CurryRest<T>;
 
@@ -97,7 +97,7 @@ export const reduceAsyncSequential = async<TElement, TResult>(
 export const mapAsyncSequential = async <T, U>(
   list: T[],
   fn: ((value: T, index: number, array: T[]) => Promise<U>),
-) => reduceAsyncSequential(list, async (prev, curr, i, l) => [...prev, await fn(curr, i, l)], [] as U[]);
+) => reduceAsyncSequential(list, async (prev, curr, i, l) => [ ...prev, await fn(curr, i, l) ], [] as U[]);
 
 /**
  * (Don't use this - deprecation incoming quickly) Provides an English-esque interface for getting a key from an object with a default value.
@@ -154,8 +154,8 @@ export const branch = <T>(
   falsePath?: ((x: T) => any),
 ) => (x: T) => (
   // eslint-disable-next-line no-nested-ternary
-  condition ? truePath(x) : (falsePath ? falsePath(x) : identity(x))
-);
+    condition ? truePath(x) : (falsePath ? falsePath(x) : identity(x))
+  );
 
 /**
  * Functional style try catch expression
@@ -166,18 +166,18 @@ export const branch = <T>(
 export const tryCatch = <T>(
   tryPath: ((x: T) => any),
   catchPath: ((x: T, error?: any) => any),
-  finallyPath: ((x: T, results: ({ tryResult: any, catchResult: any, })) => any),
+  finallyPath: ((x: T, results: ({ tryResult: any, catchResult: any })) => any),
 ) => (x: T) => {
-  let tryResult: any = null;
-  let catchResult: any = null;
-  try {
-    tryResult = tryPath(x);
-  } catch (error) {
-    catchResult = catchPath(x, error);
-  } finally {
-    finallyPath(x, { tryResult, catchResult });
-  }
-};
+    let tryResult: any = null;
+    let catchResult: any = null;
+    try {
+      tryResult = tryPath(x);
+    } catch (error) {
+      catchResult = catchPath(x, error);
+    } finally {
+      finallyPath(x, { tryResult, catchResult });
+    }
+  };
 
 /**
  * Wrap a function so that it will only run at most `times` times when called from the resulting wrapper.
