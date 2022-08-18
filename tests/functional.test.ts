@@ -220,20 +220,20 @@ describe('functional methods', () => {
   test('tryCatch', async () => {
     const a = 0;
     let b = 1;
-    tryCatch(
+    const c = await tryCatch(
+      1,
       (x: any) => {
         throw new Error('artificial error');
       },
       (x: any, error: any) => {
         b += x;
-        return error;
+        return 'Caught';
       },
-      (x: any, results) => {
-        // console.log('Finally was called.');
-      },
-    )(1);
+      (x: any, results) => results.catchResult,
+    );
     expect(a).toBe(0);
     expect(b).toBe(2);
+    expect(c).toBe('Caught');
   });
 
   test('selectBranch', async () => {
@@ -260,7 +260,7 @@ describe('functional methods', () => {
     const result = await reduceAsyncSequential(items, async (acc, item) => {
       await sleepRandom();
       return [ ...acc, item ];
-    }, [] as any[]);
+    }, [] as { order: number }[]);
 
     expect(result).toMatchObject(items);
   });
