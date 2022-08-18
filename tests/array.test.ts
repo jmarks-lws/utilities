@@ -73,10 +73,10 @@ import {
 
 describe('Array utilities tests', () => {
   const testPeopleList1 = [
-    { id: 123, name: 'Forest', age: 40, favColor: '#FF0000' },
-    { id: 125, name: 'Tiffany', age: 53, favColor: '#FFFF00' },
-    { id: 124, name: 'Lump', age: 25, favColor: '#FF00FF' },
-    { id: 128, name: 'Roxanne', age: 18, favColor: '#0000FF' },
+    { id: 123, name: 'Forest', age: 40, favColor: '#FF0000', bathrooms: 1 },
+    { id: 125, name: 'Tiffany', age: 53, favColor: '#FFFF00', bathrooms: 2.5 },
+    { id: 124, name: 'Lump', age: 25, favColor: '#FF00FF', bathrooms: 1 },
+    { id: 128, name: 'Roxanne', age: 18, favColor: '#0000FF', bathrooms: 4 },
   ];
   const testPeopleListSameOnPurpose = [
     { id: 123, name: 'Forest', age: 40, favColor: '#FF0000' },
@@ -531,6 +531,7 @@ describe('Array utilities tests', () => {
     });
     test('sum', async () => {
       expect(sum(testPeopleList1, 'age')).toBe(40 + 53 + 25 + 18);
+      expect(sum(testPeopleList1, 'bathrooms')).toBe(1 + 2.5 + 1 + 4);
     });
     test('sumWhere', async () => {
       expect(sumWhere(testPeopleList1, (person) => person.age > 20, 'age')).toBe(40 + 53 + 25);
