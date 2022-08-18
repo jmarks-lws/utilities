@@ -1,6 +1,6 @@
 import { hasKey, HashOf, isDefinedObject, keys } from './object';
 import { reverse, head, tail, isArray } from './array';
-import { undef, def } from './miscellaneous';
+import { undef, def, Nullable } from './miscellaneous';
 import { reduce } from './arrays/reduce';
 
 /**
@@ -82,6 +82,8 @@ export const reduceAsyncSequential = async<TElement, TResult>(
   fn: (previousValue: TResult, currentValue: TElement, currentIndex: number, array: TElement[]) => Promise<TResult>,
   init: TResult,
 ) => list.reduce(async (acc, el, index) => fn(await acc, el, index, list), Promise.resolve(init));
+/** Alias for `reduceAsyncSequential` */
+export const reduceAsync = reduceAsyncSequential;
 
 /**
  * Provides map()-like wrapper functionality for times when the map operation would use `await`. Waits
@@ -163,21 +165,24 @@ export const branch = <T>(
  * @param catchPath A function which handles errors if they occur in `tryPath`
  * @param finallyPath A function that is run after try or finally.
  */
-export const tryCatch = <T>(
-  tryPath: ((x: T) => any),
-  catchPath: ((x: T, error?: any) => any),
-  finallyPath: ((x: T, results: ({ tryResult: any, catchResult: any })) => any),
-) => (x: T) => {
-    let tryResult: any = null;
-    let catchResult: any = null;
-    try {
-      tryResult = tryPath(x);
-    } catch (error) {
-      catchResult = catchPath(x, error);
-    } finally {
-      finallyPath(x, { tryResult, catchResult });
-    }
-  };
+export const tryCatch = async <TContext, U = unknown, V = U>(
+  context: TContext,
+  tryPath: ((x: TContext) => U | Promise<U>),
+  catchPath: ((x: TContext, error?: unknown) => U | Promise<U>),
+  finallyPath: ((x: TContext, results: ({ tryResult: Nullable<U>, catchResult: Nullable<U> })) => V | Promise<V>),
+) => {
+  let tryResult: Nullable<U> = null;
+  let catchResult: Nullable<U> = null;
+  let finallyResult: V;
+  try {
+    tryResult = await tryPath(context);
+  } catch (error) {
+    catchResult = await catchPath(context, error);
+  } finally {
+    finallyResult = await finallyPath(context, { tryResult, catchResult });
+  }
+  return finallyResult;
+};
 
 /**
  * Wrap a function so that it will only run at most `times` times when called from the resulting wrapper.
