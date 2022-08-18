@@ -1,6 +1,6 @@
 {
   "name": "@jamesgmarks/utilities",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "A series of useful functions, heavily tested and strongly typed via Typescript declarations. Inspired by functional philosophies.",
   "homepage": "https://github.com/jmarks-lws/utilities#readme",
   "repository": {
