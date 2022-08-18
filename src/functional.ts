@@ -82,6 +82,8 @@ export const reduceAsyncSequential = async<TElement, TResult>(
   fn: (previousValue: TResult, currentValue: TElement, currentIndex: number, array: TElement[]) => Promise<TResult>,
   init: TResult,
 ) => list.reduce(async (acc, el, index) => fn(await acc, el, index, list), Promise.resolve(init));
+/** Alias for `reduceAsyncSequential` */
+export const reduceAsync = reduceAsyncSequential;
 
 /**
  * Provides map()-like wrapper functionality for times when the map operation would use `await`. Waits
