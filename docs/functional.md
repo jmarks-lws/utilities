@@ -195,6 +195,15 @@ partial(fn, args)
 | fn   |      | yes      | The function to partially apply                                                        |
 | args |      | yes      | Some arguments. Does not have to be all of the arguments needed for the base function. |
 
+## reduceAsync
+
+> Alias for `reduceAsyncSequential`
+```js
+reduceAsync()
+```
+
+
+
 ## reduceAsyncSequential
 
 > Provides reduce()-like wrapper functionality for times when the reducer would use `await`. By nature,waits for each step to complete sequentially before moving on to the next, in opposition to standard

@@ -288,6 +288,22 @@ stringToBool(s)
 | ---- | ---- | -------- | ----------------------------- |
 | s    |      | yes      | String to convert to boolean. |
 
+## stringToNumber
+
+> Returns a numeric representation of an input string or `NaN` if the provided string value is not valid.The string should consist one or more digits, with zero or one decimal point (period) within the string.
+If the string does not match this pattern, this function will return `NaN`.
+```js
+stringToNumber(str)
+```
+
+
+
+### Parameters
+
+| Name | Type | Required | Description                                                             |
+| ---- | ---- | -------- | ----------------------------------------------------------------------- |
+| str  |      | yes      | String that should represent a number, with one optional decimal point. |
+
 ## strVal
 
 > Returns an appropriate string value for `x`. If `x` is an array or object, this will be a JSONrepresentation. `null` and `undefined` will be converted to an empty string. Otherwise this will
