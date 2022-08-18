@@ -11,5 +11,5 @@ import { where } from './where';
 export const sumWhere = <T>(
   array: Array<T>,
   fn: FilterFn<T>,
-  sumField: string,
+  sumField: keyof T,
 ) => sum(where(array, fn), sumField);
