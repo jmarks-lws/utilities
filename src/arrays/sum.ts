@@ -6,5 +6,8 @@ import { reduce } from './reduce';
  * @param array - The source array
  * @param field - Which field to sum. If the value of any instance of this property in any element cannot be parsed to an Integer, the result will be NaN
  */
-export const sum = <T>(array: T[], field: string) => reduce(array,
-  (prev, cur) => prev + parseInt((cur as Hash)[field], 10), 0);
+export const sum = <T>(array: T[], field: keyof T) => reduce(
+  array,
+  (prev, cur) => prev + parseFloat(`${cur[field]}`),
+  0,
+);
