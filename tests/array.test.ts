@@ -1,75 +1,77 @@
 import {
-  map,
-  preparedMap,
-  prune,
-  intersect,
-  omit,
-  insertAt,
-  removeAt,
-  pickEach,
-  where,
-  first,
-  findFirst,
-  last,
-  findLast,
-  count,
-  countWhere,
-  sum,
-  sumWhere,
-  hasAny,
-  hasNone,
-  hasAll,
-  table,
-  compactArray,
-  slice,
-  includes,
-  head,
-  tail,
+  ArrayMergeMethod,
+  append,
   arrayCopy,
-  reverse,
+  arrayWrap,
   chopFirst,
   chopLast,
-  dropFirst,
-  dropLast,
-  isArray,
-  reduceRight,
-  reduce,
-  join,
-  arrayWrap,
-  whereNot,
-  partition,
-  min,
-  max,
-  notIntersect,
-  flatten,
+  chunkArray,
+  cloneArray,
+  compactArray,
+  count,
+  countDefined,
+  countWhere,
+  deepCloneArray,
+  deepMergeArrays,
   distinct,
   distinctObjects,
-  series,
-  group,
-  findIndex,
-  countDefined,
-  hasOneDefined,
-  hasSomeDefined,
-  hasAllDefined,
-  hasNoneDefined,
-  replaceAt,
-  slicePage,
-  cloneArray,
-  deepCloneArray,
   distinctOn,
   distinctOnFields,
-  sort,
-  prepend,
-  append,
-  deepMergeArrays,
-  ArrayMergeMethod,
+  dropFirst,
+  dropLast,
   fieldSort,
-  chunkArray,
+  findFirst,
+  findIndex,
+  findLast,
+  first,
+  flatten,
   flattenOnce,
+  group,
+  hasAll,
+  hasAllDefined,
+  hasAny,
+  hasNone,
+  hasNoneDefined,
+  hasOneDefined,
+  hasSomeDefined,
+  head,
   immutableArray,
-  multiPartition,
+  includes,
+  insertAt,
+  intersect,
+  isArray,
+  join,
+  last,
+  map,
+  max,
+  min,
   moveElement,
+  multiPartition,
+  notIntersect,
+  nullishSort,
+  omit,
+  partition,
+  pickEach,
+  preparedMap,
+  prepend,
+  prune,
+  reduce,
+  reduceRight,
+  removeAt,
+  replaceAt,
+  reverse,
+  series,
+  slice,
+  slicePage,
+  sort,
+  sum,
+  sumWhere,
+  table,
+  tail,
+  where,
+  whereNot,
 } from '../src/array';
+import { mergeSortedArrays } from '../src/arrays/nullishSort';
 
 describe('Array utilities tests', () => {
   const testPeopleList1 = [
@@ -328,6 +330,49 @@ describe('Array utilities tests', () => {
     test('notIntersect', async () => {
       expect(notIntersect([1, 2, 3, 4], [4, 5, 6, 7])).toMatchObject([1, 2, 3, 5, 6, 7]);
       expect(notIntersect([1, 2, 3, 4], [1, 2, 3, 4, 5, 6, 7])).toMatchObject([5, 6, 7]);
+    });
+    describe('nullishSort', () => {
+      test('Sorts regular unsorted array', () => {
+        expect(nullishSort([5, 4, 3, 2, 1])).toEqual([1, 2, 3, 4, 5]);
+      });
+      test('Sorts array containing `null` and `undefined` values at beginning', () => {
+        expect(nullishSort([undefined, null, 5, 4, 3, 2, 1], 'omit')).toEqual([1, 2, 3, 4, 5]);
+        expect(nullishSort([undefined, null, 5, 4, 3, 2, 1], 'first')).toEqual([undefined, null, 1, 2, 3, 4, 5]);
+        expect(nullishSort([undefined, null, 5, 4, 3, 2, 1], 'last')).toEqual([1, 2, 3, 4, 5, undefined, null]);
+      });
+      test('Sorts array containing `null` and `undefined` values at end', () => {
+        expect(nullishSort([5, 4, 3, 2, 1, null, undefined], 'omit')).toEqual([1, 2, 3, 4, 5]);
+        expect(nullishSort([5, 4, 3, 2, 1, null, undefined], 'first')).toEqual([null, undefined, 1, 2, 3, 4, 5]);
+        expect(nullishSort([5, 4, 3, 2, 1, null, undefined], 'last')).toEqual([1, 2, 3, 4, 5, null, undefined]);
+      });
+      test('Sorts array containing `null` and `undefined` values randomly mixed in', () => {
+        expect(nullishSort([null, null, 4, undefined, 3], 'omit')).toEqual([3, 4]);
+        expect(nullishSort([null, null, 4, undefined, 3], 'first')).toEqual([null, null, undefined, 3, 4]);
+        expect(nullishSort([null, null, 4, undefined, 3], 'last')).toEqual([3, 4, null, null, undefined]);
+      });
+      test('Sorts array containing only `null` and `undefined` values', () => {
+        expect(nullishSort([null, null, undefined, null], 'omit')).toEqual([]);
+        expect(nullishSort([null, null, undefined, null], 'first')).toEqual([null, null, undefined, null]);
+        expect(nullishSort([null, null, undefined, null], 'last')).toEqual([null, null, undefined, null]);
+      });
+      test('Sorts already-sorted array', () => {
+        expect(nullishSort([1, 2, 3, 4, 5], 'omit')).toEqual([1, 2, 3, 4, 5]);
+        expect(nullishSort([1, 2, 3, 4, 5], 'first')).toEqual([1, 2, 3, 4, 5]);
+        expect(nullishSort([1, 2, 3, 4, 5], 'last')).toEqual([1, 2, 3, 4, 5]);
+      });
+      test('Returns same result as regular JavaScript `.sort()` for a large array', () => {
+        const testArray = Array.from({ length: 10000 }, () => Math.floor(Math.random() * 100));
+        expect(nullishSort(testArray)).toEqual(testArray.slice().sort((a, b) => a - b));
+      });
+      test('Handles null-ish values in a stable manner', () => {
+        expect(
+          mergeSortedArrays(
+            [1, 2, 3, null],
+            [undefined, undefined, undefined, undefined],
+            'last',
+          ),
+        ).toEqual([1, 2, 3, null, undefined, undefined, undefined, undefined]);
+      });
     });
     test('omit', async () => {
       expect(omit([1, 2, 3, 4, 5, 6, 7], 4)).toMatchObject([1, 2, 3, 5, 6, 7]);
