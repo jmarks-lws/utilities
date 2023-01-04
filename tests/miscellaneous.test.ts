@@ -86,6 +86,11 @@ describe('Miscellaneous functions', () => {
     expect(strVal({ a: 1, b: 2, c: 3 })).toBe(JSON.stringify({ a: 1, b: 2, c: 3 }));
     expect(strVal(undefined)).toBe('');
     expect(strVal(null)).toBe('');
+    expect(strVal(NaN)).toBe('NaN');
+    expect(strVal(false)).toBe('false');
+    expect(strVal(0)).toBe('0');
+    expect(strVal(7)).toBe('7');
+    expect(strVal(true)).toBe('true');
   });
   test('intVal', async () => {
     expect(intVal([1, 2, 3])).toBe(1);
