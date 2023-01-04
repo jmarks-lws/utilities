@@ -55,6 +55,7 @@ export { min } from './arrays/min';
 export { moveElement } from './arrays/moveElement';
 export { multiPartition } from './arrays/multiPartition';
 export { notIntersect } from './arrays/notIntersect';
+export { nullishSort } from './arrays/nullishSort';
 export { omit } from './arrays/omit';
 export { partition } from './arrays/partition';
 export { pickEach } from './arrays/pickEach';
