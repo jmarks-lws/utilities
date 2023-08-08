@@ -1,6 +1,7 @@
 export { InvalidParameterError } from './misc/types/InvalidParameterError';
 export { NotUndefined } from './misc/types/NotUndefined';
 export { Nullable } from './misc/types/Nullable';
+export { TCountDictionary } from './misc/types/TCountDictionary';
 export { OneOrMany } from './misc/types/OneOrMany';
 export { Optional } from './misc/types/Optional';
 export { RequireAtLeastOne } from './misc/types/RequireAtLeastOne';
