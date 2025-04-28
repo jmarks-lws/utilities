@@ -1,11 +1,9 @@
 /* istanbul ignore file */
 // Note: Ignoring because this was copied from an external github source.
-import crypto from 'crypto';
 import { Hash } from '..';
 
 // Internals
-const hashes = crypto.getHashes ? crypto.getHashes().slice() : ['sha1', 'md5'];
-hashes.push('passthrough');
+const hashes = ['sha1', 'md5', 'passthrough'];
 const encodings = ['buffer', 'hex', 'binary', 'base64'];
 
 function applyDefaults(object: any, sourceOptions: any = {}) {
@@ -346,35 +344,13 @@ function typeHasher(options: any, writeTo: any, context: any = []) {
 }
 
 function hash(object: any, options: any) {
-  let hashingStream: any;
-
-  if (options.algorithm !== 'passthrough') {
-    hashingStream = crypto.createHash(options.algorithm);
-  } else {
-    hashingStream = new PassThrough();
-  }
-
-  if (typeof hashingStream.write === 'undefined') {
-    hashingStream.write = hashingStream.update;
-    hashingStream.end = hashingStream.update;
-  }
+  const hashingStream = new PassThrough();
 
   const hasher = typeHasher(options, hashingStream);
   hasher.dispatch(object);
-  if (!hashingStream.update) {
-    hashingStream.end('');
-  }
+  hashingStream.end('');
 
-  if (hashingStream.digest) {
-    return hashingStream.digest(options.encoding === 'buffer' ? undefined : options.encoding);
-  }
-
-  const buf = hashingStream.read();
-  if (options.encoding === 'buffer') {
-    return buf;
-  }
-
-  return buf.toString(options.encoding);
+  return hashingStream.read();
 }
 
 /**

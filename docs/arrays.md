@@ -697,6 +697,24 @@ max(array)
 | ----- | --------------- | -------- | ----------------------------- |
 | array | [object Object] | yes      | Array to compare values from. |
 
+## mergeSortedArrays
+
+> Merges two sorted arrays. These arrays may contain `null` or `undefined`.
+```js
+mergeSortedArrays(left, right, nullishPlacement)
+```
+
+
+
+### Parameters
+
+| Name             | Type | Required | Description                                                                       |
+| ---------------- | ---- | -------- | --------------------------------------------------------------------------------- |
+| left             |      | yes      | First sorted array.                                                               |
+| right            |      | yes      | Second sorted array.                                                              |
+| nullishPlacement |      | yes      | Whether to omit or place null-ish values at the
+start or end of the sorted array. |
+
 ## min
 
 > Compares all values in an array returning the lowest element. Elements should be naturally comparable by the `<` operator.
@@ -762,6 +780,24 @@ notIntersect(a, b)
 | ---- | ---- | -------- | ----------- |
 | a    |      | yes      |             |
 | b    |      | yes      |             |
+
+## nullishSort
+
+> Sorts an array of numbers that possibly contain numerous `null` or `undefined` values.Uses an adaptation of the merge-sort algorithm that is stable, meaning that equal
+numbers, and `null` and `undefined` values, retain their original relative positioning.
+```js
+nullishSort(items, nullishPlacement)
+```
+
+
+
+### Parameters
+
+| Name             | Type | Required | Description                                                                       |
+| ---------------- | ---- | -------- | --------------------------------------------------------------------------------- |
+| items            |      | yes      | Array of numbers, possibly including `null` or `undefined` values.                |
+| nullishPlacement |      | yes      | Whether to omit or place null-ish values at the
+start or end of the sorted array. |
 
 ## omit
 

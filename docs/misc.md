@@ -306,13 +306,19 @@ stringToNumber(str)
 
 ## strVal
 
-> Returns an appropriate string value for `x`. If `x` is an array or object, this will be a JSONrepresentation. `null` and `undefined` will be converted to an empty string. Otherwise this will
-return the result of built in .toString().
+> Returns an appropriate string value for `x`. If `x` is an array or object, this will be a JSONrepresentation. All falsy values other than `0` will be converted to an empty string.
+Otherwise this will return the result of built in .toString().
 ```js
-strVal()
+strVal(x)
 ```
 
 
+
+### Parameters
+
+| Name | Type | Required | Description |
+| ---- | ---- | -------- | ----------- |
+| x    |      | yes      |             |
 
 ## typeCast
 
