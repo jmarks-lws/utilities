@@ -3,6 +3,7 @@ export { Constructor } from './objects/types/Constructor';
 export { Hash } from './objects/types/Hash';
 export { HashOf } from './objects/types/HashOf';
 export { NullablePartial } from './objects/types/NullablePartial';
+export { NullableValues } from './objects/types/NullableValues';
 export { PartialOn } from './objects/types/PartialOn';
 
 export { addProp, addField } from './objects/addProp';

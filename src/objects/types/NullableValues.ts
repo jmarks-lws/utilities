@@ -1,0 +1,2 @@
+/** Similar to partial, NullablePartial and Nullable, allows all properties of the type `T` to be `null` in addition to the types provided by the input `T` */
+export type NullableValues<T> = { [K in keyof T]: T[K] | null };
