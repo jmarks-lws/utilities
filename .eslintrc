@@ -12,6 +12,7 @@
   ],
   "rules": {
     "@typescript-eslint/semi": "warn",
+    "no-console": ["warn", { "allow": ["info", "warn", "error", "debug", "trace"] }],
     "no-shadow": "off",
     "@typescript-eslint/no-shadow": "warn",
     "no-use-before-define": "off",

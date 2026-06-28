@@ -99,7 +99,7 @@ const jsdocToMarkdown = (jsdocData: TJsonDocData) => {
 };
 
 const fileToMarkdown = async (filepath: string, header?: string) => {
-  console.log(`Parsing file: ${filepath}`);
+  console.info(`Parsing file: ${filepath}`);
   const jsdocData = (await getRawJsdocData(`${filepath}.js`)).filter((r) => !r.undocumented);
 
   const markdownByFunction = (
@@ -119,7 +119,7 @@ const fileToMarkdown = async (filepath: string, header?: string) => {
 };
 
 const directoryToMarkdown = async (directory: string, header?: string) => {
-  console.log(`Parsing directory: ${directory}`);
+  console.info(`Parsing directory: ${directory}`);
   const jsdocData = await getRawJsdocData(`${directory}/*.js`);
 
   const markdownByFunction = (
