@@ -12,6 +12,10 @@
   ],
   "rules": {
     "@typescript-eslint/semi": "warn",
+    "no-shadow": "off",
+    "@typescript-eslint/no-shadow": "warn",
+    "no-use-before-define": "off",
+    "@typescript-eslint/no-use-before-define": "error",
     "array-bracket-spacing": "off",
     "comma-dangle": [
       2,

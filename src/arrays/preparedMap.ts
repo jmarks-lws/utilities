@@ -9,5 +9,5 @@ import { map } from './map';
  * @returns (array: IMappableObject) => T[]
  */
 export const preparedMap = <T, U>(
-  mapFn: (<T>(el: T, i: number) => U),
+  mapFn: (<V>(el: V, i: number) => U),
 ) => (ary: T[]): U[] => map(ary, mapFn);
