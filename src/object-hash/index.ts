@@ -3,17 +3,26 @@
 import { Hash } from '..';
 
 // Internals
-const hashes = ['sha1', 'md5', 'passthrough'];
-const encodings = ['buffer', 'hex', 'binary', 'base64'];
+//
+// This is a vendored, dependency-free fork of `object-hash`. The original
+// relied on node's `crypto` module to digest the serialized representation of
+// a value. That dependency was deliberately removed (for browser/bundler
+// friendliness and to keep this library at zero runtime dependencies), so the
+// supported algorithms are no longer the crypto ones. Instead we expose:
+//   - 'fnv1a'       : serialize the value, then run a tiny, dependency-free
+//                     non-cryptographic digest over it so the result is a
+//                     compact, fixed-length, collision-resistant key.
+//   - 'passthrough' : return the raw serialized string with no digest applied.
+// `fnv1a` is the default and is what the sole internal consumer (`memoize`)
+// uses to derive stable cache keys. It is NOT a cryptographic hash.
+const hashes = ['fnv1a', 'passthrough'];
 
 function applyDefaults(object: any, sourceOptions: any = {}) {
   // create a copy rather than mutating
   const options: any = {};
-  options.algorithm = sourceOptions.algorithm || 'sha1';
-  options.encoding = sourceOptions.encoding || 'hex';
+  options.algorithm = sourceOptions.algorithm || 'fnv1a';
   options.excludeValues = !!sourceOptions.excludeValues;
   options.algorithm = options.algorithm.toLowerCase();
-  options.encoding = options.encoding.toLowerCase();
   options.ignoreUnknown = sourceOptions.ignoreUnknown === true; // default to false
   options.respectType = sourceOptions.respectType !== false; // default to true
   options.respectFunctionNames = sourceOptions.respectFunctionNames !== false;
@@ -28,25 +37,9 @@ function applyDefaults(object: any, sourceOptions: any = {}) {
     throw new Error('Object argument required.');
   }
 
-  // if there is a case-insensitive match in the hashes list, accept it
-  // (i.e. SHA256 for sha256)
-  for (let i = 0; i < hashes.length; ++i) {
-    if (hashes[i].toLowerCase() === options.algorithm.toLowerCase()) {
-      options.algorithm = hashes[i];
-    }
-  }
-
   if (hashes.indexOf(options.algorithm) === -1) {
     throw new Error(`Algorithm "${options.algorithm}"  not supported. `
       + `supported values: ${hashes.join(', ')}`);
-  }
-
-  if (
-    encodings.indexOf(options.encoding) === -1
-    && options.algorithm !== 'passthrough'
-  ) {
-    throw new Error(`Encoding "${options.encoding}"  not supported. `
-      + `supported values: ${encodings.join(', ')}`);
   }
 
   return options;
@@ -343,6 +336,38 @@ function typeHasher(options: any, writeTo: any, context: any = []) {
   } as Hash;
 }
 
+/**
+ * A tiny, dependency-free, non-cryptographic 64-bit string digest (the
+ * well-known "cyrb53" hash, public domain, by bryc). It uses only 32-bit
+ * integer math (`Math.imul`) so it runs identically in node and the browser
+ * without pulling in node's `crypto` module. The 64 bits of state are rendered
+ * as a fixed-length 16-character hex string.
+ *
+ * This is a member of the FNV-family of multiplicative hashes and is used
+ * purely to turn the (potentially unbounded) serialized representation of a
+ * value into a compact, stable, collision-resistant cache key. It provides NO
+ * cryptographic guarantees and must not be relied on for security.
+ */
+/* eslint-disable no-bitwise */
+function fnv1a(str: string): string {
+  let h1 = 0xdeadbeef;
+  let h2 = 0x41c6ce57;
+  for (let i = 0; i < str.length; ++i) {
+    const ch = str.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
+  h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
+  h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  // Render both 32-bit lanes as zero-padded hex (avoids String.padStart, which
+  // is not in the ES2015 lib this project targets) for a fixed 16-char digest.
+  const toHex = (n: number) => `0000000${(n >>> 0).toString(16)}`.slice(-8);
+  return toHex(h2) + toHex(h1);
+}
+/* eslint-enable no-bitwise */
+
 function hash(object: any, options: any) {
   const hashingStream = new PassThrough();
 
@@ -350,7 +375,15 @@ function hash(object: any, options: any) {
   hasher.dispatch(object);
   hashingStream.end('');
 
-  return hashingStream.read();
+  const serialized = hashingStream.read();
+
+  // 'passthrough' returns the raw serialized form; every other (digest)
+  // algorithm condenses it to a compact, fixed-length key.
+  if (options.algorithm === 'passthrough') {
+    return serialized;
+  }
+
+  return fnv1a(serialized);
 }
 
 /**
@@ -379,9 +412,8 @@ exports.writeToStream = (object: any, options: any, stream: any) => {
  *
  * Options:
  *
- *  - `algorithm` hash algo to be used by this instance: *'sha1', 'md5'
+ *  - `algorithm` digest to be used by this instance: *'fnv1a', 'passthrough'
  *  - `excludeValues` {true|*false} hash object keys, values ignored
- *  - `encoding` hash encoding, supports 'buffer', '*hex', 'binary', 'base64'
  *  - `ignoreUnknown` {true|*false} ignore unknown object types
  *  - `replacer` optional function that replaces values before hashing
  *  - `respectFunctionProperties` {*true|false} consider function properties when hashing
@@ -409,8 +441,5 @@ export default function objectHash(object : any, options?: any) {
  * @return {string} hash value
  * @api public
  */
-objectHash.sha1 = (object: any): string => objectHash(object);
-objectHash.keys = (object: any): string => objectHash(object, { excludeValues: true, algorithm: 'sha1', encoding: 'hex' });
-objectHash.MD5 = (object: any): string => objectHash(object, { algorithm: 'md5', encoding: 'hex' });
-objectHash.keysMD5 = (object: any): string => objectHash(object, { algorithm: 'md5', encoding: 'hex', excludeValues: true });
+objectHash.keys = (object: any): string => objectHash(object, { excludeValues: true, algorithm: 'fnv1a' });
 /* eslint-enable max-len */

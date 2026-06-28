@@ -3,6 +3,17 @@ import objectHash from './object-hash';
 import { Hash, isDefinedObject } from './object';
 import { def, map } from '.';
 
+const deriveKey = (args: unknown[]): string => JSON.stringify(
+  map(
+    args,
+    (item: unknown) => (isDefinedObject(item) ? objectHash(item) : item),
+  ),
+);
+
+const isThenable = (value: unknown): value is Promise<unknown> => (
+  isDefinedObject(value) && typeof (value as { then?: unknown }).then === 'function'
+);
+
 const memoizeWithProxy = <T extends CallableFunction>(
   f: T,
   cacheProxy: {
@@ -10,12 +21,18 @@ const memoizeWithProxy = <T extends CallableFunction>(
     set: (name: string, value: unknown) => unknown,
   },
 ): T => ((...args: unknown[]) => {
-  const argStr = JSON.stringify(args);
+  const argStr = deriveKey(args);
 
-  return cacheProxy.set(
-    argStr,
-    cacheProxy.get(argStr) || f(...args),
-  );
+  const cached = cacheProxy.get(argStr);
+  if (cached !== undefined) return cached;
+
+  const value = f(...args);
+  // Evict rejected promises so a later call re-invokes the function.
+  if (isThenable(value)) {
+    value.catch(() => { cacheProxy.set(argStr, undefined); });
+  }
+  cacheProxy.set(argStr, value);
+  return value;
 }) as unknown as T;
 
 /**
@@ -39,13 +56,15 @@ export const memoize = <T extends CallableFunction>(
   const cache: Hash = {};
 
   return ((...args: any[]) => {
-    const argStr = JSON.stringify(
-      map(
-        args,
-        (item: any) => (isDefinedObject(item) ? objectHash(item) : item),
-      ),
-    );
-    cache[argStr] = cache[argStr] || fn(...args);
+    const argStr = deriveKey(args);
+    if (!(argStr in cache)) {
+      const value = fn(...args);
+      // Evict rejected promises so a later call re-invokes the function.
+      if (isThenable(value)) {
+        value.catch(() => { delete cache[argStr]; });
+      }
+      cache[argStr] = value;
+    }
     return cache[argStr];
   }) as unknown as T;
 };
