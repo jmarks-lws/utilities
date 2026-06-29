@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
       "target": "ES2015",
-      "module": "commonjs",
+      "module": "node16",
       "resolveJsonModule": true,
       "declaration": true,
       "declarationMap": true,
@@ -10,19 +10,15 @@
       "rootDir": "./src",
       "strict": true,
       "strictNullChecks": true,
-      "moduleResolution": "node",
-      "baseUrl": ".",
-      "paths": {},
+      "moduleResolution": "node16",
       "types": [
-        "node",
-        "jest"
+        "node"
       ],
       "esModuleInterop": true,
       "experimentalDecorators": true,
       "emitDecoratorMetadata": true,
       "forceConsistentCasingInFileNames": true
     },
-    "preset": "ts-jest",
     "exclude": [
       "build",
       "dist",
@@ -30,6 +26,7 @@
       "test",
       "src/devTesting",
       "node_modules",
-      "tests"
+      "tests",
+      "vitest.config.ts"
     ]
   }
