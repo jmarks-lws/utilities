@@ -6,5 +6,5 @@ import { deepCloneArray } from './deepCloneArray';
  */
 export const immutableArray = <
   T extends Array<any>,
-  TElement = T extends Array<infer X> ? X : never
+  TElement = T extends Array<infer X> ? X : never,
 >(mutableArray: Array<TElement>): readonly TElement[] => Object.freeze(deepCloneArray(mutableArray));

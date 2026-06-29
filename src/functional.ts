@@ -81,7 +81,10 @@ export const reduceAsyncSequential = async<TElement, TResult>(
   list: TElement[],
   fn: (previousValue: TResult, currentValue: TElement, currentIndex: number, array: TElement[]) => Promise<TResult>,
   init: TResult,
-) => list.reduce(async (acc, el, index) => fn(await acc, el, index, list), Promise.resolve(init));
+) => list.reduce(
+  async (acc: Promise<TResult>, el, index) => fn(await acc as TResult, el, index, list),
+  Promise.resolve(init) as Promise<TResult>,
+);
 /** Alias for `reduceAsyncSequential` */
 export const reduceAsync = reduceAsyncSequential;
 

@@ -1,6 +1,5 @@
 
 import fs from 'fs';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import jsdoc from 'jsdoc-to-markdown';
 import { max } from '../arrays/max';
 import { pluck } from '../objects/pluck';

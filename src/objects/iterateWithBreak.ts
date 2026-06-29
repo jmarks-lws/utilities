@@ -19,7 +19,7 @@ export const iterateWithBreak = ( // TODO: Make so it works with arrays too (lik
   fn: ((key: string, value: any, _break: () => void) => void),
 ) => {
   reduce(keys(hash), (acc: Hash, key) => {
-    let done: boolean = false || acc.done;
+    let done: boolean = acc.done;
     if (!acc.done) {
       fn(key as string, hash[key], () => {
         done = true; // If the consumer calls _break(), set done to true, which should short circuit the loop.

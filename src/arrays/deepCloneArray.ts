@@ -1,5 +1,6 @@
 import { isPrimitive } from '../misc/isPrimitive';
 import { deepClone } from '../objects/deepClone';
+import { Hash } from '../objects/types/Hash';
 
 /**
  * Clones `array` ensuring reference types are copied by value and not by reference.
@@ -10,8 +11,8 @@ import { deepClone } from '../objects/deepClone';
  */
 export const deepCloneArray = <T>(array: T[]): T[] => array.map(
   (x) => (
-    isPrimitive(x) // eslint-disable-line no-nested-ternary
+    isPrimitive(x)
       ? x
-      : (Array.isArray(x) ? deepCloneArray(x) : deepClone(x)) as T
+      : (Array.isArray(x) ? deepCloneArray(x) : deepClone(x as Hash)) as T
   ),
 );
