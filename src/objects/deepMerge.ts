@@ -20,7 +20,7 @@ export const deepMerge = <T extends Hash>(
   const result = reduce(allKeys, (acc, key) => {
     const aValue = a[key];
     const bValue = b[key];
-    const val = bValue || aValue;
+    const val: any = bValue || aValue;
 
     return {
       ...acc,

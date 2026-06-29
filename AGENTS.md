@@ -60,8 +60,13 @@ Tests are organized **per category, not per function**: `tests/<category>.test.t
 
 `src/object-hash/` is a vendored, trimmed fork (its own MIT `LICENSE`), used **internally only** by `src/memoize.ts` to derive cache keys for object arguments — it is not re-exported from the package. The node `crypto` dependency was deliberately removed; hashing now uses a small dependency-free FNV-family digest (`fnv1a`), so do not reintroduce `crypto` or any dependency here.
 
-## Toolchain pins (don't casually bump)
+## Linting
 
-- **`typescript` is pinned to `~4.7.4`.** TS ≥4.8 surfaces genuine type errors in existing source (e.g. `cloneArray.ts`, `getSharedKeys.ts`, `deepMerge.ts`, `functional.ts`, `pipe.ts`). Moving to TS 5/6 requires real source fixes.
-- **`eslint-config-airbnb-base` is pinned to exact `14.0.0`** to avoid a newer `no-multiple-empty-lines` rule firing across existing source.
-- ESLint is still v6 with `@typescript-eslint` v5; a move to ESLint ≥8/10 means a flat-config migration and replacing the unmaintained airbnb-base config. Remaining `npm audit` advisories are all dev-only (the package ships no runtime deps) and cluster in the eslint-6 chain and the jest/istanbul `js-yaml` chain (no upstream fix).
+ESLint uses **flat config** (`eslint.config.js`, ESLint 9 + `typescript-eslint` 8). airbnb-base (unmaintained, no flat-config support) was dropped in favour of `@eslint/js` + `typescript-eslint` recommended, with `@stylistic/eslint-plugin` for formatting (semi/quotes/comma-dangle/comma-spacing/max-len) and a set of explicitly re-ported airbnb rules: `no-nested-ternary`, `no-param-reassign`, `no-await-in-loop`, `no-loop-func`, `no-continue`, `no-bitwise`.
+
+**`reportUnusedDisableDirectives` is `error`:** every `// eslint-disable` must mark a *real, currently-used* exception — if the rule doesn't actually fire on that line, the dead directive fails lint. Scope disables to the specific line + rule; don't reach for blanket file-level disables. The vendored `src/object-hash/**` has its own narrow override (it legitimately reassigns params, aliases `this`, etc.).
+
+## Toolchain notes
+
+- **`typescript` is `^5.9.x`.** It was previously capped at 4.7.4; the TS ≥4.8 type errors (in `cloneArray.ts`, `deepCloneArray.ts`, `getSharedKeys.ts`, `keyList.ts`, `deepMerge.ts`, `functional.ts`, `pipe.ts`) are fixed with localized `as Hash`/`as T` casts and explicit annotations — preserve those when editing the files.
+- **Remaining `npm audit` advisories are all dev-only** (the package ships no runtime deps) and are confined to the **jest/istanbul `js-yaml` chain**, which has no upstream fix (it persists even in jest 30 — `@istanbuljs/load-nyc-config` pins `js-yaml@3` and is abandoned). Clearing it would require replacing the jest test stack (e.g. Vitest + V8 coverage), not bumping jest.

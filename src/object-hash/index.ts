@@ -433,7 +433,6 @@ export default function objectHash(object : any, options?: any) {
   return hash(object, applyDefaults(object, options));
 }
 
-/* eslint-disable max-len */
 /**
  * Exported sugar methods
  *
@@ -442,4 +441,3 @@ export default function objectHash(object : any, options?: any) {
  * @api public
  */
 objectHash.keys = (object: any): string => objectHash(object, { excludeValues: true, algorithm: 'fnv1a' });
-/* eslint-enable max-len */

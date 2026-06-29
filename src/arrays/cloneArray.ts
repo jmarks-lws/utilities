@@ -1,6 +1,7 @@
 import { isArray } from './isArray';
 import { isPrimitive } from '../misc/isPrimitive';
 import { clone } from '../objects/clone';
+import { Hash } from '../objects/types/Hash';
 
 /**
  * Clones each of `array`'s individual elements using shallow cloning (`clone` from the object subset
@@ -13,6 +14,6 @@ export const cloneArray = <T>(array: T[]): T[] => array.map(
   (x) => (
     isPrimitive(x) // eslint-disable-line no-nested-ternary
       ? x
-      : (isArray(x) ? x : clone(x))
+      : (isArray(x) ? x : clone(x as Hash) as T)
   ),
 );

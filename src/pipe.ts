@@ -13,7 +13,10 @@ export const pipe: IPipe = <T, U>(
   ...func: CallableFunction[]
 ): IPipeCaller<T, U> => (
     initialVal: T,
-  ) => func.reduce((acc: unknown, currentFunc: CallableFunction) => (currentFunc ? currentFunc(acc) : acc), initialVal);
+  ) => func.reduce(
+    (acc: unknown, currentFunc: CallableFunction) => (currentFunc ? currentFunc(acc) : acc),
+    initialVal,
+  ) as U;
 
 // TODO: This probaby does not work as expected, try setting it up as <T>( ... func (...)) => {...}
 export const pipeAsync: IPipeAsync<any, any> = (
