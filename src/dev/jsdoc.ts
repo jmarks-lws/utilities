@@ -152,6 +152,22 @@ const buildMainDoc = () => {
   abstract more complex functionality. A few - like \`branch\` - wrap code structures in functions, which allows
   for some fun functional funny-business, like partial application and currying.
 
+  ## Installation
+    npm i @jamesgmarks/utilities
+
+  ## Usage
+  \`\`\`ts
+  import { pipe, distinct } from '@jamesgmarks/utilities';
+
+  const unique = distinct([1, 1, 2, 3, 3]); // [1, 2, 3]
+
+  const addThenDouble = pipe(
+    (n: number) => n + 1,
+    (n: number) => n * 2,
+  );
+  addThenDouble(4); // 10
+  \`\`\`
+
   ## Categories
     - [Arrays](docs/arrays.md)
     - [Async Helpers](docs/async-helpers.md)

@@ -10,9 +10,9 @@ This file provides guidance to AI coding agents working in this repository. It i
 
 ```bash
 npm run build         # rm -rf dist && tsc  — compile to dist/ (also emits .d.ts)
-npm test              # run the full jest suite
-npm run test-watch    # jest --watch
-npm run coverage      # jest --coverage
+npm test              # run the full Vitest suite (vitest run)
+npm run test-watch    # vitest (watch mode)
+npm run coverage      # vitest run --coverage (V8 coverage)
 npm run build:doc     # build, then regenerate docs/*.md from JSDoc comments
 npm run buildAndPublish  # build:doc + npm version patch + git push + npm publish
 ```
@@ -20,8 +20,8 @@ npm run buildAndPublish  # build:doc + npm version patch + git push + npm publis
 Run a single test file or a single test by name:
 
 ```bash
-npx jest tests/array.test.ts
-npx jest tests/array.test.ts -t "distinct"
+npx vitest run tests/array.test.ts
+npx vitest run tests/array.test.ts -t "distinct"
 ```
 
 Lint (there is no `lint` npm script; invoke eslint directly):
@@ -50,7 +50,7 @@ Note the plural/singular split is intentional but inconsistent in one place: the
 
 ## Tests
 
-Tests are organized **per category, not per function**: `tests/<category>.test.ts` (e.g. `tests/array.test.ts`, `tests/object.test.ts`) exercises everything in that category and imports from `../src`. When you add or change a function, update the corresponding category test file rather than creating a new per-function test.
+Tests run on **Vitest** (`vitest.config.ts`) with `globals: true`, so `describe`/`test`/`expect` are available without imports (jest-compatible). Tests are organized **per category, not per function**: `tests/<category>.test.ts` (e.g. `tests/array.test.ts`, `tests/object.test.ts`) exercises everything in that category and imports from `../src`. When you add or change a function, update the corresponding category test file rather than creating a new per-function test. Coverage uses the V8 provider (`npm run coverage`).
 
 ## Generated docs
 
@@ -68,5 +68,5 @@ ESLint uses **flat config** (`eslint.config.js`, ESLint 9 + `typescript-eslint` 
 
 ## Toolchain notes
 
-- **`typescript` is `^5.9.x`.** It was previously capped at 4.7.4; the TS ≥4.8 type errors (in `cloneArray.ts`, `deepCloneArray.ts`, `getSharedKeys.ts`, `keyList.ts`, `deepMerge.ts`, `functional.ts`, `pipe.ts`) are fixed with localized `as Hash`/`as T` casts and explicit annotations — preserve those when editing the files.
-- **Remaining `npm audit` advisories are all dev-only** (the package ships no runtime deps) and are confined to the **jest/istanbul `js-yaml` chain**, which has no upstream fix (it persists even in jest 30 — `@istanbuljs/load-nyc-config` pins `js-yaml@3` and is abandoned). Clearing it would require replacing the jest test stack (e.g. Vitest + V8 coverage), not bumping jest.
+- **`typescript` is `^6.x`.** It was previously capped at 4.7.4; the TS ≥4.8 type errors (in `cloneArray.ts`, `deepCloneArray.ts`, `getSharedKeys.ts`, `keyList.ts`, `deepMerge.ts`, `functional.ts`, `pipe.ts`) are fixed with localized `as Hash`/`as T` casts and explicit annotations — preserve those when editing the files. `tsconfig.json` uses `module`/`moduleResolution` `node16` (the package emits CommonJS since there is no `"type": "module"`); avoid reintroducing the deprecated `node`/`baseUrl` options TS 6 rejects.
+- **`npm audit` is clean (0 advisories).** Migrating off jest/ts-jest to Vitest + V8 coverage removed the istanbul→`js-yaml` chain that was the last remaining (dev-only) advisory cluster. Keep the test stack on Vitest rather than reintroducing jest.
